@@ -21,7 +21,7 @@ class CheckUserRole
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['message' => 'Authentication required. Please log in.'], 401);
             }
-            return redirect()->route('login');
+            return redirect('/admin/login');
         }
         
         $user = auth()->user();
@@ -33,7 +33,7 @@ class CheckUserRole
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['message' => 'Your account is not active.'], 401);
             }
-            return redirect()->route('login')->with('error', 'Your account is not active.');
+            return redirect('/admin/login')->with('error', 'Your account is not active.');
         }
         
         // If no specific roles are required, just check authentication

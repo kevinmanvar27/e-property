@@ -9,16 +9,16 @@ use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\LocationController;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect('/admin/login');
 });
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [LoginController::class, 'login']);
+    Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/admin/login', [LoginController::class, 'login']);
 });
 
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh-csrf');
@@ -33,9 +33,9 @@ Route::get('/admin/dashboard', function () {
 
 // Profile Routes
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [UserController::class, 'showProfile'])->name('profile.show');
-    Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
-    Route::put('/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
+    Route::get('/admin/profile', [UserController::class, 'showProfile'])->name('profile.show');
+    Route::put('/admin/profile', [UserController::class, 'updateProfile'])->name('profile.update');
+    Route::put('/admin/profile/password', [UserController::class, 'updatePassword'])->name('profile.password.update');
 });
 
 // User Management Routes
