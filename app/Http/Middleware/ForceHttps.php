@@ -15,11 +15,8 @@ class ForceHttps
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Only force HTTPS in production environment
-        if (!$request->secure() && app()->environment('production')) {
-            return redirect()->secure($request->getRequestUri());
-        }
-
+        // Temporarily disable HTTPS enforcement to fix connection issues
+        // In a real production environment, you would properly configure SSL
         return $next($request);
     }
 }

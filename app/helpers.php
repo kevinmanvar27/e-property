@@ -31,32 +31,55 @@ if (!function_exists('setting_set')) {
     }
 }
 
-if (!function_exists('safe_asset')) {
+if (!function_exists('hasPermission')) {
     /**
-     * Safely get asset path, checking if file exists
+     * Check if the authenticated user has a specific permission
      *
-     * @param string $path
-     * @param string $default
-     * @return string
+     * @param string $module
+     * @param string $action
+     * @return bool
      */
-    function safe_asset($path, $default = null)
+    function hasPermission($module, $action)
     {
-        // For storage files, check if they exist
-        if (strpos($path, 'storage/') === 0) {
-            $storagePath = str_replace('storage/', '', $path);
-            if (file_exists(storage_path('app/public/' . $storagePath))) {
-                return asset($path);
-            }
-        } else {
-            // For regular assets, check if file exists
-            $publicPath = public_path($path);
-            if (file_exists($publicPath)) {
-                return asset($path);
-            }
+        // If user is not authenticated, return false
+        if (!auth()->check()) {
+            return false;
         }
         
-        // Return default if provided, otherwise return the original path
-        return $default ? asset($default) : asset($path);
+        $user = auth()->user();
+        
+        // Super admins have all permissions
+        if ($user->isSuperAdmin()) {
+            return true;
+        }
+        
+        // Check if user has the specific permission
+        return $user->hasPermission($module, $action);
+    }
+}
+
+if (!function_exists('safe_asset')) {
+    /**
+     * Generate a secure asset path for the application.
+     *
+     * @param  string  $path
+     * @param  string|null  $fallback
+     * @return string
+     */
+    function safe_asset($path, $fallback = null)
+    {
+        // Check if the file exists
+        if (file_exists(public_path($path))) {
+            return asset($path);
+        }
+        
+        // Return fallback if provided
+        if ($fallback) {
+            return asset($fallback);
+        }
+        
+        // Return default asset path
+        return asset($path);
     }
 }
 

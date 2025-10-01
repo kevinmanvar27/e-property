@@ -92,6 +92,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex order-actions">
+                                            <a href="{{ route('users.management.permissions', $user->id) }}" class="ms-3 text-primary" title="Manage Permissions"><i class='bx bx-key bx-sm'></i></a>
                                             <a href="javascript:;" class="ms-3 edit-user text-warning" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-username="{{ $user->username }}" data-email="{{ $user->email }}" data-contact="{{ $user->contact }}" data-dob="{{ $user->dob ? $user->dob->format('Y-m-d') : '' }}" data-role="{{ $user->role }}" data-status="{{ $user->status }}"><i class='bx bxs-edit bx-sm'></i></a>
                                             <a href="javascript:;" class="ms-3 delete-user text-danger" data-id="{{ $user->id }}"><i class='bx bxs-trash bx-sm'></i></a>
                                         </div>
@@ -109,7 +110,7 @@
 
 <!-- Add User Modal -->
 <div class="modal fade" id="addUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Add New Management User</h5>
@@ -167,26 +168,74 @@
                                 <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
                             </div>
                         </div>
+                        
+                        <!-- Remove the redundant Role field and keep only Role Assignment -->
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="role" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select" id="role" name="role" required>
+                                <label for="role_id" class="form-label">Role Assignment <span class="text-danger">*</span></label>
+                                <select class="form-select" id="role_id" name="role_id" required>
                                     <option value="">Select Role</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="super_admin">Super Admin</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @endforeach
                                 </select>
+                                <div class="form-text">Select a role to assign default permissions.</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Permissions Section -->
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="mb-3">
-                                <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
-                                <select class="form-select" id="status" name="status" required>
-                                    <option value="">Select Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                                <label class="form-label">Permissions</label>
+                                <div class="permissions-container">
+                                    @if(isset($modules))
+                                        @foreach($modules as $moduleKey => $moduleLabel)
+                                            <div class="card mb-2">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">{{ $moduleLabel }}</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-view" id="add-{{ $moduleKey }}-view">
+                                                                <label class="form-check-label" for="add-{{ $moduleKey }}-view">
+                                                                    View
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-create" id="add-{{ $moduleKey }}-create">
+                                                                <label class="form-check-label" for="add-{{ $moduleKey }}-create">
+                                                                    Create
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-update" id="add-{{ $moduleKey }}-update">
+                                                                <label class="form-check-label" for="add-{{ $moduleKey }}-update">
+                                                                    Update
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-delete" id="add-{{ $moduleKey }}-delete">
+                                                                <label class="form-check-label" for="add-{{ $moduleKey }}-delete">
+                                                                    Delete
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -202,7 +251,7 @@
 
 <!-- Edit User Modal -->
 <div class="modal fade" id="editUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Edit Management User</h5>
@@ -263,26 +312,74 @@
                                 <div class="mt-2" id="current_photo"></div>
                             </div>
                         </div>
+                        
+                        <!-- Remove the redundant Role field and keep only Role Assignment -->
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="edit_role" class="form-label">Role <span class="text-danger">*</span></label>
-                                <select class="form-select" id="edit_role" name="role" required>
+                                <label for="edit_role_id" class="form-label">Role Assignment <span class="text-danger">*</span></label>
+                                <select class="form-select" id="edit_role_id" name="role_id" required>
                                     <option value="">Select Role</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="super_admin">Super Admin</option>
+                                    @foreach($roles as $role)
+                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @endforeach
                                 </select>
+                                <div class="form-text">Select a role to assign default permissions.</div>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Permissions Section -->
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-12">
                             <div class="mb-3">
-                                <label for="edit_status" class="form-label">Status <span class="text-danger">*</span></label>
-                                <select class="form-select" id="edit_status" name="status" required>
-                                    <option value="">Select Status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                </select>
+                                <label class="form-label">Permissions</label>
+                                <div class="permissions-container">
+                                    @if(isset($modules))
+                                        @foreach($modules as $moduleKey => $moduleLabel)
+                                            <div class="card mb-2">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">{{ $moduleLabel }}</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-view" id="edit-{{ $moduleKey }}-view">
+                                                                <label class="form-check-label" for="edit-{{ $moduleKey }}-view">
+                                                                    View
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-create" id="edit-{{ $moduleKey }}-create">
+                                                                <label class="form-check-label" for="edit-{{ $moduleKey }}-create">
+                                                                    Create
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-update" id="edit-{{ $moduleKey }}-update">
+                                                                <label class="form-check-label" for="edit-{{ $moduleKey }}-update">
+                                                                    Update
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" name="permissions[]" value="{{ $moduleKey }}-delete" id="edit-{{ $moduleKey }}-delete">
+                                                                <label class="form-check-label" for="edit-{{ $moduleKey }}-delete">
+                                                                    Delete
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -311,6 +408,12 @@
         width: 40px;
         height: 40px;
         object-fit: cover;
+    }
+    .permissions-container .card {
+        border: 1px solid #dee2e6;
+    }
+    .permissions-container .card-header {
+        background-color: #f8f9fa;
     }
 </style>
 @endsection
@@ -445,6 +548,26 @@
         $('#edit_role').val(role);
         $('#edit_status').val(status);
         
+        // Reset all permission checkboxes
+        $('.permissions-container input[type="checkbox"]').prop('checked', false);
+        
+        // Fetch user permissions
+        $.ajax({
+            url: '/admin/users/management/' + id + '/permissions',
+            type: 'GET',
+            success: function(response) {
+                // Check the permission checkboxes based on user permissions
+                if (response.permissions) {
+                    response.permissions.forEach(function(permission) {
+                        $('#edit-' + permission.module + '-' + permission.action).prop('checked', true);
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.log('Error fetching user permissions');
+            }
+        });
+        
         // Display current photo if exists
         var photoHtml = '';
         // You would need to pass the photo URL from the backend to display it here
@@ -557,5 +680,57 @@
             }
         });
     });
+    
+    // Handle role selection for add user modal
+    $('#role_id').on('change', function() {
+        var roleId = $(this).val();
+        
+        // Reset all permission checkboxes
+        $('#addUserModal .permissions-container input[type="checkbox"]').prop('checked', false);
+        
+        // If a role is selected, fetch and check its permissions
+        if (roleId) {
+            // In a real implementation, you would fetch the role permissions via AJAX
+            // For now, we'll simulate this by checking a data attribute
+            // In the future, you can make an AJAX call to fetch role permissions
+            checkRolePermissions(roleId, 'add');
+        }
+    });
+    
+    // Handle role selection for edit user modal
+    $('#edit_role_id').on('change', function() {
+        var roleId = $(this).val();
+        
+        // Reset all permission checkboxes
+        $('#editUserModal .permissions-container input[type="checkbox"]').prop('checked', false);
+        
+        // If a role is selected, fetch and check its permissions
+        if (roleId) {
+            // In a real implementation, you would fetch the role permissions via AJAX
+            // For now, we'll simulate this by checking a data attribute
+            // In the future, you can make an AJAX call to fetch role permissions
+            checkRolePermissions(roleId, 'edit');
+        }
+    });
+    
+    // Function to check role permissions
+    function checkRolePermissions(roleId, modalType) {
+        // Make AJAX call to get role permissions
+        $.ajax({
+            url: '/admin/roles/' + roleId + '/permissions',
+            type: 'GET',
+            success: function(response) {
+                if (response.permissions) {
+                    response.permissions.forEach(function(permission) {
+                        var checkboxId = (modalType === 'add' ? 'add-' : 'edit-') + permission.module + '-' + permission.action;
+                        $('#' + checkboxId).prop('checked', true);
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.log('Error fetching role permissions');
+            }
+        });
+    }
 </script>
 @endsection

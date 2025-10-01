@@ -26,6 +26,7 @@ class User extends Authenticatable
         'photo',
         'dob',
         'role',
+        'role_id',
         'status',
     ];
     
@@ -61,6 +62,14 @@ class User extends Authenticatable
             'password' => 'hashed',
             'dob' => 'date',
         ];
+    }
+    
+    /**
+     * Get the role that owns the user.
+     */
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
     
     /**
@@ -128,5 +137,32 @@ class User extends Authenticatable
     {
         $this->password_changed_at = now();
         $this->save();
+    }
+    
+    /**
+     * Check if the user has a specific permission
+     *
+     * @param string $module
+     * @param string $action
+     * @return bool
+     */
+    public function hasPermission($module, $action)
+    {
+        // Super admins have all permissions
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+        
+        // Check if user has specific permission
+        return $this->permissions()->where('module', $module)->where('action', $action)->exists() ||
+               ($this->role && $this->role->permissions()->where('module', $module)->where('action', $action)->exists());
+    }
+    
+    /**
+     * Get user permissions
+     */
+    public function permissions()
+    {
+        return $this->belongsToMany(\App\Models\Permission::class, 'user_permissions', 'user_id', 'permission_id');
     }
 }

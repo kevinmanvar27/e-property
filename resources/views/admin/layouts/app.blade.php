@@ -60,9 +60,14 @@
         }
     </style>
     
+    <!-- Auto Logout Timeout Setting -->
+    <script>
+        window.autoLogoutTimeout = {{ \App\Models\Setting::get('general', 'auto_logout_timeout', 30) }};
+    </script>
+    
     <!-- Vite assets -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/auto-logout.js'])
     @endif
 </head>
 

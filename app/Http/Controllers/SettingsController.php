@@ -518,12 +518,18 @@ class SettingsController extends Controller
             ['section' => 'general', 'key' => 'website_title'],
             ['value' => 'E-Property', 'type' => 'text']
         );
-        
+
         Setting::firstOrCreate(
             ['section' => 'general', 'key' => 'tagline'],
             ['value' => 'Find Your property destiny', 'type' => 'text']
         );
         
+        // Auto logout timeout setting (in minutes)
+        Setting::firstOrCreate(
+            ['section' => 'general', 'key' => 'auto_logout_timeout'],
+            ['value' => '30', 'type' => 'number']
+        );
+
         // Contact settings (empty by default)
         Setting::firstOrCreate(
             ['section' => 'contact', 'key' => 'phone_number'],
@@ -665,6 +671,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'website_title' => 'nullable|string|max:255',
             'tagline' => 'nullable|string|max:255',
+            'auto_logout_timeout' => 'nullable|integer|min:1|max:1440', // 1 minute to 24 hours
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:2048',
             'favicon' => 'nullable|image|mimes:jpeg,png,jpg,ico|max:2048',
         ]);

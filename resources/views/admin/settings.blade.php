@@ -703,6 +703,16 @@
                         <div class="setting-row">
                             <div class="setting-col">
                                 <div class="form-group">
+                                    <label class="form-label">Auto Logout Timeout (minutes)</label>
+                                    <input type="number" class="form-control" name="auto_logout_timeout" value="{{ $settings['general']->where('key', 'auto_logout_timeout')->first()?->value ?? '30' }}" min="1" max="1440">
+                                    <div class="form-text">Set the time (in minutes) after which inactive users will be automatically logged out. Set between 1 and 1440 minutes (24 hours).</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="setting-row">
+                            <div class="setting-col">
+                                <div class="form-group">
                                     <label class="form-label">Logo</label>
                                     <input type="file" class="form-control" name="logo" accept="image/*">
                                     @if(isset($settings['general']) && $settings['general']->where('key', 'logo')->first()?->value)
