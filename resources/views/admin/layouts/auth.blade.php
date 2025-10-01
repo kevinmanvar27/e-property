@@ -48,10 +48,12 @@
         }
         .logo-container {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         .logo-container img {
             max-height: 80px;
+            /* box-shadow: 0 4px 8px rgba(0,0,0,0.1); */
+            border-radius: 8px;
         }
         .input-group .form-control {
             border-right: 0;
@@ -65,7 +67,7 @@
         }
     </style>
 </head>
-
+ 
 <body>
     <!-- Only the login form, no header, sidebar or footer -->
     <div class="login-container">

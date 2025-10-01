@@ -12,6 +12,13 @@ Route::get('/', function () {
     return redirect('/admin/login');
 });
 
+Route::get('/admin/', function () {
+    if (auth()->check()) {
+        return redirect()->route('dashboard');
+    }
+    return redirect()->route('login');
+});
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [LoginController::class, 'showLoginForm'])->name('login');
