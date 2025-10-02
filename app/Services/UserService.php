@@ -3,12 +3,94 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Permission;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserService
 {
+    protected $cacheDuration = 1800; // 30 minutes
+
+    /**
+     * Get cached active users count
+     */
+    public function getActiveUsersCount()
+    {
+        return Cache::remember('active_users_count', $this->cacheDuration, function () {
+            return User::where('status', 'active')->count();
+        });
+    }
+
+    /**
+     * Get cached roles list
+     */
+    public function getRoles()
+    {
+        return Cache::remember('roles_list', 3600, function () {
+            return Role::where('status', 'active')->pluck('name', 'id');
+        });
+    }
+
+    /**
+     * Get cached permissions list
+     */
+    public function getPermissions()
+    {
+        return Cache::remember('permissions_list', 3600, function () {
+            return Permission::select('id', 'name', 'module', 'action')->get();
+        });
+    }
+
+    /**
+     * Get cached user by ID
+     */
+    public function getUserById($userId)
+    {
+        return Cache::remember('user_' . $userId, $this->cacheDuration, function () use ($userId) {
+            return User::find($userId);
+        });
+    }
+
+    /**
+     * Get cached users with roles
+     */
+    public function getUsersWithRoles()
+    {
+        return Cache::remember('users_with_roles', $this->cacheDuration, function () {
+            return User::with('role')->get();
+        });
+    }
+
+    /**
+     * Clear user cache
+     */
+    public function clearUserCache($userId = null)
+    {
+        if ($userId) {
+            Cache::forget('user_' . $userId);
+        }
+        Cache::forget('active_users_count');
+        Cache::forget('users_with_roles');
+    }
+
+    /**
+     * Clear roles cache
+     */
+    public function clearRolesCache()
+    {
+        Cache::forget('roles_list');
+    }
+
+    /**
+     * Clear permissions cache
+     */
+    public function clearPermissionsCache()
+    {
+        Cache::forget('permissions_list');
+    }
+
     /**
      * Create a new user
      */
@@ -26,7 +108,7 @@ class UserService
             'status' => $data['status'] ?? 'active',
         ]);
     }
-    
+
     /**
      * Update user
      */
@@ -40,16 +122,16 @@ class UserService
         $user->role_id = $data['role_id'] ?? $user->role_id;
         $user->role = $data['role'] ?? $user->role;
         $user->status = $data['status'] ?? $user->status;
-        
-        if (isset($data['password']) && !empty($data['password'])) {
+
+        if (isset($data['password']) && ! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
         }
-        
+
         $user->save();
-        
+
         return $user;
     }
-    
+
     /**
      * Handle user photo upload
      */
@@ -57,12 +139,12 @@ class UserService
     {
         if ($photo) {
             $filename = time() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('assets/images/avatars'), $filename);
+            Storage::disk('photos')->putFileAs('', $photo, $filename);
             $user->photo = $filename;
             $user->save();
         }
     }
-    
+
     /**
      * Assign role permissions to user
      */
@@ -76,7 +158,7 @@ class UserService
             }
         }
     }
-    
+
     /**
      * Assign additional permissions to user
      */
@@ -92,24 +174,24 @@ class UserService
                 if (count($parts) == 2) {
                     $module = $parts[0];
                     $action = $parts[1];
-                    
+
                     // Handle special case for modules with hyphens
                     if (count($parts) > 2) {
                         $action = $parts[count($parts) - 1];
                         $module = implode('-', array_slice($parts, 0, count($parts) - 1));
                     }
-                    
+
                     // Create or get the permission
                     $permission = Permission::firstOrCreate([
                         'module' => $module,
                         'action' => $action,
-                        'name' => $module . '-' . $action
+                        'name' => $module . '-' . $action,
                     ]);
-                    
+
                     $permissionIds[] = $permission->id;
                 }
             }
-            
+
             // Merge with role permissions if role_id is provided
             if ($roleId) {
                 $role = Role::find($roleId);
@@ -118,14 +200,14 @@ class UserService
                     $permissionIds = array_unique(array_merge($rolePermissionIds, $permissionIds));
                 }
             }
-            
+
             $user->permissions()->sync($permissionIds);
-        } else if (!$roleId) {
+        } elseif (! $roleId) {
             // If no role_id and no permissions, clear user permissions
             $user->permissions()->detach();
         }
     }
-    
+
     /**
      * Toggle user status
      */
@@ -135,20 +217,20 @@ class UserService
         if ($currentUserId == $user->id && $user->status == 'active') {
             throw new \Exception('You cannot deactivate your own account.');
         }
-        
+
         // Toggle status
         $user->status = $user->status == 'active' ? 'inactive' : 'active';
         $user->save();
-        
+
         return $user;
     }
-    
+
     /**
      * Get status text with styling
      */
     public function getStatusText($status)
     {
-        switch($status) {
+        switch ($status) {
             case 'active':
                 return '<span class="text-success fw-bold">Active</span>';
             case 'inactive':

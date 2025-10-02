@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Property;
 use App\Models\Amenity;
 use App\Models\LandType;
-use Illuminate\Support\Facades\Storage;
+use App\Models\Property;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class PropertyService
 {
@@ -19,7 +19,7 @@ class PropertyService
             return \App\Models\Country::pluck('country_name', 'country_id');
         });
     }
-    
+
     /**
      * Get cached states list
      */
@@ -29,7 +29,17 @@ class PropertyService
             return \App\Models\State::pluck('state_title', 'state_id');
         });
     }
-    
+
+    /**
+     * Get cached states by country
+     */
+    public function getStatesByCountry($countryId)
+    {
+        return Cache::remember('states_list_country_' . $countryId, 3600, function () use ($countryId) {
+            return \App\Models\State::where('country_id', $countryId)->pluck('state_title', 'state_id');
+        });
+    }
+
     /**
      * Get cached districts list by state
      */
@@ -39,7 +49,7 @@ class PropertyService
             return \App\Models\District::where('state_id', $stateId)->pluck('district_name', 'districtid');
         });
     }
-    
+
     /**
      * Get cached talukas list by district
      */
@@ -49,7 +59,7 @@ class PropertyService
             return \App\Models\City::where('district_id', $districtId)->pluck('city_name', 'id');
         });
     }
-    
+
     /**
      * Get cached amenities list
      */
@@ -59,7 +69,7 @@ class PropertyService
             return Amenity::select('id', 'name')->get();
         });
     }
-    
+
     /**
      * Get cached land types list
      */
@@ -69,7 +79,7 @@ class PropertyService
             return LandType::select('id', 'name')->get();
         });
     }
-    
+
     /**
      * Handle document upload
      */
@@ -77,50 +87,52 @@ class PropertyService
     {
         if ($document) {
             $filename = $prefix . '_' . time() . '.' . $document->getClientOriginalExtension();
-            $document->move(public_path('assets/documents'), $filename);
+            Storage::disk('documents')->putFileAs('', $document, $filename);
+
             return $filename;
         }
+
         return null;
     }
-    
+
     /**
      * Handle photo uploads
      */
     public function handlePhotoUploads($photos, $existingPhotos = [])
     {
         $photoPaths = $existingPhotos;
-        
+
         if ($photos) {
             foreach ($photos as $index => $photo) {
                 $filename = 'photo_' . time() . '_' . $index . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('assets/images/properties'), $filename);
+                Storage::disk('photos')->putFileAs('', $photo, $filename);
                 $photoPaths[] = $filename;
             }
         }
-        
+
         return $photoPaths;
     }
-    
+
     /**
      * Delete property files
      */
     public function deletePropertyFiles(Property $property)
     {
         // Delete associated documents
-        if ($property->document_7_12 && file_exists(public_path('assets/documents/' . $property->document_7_12))) {
-            unlink(public_path('assets/documents/' . $property->document_7_12));
+        if ($property->document_7_12 && Storage::disk('documents')->exists($property->document_7_12)) {
+            Storage::disk('documents')->delete($property->document_7_12);
         }
-        
-        if ($property->document_8a && file_exists(public_path('assets/documents/' . $property->document_8a))) {
-            unlink(public_path('assets/documents/' . $property->document_8a));
+
+        if ($property->document_8a && Storage::disk('documents')->exists($property->document_8a)) {
+            Storage::disk('documents')->delete($property->document_8a);
         }
-        
+
         // Delete photo files
         if ($property->photos) {
             $photos = json_decode($property->photos, true);
             foreach ($photos as $photo) {
-                if (file_exists(public_path('assets/images/properties/' . $photo))) {
-                    unlink(public_path('assets/images/properties/' . $photo));
+                if (Storage::disk('photos')->exists($photo)) {
+                    Storage::disk('photos')->delete($photo);
                 }
             }
         }

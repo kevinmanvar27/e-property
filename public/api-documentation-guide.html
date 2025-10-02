@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Property API Documentation Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #3498db;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+            margin-top: 30px;
+        }
+        .endpoint {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        .url {
+            font-family: 'Courier New', monospace;
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 10px 0;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>E-Property API Documentation</h1>
+        
+        <p>Welcome to the E-Property API documentation. This guide will help you access and use the comprehensive API documentation for the E-Property project.</p>
+        
+        <h2>Accessing the Visual API Documentation</h2>
+        
+        <p>The API documentation is available in an interactive Swagger UI format. To access it:</p>
+        
+        <div class="endpoint">
+            <strong>Documentation URL:</strong>
+            <div class="url">http://127.0.0.1:8001/api/documentation</div>
+        </div>
+        
+        <p><a href="http://127.0.0.1:8001/api/documentation" class="btn" target="_blank">Open API Documentation</a></p>
+        
+        <h2>API Overview</h2>
+        
+        <p>The E-Property API provides comprehensive endpoints for managing:</p>
+        
+        <ul>
+            <li><strong>Properties</strong> - Land Jamin, Plot, Shad, Shop, and House properties</li>
+            <li><strong>Locations</strong> - Countries, States, Districts, and Cities</li>
+            <li><strong>Master Data</strong> - Amenities and Land Types</li>
+            <li><strong>User Management</strong> - Management and Regular Users</li>
+            <li><strong>Roles & Permissions</strong> - Access control system</li>
+            <li><strong>Profile</strong> - User profile management</li>
+            <li><strong>Settings</strong> - Application configuration</li>
+        </ul>
+        
+        <h2>Authentication</h2>
+        
+        <p>Most API endpoints require authentication. You can authenticate using:</p>
+        
+        <ol>
+            <li><strong>Bearer Token</strong> - Include in the Authorization header</li>
+            <li><strong>Session Authentication</strong> - For web applications</li>
+        </ol>
+        
+        <div class="note">
+            <strong>Note:</strong> In the Swagger UI, you can click the "Authorize" button (lock icon) in the top right corner to enter your authentication token.
+        </div>
+        
+        <h2>Response Format</h2>
+        
+        <p>All API responses follow a consistent format:</p>
+        
+        <h3>Success Response</h3>
+        <pre><code>{
+  "success": true,
+  "data": {},
+  "message": "Description of the action"
+}</code></pre>
+        
+        <h3>Error Response</h3>
+        <pre><code>{
+  "success": false,
+  "message": "Error description"
+}</code></pre>
+        
+        <h2>Key Features of the Documentation</h2>
+        
+        <ul>
+            <li><strong>Interactive Testing</strong> - Try out API endpoints directly from the documentation</li>
+            <li><strong>Request/Response Examples</strong> - See exactly what data to send and expect</li>
+            <li><strong>Authentication Support</strong> - Easily test authenticated endpoints</li>
+            <li><strong>Model Schemas</strong> - Detailed data structure definitions</li>
+            <li><strong>Error Codes</strong> - Comprehensive list of possible HTTP status codes</li>
+        </ul>
+        
+        <h2>Getting Started</h2>
+        
+        <ol>
+            <li>Start the Laravel development server: <code>php artisan serve</code></li>
+            <li>Open the documentation URL in your browser</li>
+            <li>Authorize with your API token if needed</li>
+            <li>Expand any endpoint to see details and try it out</li>
+        </ol>
+        
+        <div class="note">
+            <strong>Tip:</strong> The documentation automatically updates when you make changes to the API annotations in the code.
+        </div>
+        
+        <h2>Need Help?</h2>
+        
+        <p>If you have any questions about the API or need assistance:</p>
+        
+        <ul>
+            <li>Check the detailed endpoint descriptions in the documentation</li>
+            <li>Look at the example requests and responses</li>
+            <li>Contact the development team for authentication credentials</li>
+        </ul>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <a href="http://127.0.0.1:8001/api/documentation" class="btn" target="_blank">Open API Documentation</a>
+        </p>
+    </div>
+</body>
+</html>

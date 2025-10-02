@@ -6,11 +6,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -29,7 +31,7 @@ class User extends Authenticatable
         'role_id',
         'status',
     ];
-    
+
     /**
      * The attributes that should be mutated to dates.
      *
@@ -63,7 +65,28 @@ class User extends Authenticatable
             'dob' => 'date',
         ];
     }
-    
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        // Clear cache when a user is created, updated, or deleted
+        static::saved(function ($user) {
+            Cache::forget('active_users_count');
+            Cache::forget('users_with_roles');
+            Cache::forget('user_' . $user->id);
+        });
+
+        static::deleted(function ($user) {
+            Cache::forget('active_users_count');
+            Cache::forget('users_with_roles');
+            Cache::forget('user_' . $user->id);
+        });
+    }
+
     /**
      * Get the role that owns the user.
      */
@@ -71,7 +94,7 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
-    
+
     /**
      * Check if the user is an admin
      *
@@ -81,7 +104,7 @@ class User extends Authenticatable
     {
         return $this->role === 'admin' || $this->role === 'super_admin';
     }
-    
+
     /**
      * Check if the user is a super admin
      *
@@ -91,7 +114,7 @@ class User extends Authenticatable
     {
         return $this->role === 'super_admin';
     }
-    
+
     /**
      * Check if the user is active
      *
@@ -101,7 +124,7 @@ class User extends Authenticatable
     {
         return $this->status === 'active';
     }
-    
+
     /**
      * Record user login
      *
@@ -112,7 +135,7 @@ class User extends Authenticatable
         $this->last_login_at = now();
         $this->save();
     }
-    
+
     /**
      * Check if password has been changed recently
      *
@@ -121,13 +144,13 @@ class User extends Authenticatable
      */
     public function passwordChangedWithin($days = 90)
     {
-        if (!$this->password_changed_at) {
+        if (! $this->password_changed_at) {
             return false;
         }
-        
+
         return $this->password_changed_at->greaterThan(now()->subDays($days));
     }
-    
+
     /**
      * Mark password as changed
      *
@@ -138,7 +161,7 @@ class User extends Authenticatable
         $this->password_changed_at = now();
         $this->save();
     }
-    
+
     /**
      * Check if the user has a specific permission
      *
@@ -152,12 +175,12 @@ class User extends Authenticatable
         if ($this->isSuperAdmin()) {
             return true;
         }
-        
+
         // Check if user has specific permission
         return $this->permissions()->where('module', $module)->where('action', $action)->exists() ||
                ($this->role && $this->role->permissions()->where('module', $module)->where('action', $action)->exists());
     }
-    
+
     /**
      * Get user permissions
      */

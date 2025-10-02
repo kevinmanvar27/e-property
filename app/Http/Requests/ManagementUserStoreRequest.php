@@ -32,7 +32,7 @@ class ManagementUserStoreRequest extends FormRequest
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
-    
+
     /**
      * Get custom messages for validator errors.
      */

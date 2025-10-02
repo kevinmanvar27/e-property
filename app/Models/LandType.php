@@ -10,7 +10,7 @@ class LandType extends Model
         'name',
         'description',
     ];
-    
+
     public function landJamins()
     {
         return $this->belongsToMany(LandJamin::class, 'land_land_types', 'land_type_id', 'land_id');

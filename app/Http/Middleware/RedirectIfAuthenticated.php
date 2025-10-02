@@ -19,7 +19,7 @@ class RedirectIfAuthenticated
         if (Auth::check()) {
             // If user is authenticated, redirect based on role
             $user = Auth::user();
-            
+
             if ($user->isSuperAdmin() || $user->isAdmin()) {
                 return redirect('/admin/settings');
             } else {

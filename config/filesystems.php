@@ -60,6 +60,22 @@ return [
             'report' => false,
         ],
 
+        'documents' => [
+            'driver' => 'local',
+            'root' => public_path('assets/documents'),
+            'url' => env('APP_URL').'/assets/documents',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'photos' => [
+            'driver' => 'local',
+            'root' => public_path('assets/images/properties'),
+            'url' => env('APP_URL').'/assets/images/properties',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
     ],
 
     /*

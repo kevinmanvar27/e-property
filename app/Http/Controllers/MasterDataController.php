@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\AmenityStoreRequest;
+use App\Http\Requests\AmenityUpdateRequest;
+use App\Http\Requests\LandTypeStoreRequest;
+use App\Http\Requests\LandTypeUpdateRequest;
 use App\Models\Amenity;
 use App\Models\LandType;
-use Illuminate\Support\Facades\Validator;
 
 class MasterDataController extends Controller
 {
@@ -15,23 +17,15 @@ class MasterDataController extends Controller
     public function indexAmenities()
     {
         $amenities = Amenity::all();
+
         return view('admin.master-data.amenities.index', compact('amenities'));
     }
 
     /**
      * Store a newly created amenity in storage
      */
-    public function storeAmenity(Request $request)
+    public function storeAmenity(AmenityStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:amenities',
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $amenity = Amenity::create($request->only(['name', 'description']));
 
         return response()->json(['success' => true, 'amenity' => $amenity]);
@@ -40,17 +34,8 @@ class MasterDataController extends Controller
     /**
      * Update the specified amenity in storage
      */
-    public function updateAmenity(Request $request, Amenity $amenity)
+    public function updateAmenity(AmenityUpdateRequest $request, Amenity $amenity)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:amenities,name,' . $amenity->id,
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $amenity->update($request->only(['name', 'description']));
 
         return response()->json(['success' => true, 'amenity' => $amenity]);
@@ -62,6 +47,7 @@ class MasterDataController extends Controller
     public function destroyAmenity(Amenity $amenity)
     {
         $amenity->delete();
+
         return response()->json(['success' => true]);
     }
 
@@ -71,23 +57,15 @@ class MasterDataController extends Controller
     public function indexLandTypes()
     {
         $landTypes = LandType::all();
+
         return view('admin.master-data.land-types.index', compact('landTypes'));
     }
 
     /**
      * Store a newly created land type in storage
      */
-    public function storeLandType(Request $request)
+    public function storeLandType(LandTypeStoreRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:land_types',
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $landType = LandType::create($request->only(['name', 'description']));
 
         return response()->json(['success' => true, 'landType' => $landType]);
@@ -96,17 +74,8 @@ class MasterDataController extends Controller
     /**
      * Update the specified land type in storage
      */
-    public function updateLandType(Request $request, LandType $landType)
+    public function updateLandType(LandTypeUpdateRequest $request, LandType $landType)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:land_types,name,' . $landType->id,
-            'description' => 'nullable|string',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 422);
-        }
-
         $landType->update($request->only(['name', 'description']));
 
         return response()->json(['success' => true, 'landType' => $landType]);
@@ -118,6 +87,7 @@ class MasterDataController extends Controller
     public function destroyLandType(LandType $landType)
     {
         $landType->delete();
+
         return response()->json(['success' => true]);
     }
 }

@@ -175,8 +175,8 @@
                                 <label for="role_id" class="form-label">Role Assignment <span class="text-danger">*</span></label>
                                 <select class="form-select" id="role_id" name="role_id" required>
                                     <option value="">Select Role</option>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @foreach($roles as $id => $name)
+                                        <option value="{{ $id }}">{{ $name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="form-text">Select a role to assign default permissions.</div>
@@ -319,8 +319,8 @@
                                 <label for="edit_role_id" class="form-label">Role Assignment <span class="text-danger">*</span></label>
                                 <select class="form-select" id="edit_role_id" name="role_id" required>
                                     <option value="">Select Role</option>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}">{{ $role->name }}</option>
+                                    @foreach($roles as $id => $name)
+                                        <option value="{{ $id }}">{{ $name }}</option>
                                     @endforeach
                                 </select>
                                 <div class="form-text">Select a role to assign default permissions.</div>

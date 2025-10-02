@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PermissionStoreRequest;
+use App\Http\Requests\PermissionUpdateRequest;
 use App\Models\Permission;
-use Illuminate\Http\Request;
+use App\Services\RoleService;
 
 class PermissionController extends Controller
 {
+    protected $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $permissions = Permission::all();
+        $permissions = $this->roleService->getAllPermissions();
+
         return view('admin.permissions.index', compact('permissions'));
     }
 
@@ -27,15 +37,12 @@ class PermissionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(PermissionStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|unique:permissions,name',
-            'module' => 'required|string',
-            'action' => 'required|string'
-        ]);
-
         Permission::create($request->all());
+
+        // Clear cache
+        $this->roleService->clearCache('all_permissions');
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permission created successfully.');
     }
@@ -46,6 +53,7 @@ class PermissionController extends Controller
     public function show(string $id)
     {
         $permission = Permission::findOrFail($id);
+
         return view('admin.permissions.show', compact('permission'));
     }
 
@@ -55,23 +63,21 @@ class PermissionController extends Controller
     public function edit(string $id)
     {
         $permission = Permission::findOrFail($id);
+
         return view('admin.permissions.edit', compact('permission'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(PermissionUpdateRequest $request, string $id)
     {
         $permission = Permission::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required|unique:permissions,name,' . $permission->id,
-            'module' => 'required|string',
-            'action' => 'required|string'
-        ]);
 
         $permission->update($request->all());
+
+        // Clear cache
+        $this->roleService->clearCache('all_permissions');
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permission updated successfully.');
     }
@@ -83,6 +89,9 @@ class PermissionController extends Controller
     {
         $permission = Permission::findOrFail($id);
         $permission->delete();
+
+        // Clear cache
+        $this->roleService->clearCache('all_permissions');
 
         return redirect()->route('admin.permissions.index')->with('success', 'Permission deleted successfully.');
     }

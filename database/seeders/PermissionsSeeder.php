@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\Permission;
+use Illuminate\Database\Seeder;
 
 class PermissionsSeeder extends Seeder
 {
@@ -27,18 +27,18 @@ class PermissionsSeeder extends Seeder
             'cities' => 'Cities/Talukas',
             'settings' => 'Settings',
             'users-management' => 'Management Users',
-            'users-regular' => 'Regular Users'
+            'users-regular' => 'Regular Users',
         ];
-        
+
         $actions = ['view', 'create', 'update', 'delete'];
-        
+
         // Create permissions for each module and action
         foreach ($modules as $moduleKey => $moduleLabel) {
             foreach ($actions as $action) {
                 Permission::firstOrCreate([
                     'name' => $moduleKey . '-' . $action,
                     'module' => $moduleKey,
-                    'action' => $action
+                    'action' => $action,
                 ]);
             }
         }

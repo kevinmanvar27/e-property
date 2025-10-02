@@ -1,6 +1,8 @@
 <?php
 
-if (!function_exists('setting')) {
+use Illuminate\Support\Facades\Storage;
+
+if (! function_exists('setting')) {
     /**
      * Get a setting value by section and key
      *
@@ -15,7 +17,7 @@ if (!function_exists('setting')) {
     }
 }
 
-if (!function_exists('setting_set')) {
+if (! function_exists('setting_set')) {
     /**
      * Set a setting value by section and key
      *
@@ -31,7 +33,7 @@ if (!function_exists('setting_set')) {
     }
 }
 
-if (!function_exists('hasPermission')) {
+if (! function_exists('hasPermission')) {
     /**
      * Check if the authenticated user has a specific permission
      *
@@ -42,23 +44,23 @@ if (!function_exists('hasPermission')) {
     function hasPermission($module, $action)
     {
         // If user is not authenticated, return false
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return false;
         }
-        
+
         $user = auth()->user();
-        
+
         // Super admins have all permissions
         if ($user->isSuperAdmin()) {
             return true;
         }
-        
+
         // Check if user has the specific permission
         return $user->hasPermission($module, $action);
     }
 }
 
-if (!function_exists('safe_asset')) {
+if (! function_exists('safe_asset')) {
     /**
      * Generate a secure asset path for the application.
      *
@@ -68,22 +70,31 @@ if (!function_exists('safe_asset')) {
      */
     function safe_asset($path, $fallback = null)
     {
-        // Check if the file exists
-        if (file_exists(public_path($path))) {
-            return asset($path);
+        // For storage paths, we need to check the actual file path
+        if (strpos($path, 'storage/') === 0) {
+            // Convert storage path to actual file path
+            $filePath = str_replace('storage/', '', $path);
+            if (Storage::disk('public')->exists($filePath)) {
+                return asset($path);
+            }
+        } else {
+            // Check if the file exists using the default path
+            if (Storage::exists($path)) {
+                return asset($path);
+            }
         }
-        
+
         // Return fallback if provided
         if ($fallback) {
             return asset($fallback);
         }
-        
+
         // Return default asset path
         return asset($path);
     }
 }
 
-if (!function_exists('hex_to_rgba')) {
+if (! function_exists('hex_to_rgba')) {
     /**
      * Convert HEX color to RGBA
      *
@@ -91,9 +102,10 @@ if (!function_exists('hex_to_rgba')) {
      * @param float $alpha
      * @return string
      */
-    function hex_to_rgba($hex, $alpha = 1) {
+    function hex_to_rgba($hex, $alpha = 1)
+    {
         $hex = str_replace('#', '', $hex);
-        
+
         if (strlen($hex) == 3) {
             $r = hexdec(str_repeat(substr($hex, 0, 1), 2));
             $g = hexdec(str_repeat(substr($hex, 1, 1), 2));
@@ -103,12 +115,12 @@ if (!function_exists('hex_to_rgba')) {
             $g = hexdec(substr($hex, 2, 2));
             $b = hexdec(substr($hex, 4, 2));
         }
-        
+
         return "rgba($r, $g, $b, $alpha)";
     }
 }
 
-if (!function_exists('get_rgba_setting')) {
+if (! function_exists('get_rgba_setting')) {
     /**
      * Get a color setting and convert it to RGBA format
      *
@@ -118,8 +130,10 @@ if (!function_exists('get_rgba_setting')) {
      * @param string $default
      * @return string
      */
-    function get_rgba_setting($section, $key, $alpha = 1, $default = '#333333') {
+    function get_rgba_setting($section, $key, $alpha = 1, $default = '#333333')
+    {
         $hex = setting($section, $key, $default);
+
         return hex_to_rgba($hex, $alpha);
     }
 }

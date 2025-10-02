@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Services\SettingsService;
+use Illuminate\Database\Eloquent\Model;
 
 class Setting extends Model
 {
@@ -11,33 +11,33 @@ class Setting extends Model
         'section',
         'key',
         'value',
-        'type'
+        'type',
     ];
-    
+
     protected $casts = [
-        'value' => 'string'
+        'value' => 'string',
     ];
-    
+
     /**
      * Boot the model.
      */
     protected static function boot()
     {
         parent::boot();
-        
+
         // Clear cache when settings are saved
         static::saved(function ($setting) {
             $settingsService = new SettingsService();
             $settingsService->clearCache();
         });
-        
+
         // Clear cache when settings are deleted
         static::deleted(function ($setting) {
             $settingsService = new SettingsService();
             $settingsService->clearCache();
         });
     }
-    
+
     /**
      * Get a setting value by section and key
      *
@@ -49,9 +49,10 @@ class Setting extends Model
     public static function get($section, $key, $default = null)
     {
         $setting = self::where('section', $section)->where('key', $key)->first();
+
         return $setting ? $setting->value : $default;
     }
-    
+
     /**
      * Set a setting value by section and key
      *

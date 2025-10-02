@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\Country;
-use App\Models\State;
-use App\Models\District;
 use App\Models\City;
+use App\Models\Country;
+use App\Models\District;
+use App\Models\State;
+use Illuminate\Database\Seeder;
 
 class LocationSeeder extends Seeder
 {

@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'super_admin',
             'status' => 'active',
         ]);
-        
+
         // Create a regular user
         User::factory()->create([
             'name' => 'Test User',
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
             'status' => 'active',
         ]);
-        
+
         // Run all the seeders
         $this->call([
             LocationSeeder::class,

@@ -54,7 +54,7 @@ class BasePropertyRequest extends FormRequest
             'land_types.*' => 'exists:land_types,id',
         ];
     }
-    
+
     /**
      * Get custom messages for validator errors.
      */

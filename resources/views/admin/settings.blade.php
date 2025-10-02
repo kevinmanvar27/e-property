@@ -289,8 +289,7 @@
             <!-- Settings Tabs Navigation -->
             <div class="settings-tabs">
                 <ul>
-                    <li><a href="#" data-tab="appearance-settings" class="active">Appearance</a></li>
-                    <li><a href="#" data-tab="general-settings">General</a></li>
+                    <li><a href="#" data-tab="general-settings" class="active">General</a></li>
                     <li><a href="#" data-tab="contact-settings">Contact</a></li>
                     <li><a href="#" data-tab="social-settings">Social Media</a></li>
                     <li><a href="#" data-tab="custom-code-settings">Custom Code</a></li>
@@ -299,386 +298,8 @@
             
             <!-- Settings Content -->
             <div class="settings-content">
-                <!-- Appearance Settings -->
-                <div id="appearance-settings" class="settings-section active">
-                    <h2 class="settings-section-title">Appearance Settings</h2>
-                    <p>Manage your site's appearance and styling options.</p>
-                    
-                    <form method="POST" action="{{ route('settings.appearance.update') }}">
-                        @csrf
-                        
-                        <!-- Primary Colors -->
-                        <div class="settings-subtitle">Primary Colors</div>
-                        <div class="setting-row">
-                            <div class="setting-col">
-                                <div class="form-group">
-                                    <label class="form-label">Primary Color</label>
-                                    <div class="color-setting">
-                                        <input type="color" class="form-control" name="primary_color" value="{{ $settings['appearance']->where('key', 'primary_color')->first()?->value ?? '#333333' }}">
-                                        <span>{{ $settings['appearance']->where('key', 'primary_color')->first()?->value ?? '#333333' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="setting-col">
-                                <div class="form-group">
-                                    <label class="form-label">Secondary Color</label>
-                                    <div class="color-setting">
-                                        <input type="color" class="form-control" name="secondary_color" value="{{ $settings['appearance']->where('key', 'secondary_color')->first()?->value ?? '#ff5b2e' }}">
-                                        <span>{{ $settings['appearance']->where('key', 'secondary_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Header Style -->
-                        <div class="form-group">
-                            <label class="form-label">Header Style</label>
-                            <select class="form-select" name="header_style">
-                                <option value="sticky" {{ ($settings['appearance']->where('key', 'header_style')->first()?->value ?? 'sticky') == 'sticky' ? 'selected' : '' }}>Sticky Header</option>
-                                <option value="static" {{ ($settings['appearance']->where('key', 'header_style')->first()?->value ?? 'sticky') == 'static' ? 'selected' : '' }}>Static Header</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Heading Settings -->
-                        <div class="settings-subtitle">Heading Settings</div>
-                        
-                        <!-- H1 Settings -->
-                        <div class="settings-subtitle">H1 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h1_color" value="{{ $settings['appearance']->where('key', 'h1_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h1_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h1_hover_color" value="{{ $settings['appearance']->where('key', 'h1_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h1_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h1_font_family" value="{{ $settings['appearance']->where('key', 'h1_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h1_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h1_font_size_desktop')->first()?->value ?? '32' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h1_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h1_font_size_tablet')->first()?->value ?? '28' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h1_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h1_font_size_mobile')->first()?->value ?? '24' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- H2 Settings -->
-                        <div class="settings-subtitle">H2 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h2_color" value="{{ $settings['appearance']->where('key', 'h2_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h2_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h2_hover_color" value="{{ $settings['appearance']->where('key', 'h2_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h2_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h2_font_family" value="{{ $settings['appearance']->where('key', 'h2_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h2_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h2_font_size_desktop')->first()?->value ?? '28' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h2_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h2_font_size_tablet')->first()?->value ?? '24' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h2_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h2_font_size_mobile')->first()?->value ?? '20' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- H3 Settings -->
-                        <div class="settings-subtitle">H3 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h3_color" value="{{ $settings['appearance']->where('key', 'h3_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h3_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h3_hover_color" value="{{ $settings['appearance']->where('key', 'h3_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h3_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h3_font_family" value="{{ $settings['appearance']->where('key', 'h3_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h3_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h3_font_size_desktop')->first()?->value ?? '24' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h3_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h3_font_size_tablet')->first()?->value ?? '20' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h3_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h3_font_size_mobile')->first()?->value ?? '18' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- H4 Settings -->
-                        <div class="settings-subtitle">H4 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h4_color" value="{{ $settings['appearance']->where('key', 'h4_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h4_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h4_hover_color" value="{{ $settings['appearance']->where('key', 'h4_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h4_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h4_font_family" value="{{ $settings['appearance']->where('key', 'h4_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h4_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h4_font_size_desktop')->first()?->value ?? '20' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h4_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h4_font_size_tablet')->first()?->value ?? '18' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h4_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h4_font_size_mobile')->first()?->value ?? '16' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- H5 Settings -->
-                        <div class="settings-subtitle">H5 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h5_color" value="{{ $settings['appearance']->where('key', 'h5_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h5_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h5_hover_color" value="{{ $settings['appearance']->where('key', 'h5_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h5_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h5_font_family" value="{{ $settings['appearance']->where('key', 'h5_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h5_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h5_font_size_desktop')->first()?->value ?? '18' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h5_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h5_font_size_tablet')->first()?->value ?? '16' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h5_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h5_font_size_mobile')->first()?->value ?? '14' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- H6 Settings -->
-                        <div class="settings-subtitle">H6 Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h6_color" value="{{ $settings['appearance']->where('key', 'h6_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h6_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="h6_hover_color" value="{{ $settings['appearance']->where('key', 'h6_hover_color')->first()?->value ?? '#ff5b2e' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'h6_hover_color')->first()?->value ?? '#ff5b2e' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="h6_font_family" value="{{ $settings['appearance']->where('key', 'h6_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="h6_font_size_desktop" value="{{ $settings['appearance']->where('key', 'h6_font_size_desktop')->first()?->value ?? '16' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="h6_font_size_tablet" value="{{ $settings['appearance']->where('key', 'h6_font_size_tablet')->first()?->value ?? '14' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="h6_font_size_mobile" value="{{ $settings['appearance']->where('key', 'h6_font_size_mobile')->first()?->value ?? '12' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Paragraph Settings -->
-                        <div class="settings-subtitle">Paragraph Settings</div>
-                        <div class="typography-settings-row">
-                            <div class="typography-setting">
-                                <label class="form-label">Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="p_color" value="{{ $settings['appearance']->where('key', 'p_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'p_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Hover Color</label>
-                                <div class="color-setting">
-                                    <input type="color" class="form-control" name="p_hover_color" value="{{ $settings['appearance']->where('key', 'p_hover_color')->first()?->value ?? '#333333' }}">
-                                    <span>{{ $settings['appearance']->where('key', 'p_hover_color')->first()?->value ?? '#333333' }}</span>
-                                </div>
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Family</label>
-                                <input type="text" class="form-control font-family-input" name="p_font_family" value="{{ $settings['appearance']->where('key', 'p_font_family')->first()?->value ?? 'Arial, sans-serif' }}" placeholder="e.g., Arial, sans-serif">
-                            </div>
-                            <div class="typography-setting">
-                                <label class="form-label">Font Size</label>
-                                <div class="font-size-controls">
-                                    <div class="font-size-device">
-                                        <label>Desktop:</label>
-                                        <input type="number" class="form-control" name="p_font_size_desktop" value="{{ $settings['appearance']->where('key', 'p_font_size_desktop')->first()?->value ?? '16' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Tablet:</label>
-                                        <input type="number" class="form-control" name="p_font_size_tablet" value="{{ $settings['appearance']->where('key', 'p_font_size_tablet')->first()?->value ?? '14' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                    <div class="font-size-device">
-                                        <label>Mobile:</label>
-                                        <input type="number" class="form-control" name="p_font_size_mobile" value="{{ $settings['appearance']->where('key', 'p_font_size_mobile')->first()?->value ?? '12' }}" min="1" max="100">
-                                        <span>px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Link Color Options -->
-                        <div class="settings-subtitle">Link Color Options</div>
-                        <div class="setting-row">
-                            <div class="setting-col">
-                                <div class="form-group">
-                                    <label class="form-label">Link Color</label>
-                                    <div class="color-setting">
-                                        <input type="color" class="form-control" name="link_color" value="{{ $settings['appearance']->where('key', 'link_color')->first()?->value ?? '#0d6efd' }}">
-                                        <span>{{ $settings['appearance']->where('key', 'link_color')->first()?->value ?? '#0d6efd' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="setting-col">
-                                <div class="form-group">
-                                    <label class="form-label">Link Hover Color</label>
-                                    <div class="color-setting">
-                                        <input type="color" class="form-control" name="link_hover_color" value="{{ $settings['appearance']->where('key', 'link_hover_color')->first()?->value ?? '#0b5ed7' }}">
-                                        <span>{{ $settings['appearance']->where('key', 'link_hover_color')->first()?->value ?? '#0b5ed7' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Custom CSS -->
-                        <div class="form-group">
-                            <label class="form-label">Custom CSS</label>
-                            <textarea class="form-control" name="custom_css" rows="6" placeholder="Enter your custom CSS here...">{{ $settings['appearance']->where('key', 'custom_css')->first()?->value ?? '' }}</textarea>
-                            <div class="form-text">Add your custom CSS here.</div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary btn-save">Save Appearance Settings</button>
-                    </form>
-                </div>
-                
                 <!-- General Settings -->
-                <div id="general-settings" class="settings-section">
+                <div id="general-settings" class="settings-section active">
                     <h2 class="settings-section-title">General Settings</h2>
                     <p>Manage your site's general information and branding.</p>
                     
@@ -715,10 +336,15 @@
                                 <div class="form-group">
                                     <label class="form-label">Logo</label>
                                     <input type="file" class="form-control" name="logo" accept="image/*">
-                                    @if(isset($settings['general']) && $settings['general']->where('key', 'logo')->first()?->value)
-                                        <div class="mt-2">
-                                            <img src="{{ asset('storage/' . $settings['general']->where('key', 'logo')->first()->value) }}" alt="Logo" style="max-height: 100px;">
-                                        </div>
+                                    @if(isset($settings['general']))
+                                        @php
+                                            $logoSetting = $settings['general']->where('key', 'logo')->first();
+                                        @endphp
+                                        @if($logoSetting && $logoSetting->value)
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $logoSetting->value) }}" alt="Logo" style="max-height: 100px;">
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                             </div>
@@ -726,10 +352,15 @@
                                 <div class="form-group">
                                     <label class="form-label">Favicon</label>
                                     <input type="file" class="form-control" name="favicon" accept="image/*,.ico">
-                                    @if(isset($settings['general']) && $settings['general']->where('key', 'favicon')->first()?->value)
-                                        <div class="mt-2">
-                                            <img src="{{ asset('storage/' . $settings['general']->where('key', 'favicon')->first()->value) }}" alt="Favicon" style="max-height: 32px;">
-                                        </div>
+                                    @if(isset($settings['general']))
+                                        @php
+                                            $faviconSetting = $settings['general']->where('key', 'favicon')->first();
+                                        @endphp
+                                        @if($faviconSetting && $faviconSetting->value)
+                                            <div class="mt-2">
+                                                <img src="{{ asset('storage/' . $faviconSetting->value) }}" alt="Favicon" style="max-height: 32px;">
+                                            </div>
+                                        @endif
                                     @endif
                                 </div>
                             </div>

@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Support\Facades\Auth;
 
 class UserPasswordUpdateRequest extends FormRequest
 {
@@ -25,7 +24,7 @@ class UserPasswordUpdateRequest extends FormRequest
             'password' => 'required|string|min:8|confirmed',
         ];
     }
-    
+
     /**
      * Get custom messages for validator errors.
      */

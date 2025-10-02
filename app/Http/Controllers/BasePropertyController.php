@@ -5,19 +5,34 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PropertyStoreRequest;
 use App\Http\Requests\PropertyUpdateRequest;
 use App\Models\Property;
+use App\Services\DocumentService;
+use App\Services\LocationService;
+use App\Services\MasterDataService;
+use App\Services\PhotoService;
 use App\Services\PropertyService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
 
 class BasePropertyController extends Controller
 {
     protected $propertyType = 'land_jamin';
     protected $propertyService;
+    protected $photoService;
+    protected $documentService;
+    protected $locationService;
+    protected $masterDataService;
 
-    public function __construct(PropertyService $propertyService)
-    {
+    public function __construct(
+        PropertyService $propertyService,
+        PhotoService $photoService,
+        DocumentService $documentService,
+        LocationService $locationService,
+        MasterDataService $masterDataService
+    ) {
         $this->propertyService = $propertyService;
+        $this->photoService = $photoService;
+        $this->documentService = $documentService;
+        $this->locationService = $locationService;
+        $this->masterDataService = $masterDataService;
     }
 
     /**
@@ -34,6 +49,7 @@ class BasePropertyController extends Controller
             return view('admin.' . str_replace('_', '-', $this->propertyType) . '.index', compact('properties'));
         } catch (\Exception $e) {
             \Log::error('Error loading properties: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'An error occurred while loading properties. Please try again.');
         }
     }
@@ -52,6 +68,7 @@ class BasePropertyController extends Controller
             return view('admin.' . str_replace('_', '-', $this->propertyType) . '.create', compact('countries', 'states', 'amenities', 'landTypes'));
         } catch (\Exception $e) {
             \Log::error('Error loading create property form: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'An error occurred while loading the form. Please try again.');
         }
     }
@@ -67,11 +84,13 @@ class BasePropertyController extends Controller
             $unit = strtolower(substr($postMaxSize, -1));
             $value = (int) $postMaxSize;
 
-            switch($unit) {
+            switch ($unit) {
                 case 'g':
                     $value *= 1024; // Fall through
+                    // no break
                 case 'm':
                     $value *= 1024; // Fall through
+                    // no break
                 case 'k':
                     $value *= 1024;
             }
@@ -79,8 +98,8 @@ class BasePropertyController extends Controller
             if ($request->server('CONTENT_LENGTH') > $value) {
                 return response()->json([
                     'errors' => [
-                        'general' => ['The uploaded files are too large. Please reduce the file sizes and try again. Current limit is 100MB per file.']
-                    ]
+                        'general' => ['The uploaded files are too large. Please reduce the file sizes and try again. Current limit is 100MB per file.'],
+                    ],
                 ], 413);
             }
 
@@ -115,18 +134,9 @@ class BasePropertyController extends Controller
                 'additional_notes',
             ]);
 
-            // Handle document uploads (only for land/jamin)
-            if ($this->propertyType !== 'plot') {
-                if ($request->hasFile('document_7_12')) {
-                    $filename = $this->propertyService->handleDocumentUpload($request->file('document_7_12'), 'doc_7_12');
-                    $data['document_7_12'] = $filename;
-                }
-
-                if ($request->hasFile('document_8a')) {
-                    $filename = $this->propertyService->handleDocumentUpload($request->file('document_8a'), 'doc_8a');
-                    $data['document_8a'] = $filename;
-                }
-            }
+            // Handle document uploads using DocumentService
+            $documentData = $this->documentService->handlePropertyDocumentUploads($request, new Property(), $this->propertyType);
+            $data = array_merge($data, $documentData);
 
             // Handle photo uploads
             $photoPaths = [];
@@ -142,6 +152,7 @@ class BasePropertyController extends Controller
             return response()->json(['message' => 'Property created successfully', 'property' => $property]);
         } catch (\Exception $e) {
             \Log::error('Error creating property: ' . $e->getMessage());
+
             return response()->json(['errors' => ['general' => ['An error occurred while creating the property. Please try again.']]], 500);
         }
     }
@@ -157,6 +168,7 @@ class BasePropertyController extends Controller
         }
 
         $property->load(['state', 'district', 'taluka', 'amenities', 'landTypes']);
+
         return view('admin.' . str_replace('_', '-', $this->propertyType) . '.show', compact('property'));
     }
 
@@ -223,28 +235,9 @@ class BasePropertyController extends Controller
                 'additional_notes',
             ]);
 
-            // Handle document uploads (only for land/jamin)
-            if ($this->propertyType !== 'plot') {
-                if ($request->hasFile('document_7_12')) {
-                    // Delete old document if exists
-                    if ($property->document_7_12 && file_exists(public_path('assets/documents/' . $property->document_7_12))) {
-                        unlink(public_path('assets/documents/' . $property->document_7_12));
-                    }
-
-                    $filename = $this->propertyService->handleDocumentUpload($request->file('document_7_12'), 'doc_7_12');
-                    $data['document_7_12'] = $filename;
-                }
-
-                if ($request->hasFile('document_8a')) {
-                    // Delete old document if exists
-                    if ($property->document_8a && file_exists(public_path('assets/documents/' . $property->document_8a))) {
-                        unlink(public_path('assets/documents/' . $property->document_8a));
-                    }
-
-                    $filename = $this->propertyService->handleDocumentUpload($request->file('document_8a'), 'doc_8a');
-                    $data['document_8a'] = $filename;
-                }
-            }
+            // Handle document uploads using DocumentService
+            $documentData = $this->documentService->handlePropertyDocumentUploads($request, $property, $this->propertyType);
+            $data = array_merge($data, $documentData);
 
             // Handle photo uploads
             $existingPhotos = $property->photos ? json_decode($property->photos, true) : [];
@@ -271,6 +264,7 @@ class BasePropertyController extends Controller
             return response()->json(['message' => 'Property updated successfully', 'property' => $property]);
         } catch (\Exception $e) {
             \Log::error('Error updating property: ' . $e->getMessage());
+
             return response()->json(['errors' => ['general' => ['An error occurred while updating the property. Please try again.']]], 500);
         }
     }
@@ -294,6 +288,7 @@ class BasePropertyController extends Controller
             return response()->json(['message' => 'Property deleted successfully']);
         } catch (\Exception $e) {
             \Log::error('Error deleting property: ' . $e->getMessage());
+
             return response()->json(['message' => 'An error occurred while deleting the property. Please try again.'], 500);
         }
     }
@@ -310,7 +305,7 @@ class BasePropertyController extends Controller
             }
 
             $request->validate([
-                'status' => 'required|string|in:active,inactive,urgent,under_offer,reserved,sold,cancelled,coming_soon,price_reduced'
+                'status' => 'required|string|in:active,inactive,urgent,under_offer,reserved,sold,cancelled,coming_soon,price_reduced',
             ]);
 
             $property->status = $request->status;
@@ -318,42 +313,52 @@ class BasePropertyController extends Controller
 
             // Return appropriate status text with styling
             $statusText = '';
-            switch($property->status) {
+            switch ($property->status) {
                 case 'active':
                     $statusText = '<span class="text-success fw-bold">Active</span>';
+
                     break;
                 case 'inactive':
                     $statusText = '<span class="text-secondary fw-bold">Inactive</span>';
+
                     break;
                 case 'urgent':
                     $statusText = '<span class="text-danger fw-bold">Urgent</span>';
+
                     break;
                 case 'under_offer':
                     $statusText = '<span class="text-warning fw-bold">Under Offer</span>';
+
                     break;
                 case 'reserved':
                     $statusText = '<span class="text-info fw-bold">Reserved</span>';
+
                     break;
                 case 'sold':
                     $statusText = '<span class="text-muted fw-bold">Sold</span>';
+
                     break;
                 case 'cancelled':
                     $statusText = '<span class="text-dark fw-bold">Cancelled</span>';
+
                     break;
                 case 'coming_soon':
                     $statusText = '<span class="text-primary fw-bold">Coming Soon</span>';
+
                     break;
                 case 'price_reduced':
                     $statusText = '<span class="text-orange fw-bold">Price Reduced</span>';
+
                     break;
             }
 
             return response()->json([
                 'message' => 'Status updated successfully',
-                'status_text' => $statusText
+                'status_text' => $statusText,
             ]);
         } catch (\Exception $e) {
             \Log::error('Error updating property status: ' . $e->getMessage());
+
             return response()->json(['message' => 'An error occurred while updating the property status. Please try again.'], 500);
         }
     }
@@ -363,7 +368,8 @@ class BasePropertyController extends Controller
      */
     public function getStatesByCountry($countryId)
     {
-        $states = $this->propertyService->getStatesByCountry($countryId);
+        $states = $this->locationService->getStatesByCountry($countryId);
+
         return response()->json($states);
     }
 
@@ -372,7 +378,8 @@ class BasePropertyController extends Controller
      */
     public function getDistrictsByState($stateId)
     {
-        $districts = $this->propertyService->getDistrictsByState($stateId);
+        $districts = $this->locationService->getDistrictsByState($stateId);
+
         return response()->json($districts);
     }
 
@@ -381,7 +388,8 @@ class BasePropertyController extends Controller
      */
     public function getTalukasByDistrict($districtId)
     {
-        $talukas = $this->propertyService->getTalukasByDistrict($districtId);
+        $talukas = $this->locationService->getTalukasByDistrict($districtId);
+
         return response()->json($talukas);
     }
 
@@ -391,10 +399,10 @@ class BasePropertyController extends Controller
     public function storeAmenity(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:amenities,name'
+            'name' => 'required|string|max:255|unique:amenities,name',
         ]);
 
-        $amenity = \App\Models\Amenity::create($request->only('name'));
+        $amenity = $this->masterDataService->storeAmenity($request->only('name'));
 
         return response()->json(['message' => 'Amenity created successfully', 'amenity' => $amenity]);
     }
@@ -405,10 +413,10 @@ class BasePropertyController extends Controller
     public function storeLandType(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255|unique:land_types,name'
+            'name' => 'required|string|max:255|unique:land_types,name',
         ]);
 
-        $landType = \App\Models\LandType::create($request->only('name'));
+        $landType = $this->masterDataService->storeLandType($request->only('name'));
 
         return response()->json(['message' => 'Land type created successfully', 'landType' => $landType]);
     }
@@ -425,24 +433,15 @@ class BasePropertyController extends Controller
             }
 
             $request->validate([
-                'positions' => 'required|array'
+                'positions' => 'required|array',
             ]);
 
-            $photos = json_decode($property->photos, true);
-            $newPhotos = [];
-
-            foreach ($request->positions as $index) {
-                if (isset($photos[$index])) {
-                    $newPhotos[] = $photos[$index];
-                }
-            }
-
-            $property->photos = json_encode($newPhotos);
-            $property->save();
+            $this->photoService->updatePhotoPositions($property, $request->positions);
 
             return response()->json(['message' => 'Photo positions updated successfully']);
         } catch (\Exception $e) {
             \Log::error('Error updating photo positions: ' . $e->getMessage());
+
             return response()->json(['message' => 'An error occurred while updating photo positions. Please try again.'], 500);
         }
     }
@@ -458,30 +457,12 @@ class BasePropertyController extends Controller
                 return response()->json(['message' => 'Property not found'], 404);
             }
 
-            $photos = json_decode($property->photos, true);
-
-            if (!isset($photos[$photoIndex])) {
-                return response()->json(['message' => 'Photo not found'], 404);
-            }
-
-            // Delete the photo file
-            $photoPath = public_path('assets/images/properties/' . $photos[$photoIndex]);
-            if (file_exists($photoPath)) {
-                unlink($photoPath);
-            }
-
-            // Remove from array
-            unset($photos[$photoIndex]);
-
-            // Reindex array
-            $photos = array_values($photos);
-
-            $property->photos = json_encode($photos);
-            $property->save();
+            $this->photoService->deletePhoto($property, $photoIndex);
 
             return response()->json(['message' => 'Photo deleted successfully']);
         } catch (\Exception $e) {
             \Log::error('Error deleting photo: ' . $e->getMessage());
+
             return response()->json(['message' => 'An error occurred while deleting the photo. Please try again.'], 500);
         }
     }

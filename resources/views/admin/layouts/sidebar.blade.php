@@ -3,6 +3,7 @@
         @php
             $logoPath = \App\Models\Setting::get('general', 'logo');
             $faviconPath = \App\Models\Setting::get('general', 'favicon');
+            $websiteTitle = \App\Models\Setting::get('general', 'website_title', 'E-Property');
         @endphp
         
         <div>
@@ -13,7 +14,7 @@
                 <img src="{{ $faviconPath ? safe_asset('storage/' . $faviconPath, 'assets/images/favicon-32x32.png') : asset('assets/images/favicon-32x32.png') }}" class="logo-icon" alt="favicon" id="favicon-logo">
             @else
                 <!-- Website title when no logo is uploaded -->
-                <h4 class="logo-text">E-Property</h4>
+                <h4 class="logo-text">{{ $websiteTitle }}</h4>
             @endif
         </div>
         <div class="toggle-icon ms-auto"><i class='bx bx-arrow-back'></i>

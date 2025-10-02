@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\User;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 
 class PermissionService
 {
@@ -21,16 +21,16 @@ class PermissionService
                 $permissionIds = $role->permissions->pluck('id')->toArray();
             }
         }
-        
+
         // Merge with additional permissions
         if ($permissions) {
             $permissionIds = array_unique(array_merge($permissionIds, $permissions));
         }
-        
+
         // Sync user permissions
         $user->permissions()->sync($permissionIds);
     }
-    
+
     /**
      * Get all permissions grouped by module
      */
@@ -38,21 +38,21 @@ class PermissionService
     {
         $permissions = Permission::all();
         $grouped = [];
-        
+
         foreach ($permissions as $permission) {
-            if (!isset($grouped[$permission->module])) {
+            if (! isset($grouped[$permission->module])) {
                 $grouped[$permission->module] = [
                     'name' => $this->getModuleName($permission->module),
-                    'permissions' => []
+                    'permissions' => [],
                 ];
             }
-            
+
             $grouped[$permission->module]['permissions'][] = $permission;
         }
-        
+
         return $grouped;
     }
-    
+
     /**
      * Get module name for display
      */
@@ -74,12 +74,12 @@ class PermissionService
             'users-management' => 'Management Users',
             'users-regular' => 'Regular Users',
             'roles' => 'Roles',
-            'permissions' => 'Permissions'
+            'permissions' => 'Permissions',
         ];
-        
+
         return $modules[$moduleKey] ?? ucfirst(str_replace('-', ' ', $moduleKey));
     }
-    
+
     /**
      * Check if user has permission
      */
@@ -89,7 +89,7 @@ class PermissionService
         if ($user->isSuperAdmin()) {
             return true;
         }
-        
+
         // Check if user has the specific permission
         return $user->hasPermission($module, $action);
     }

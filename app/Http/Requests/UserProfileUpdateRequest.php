@@ -21,7 +21,7 @@ class UserProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         $user = Auth::user();
-        
+
         return [
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$user->id,
@@ -31,7 +31,7 @@ class UserProfileUpdateRequest extends FormRequest
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
-    
+
     /**
      * Get custom messages for validator errors.
      */

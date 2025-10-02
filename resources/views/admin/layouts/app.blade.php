@@ -31,6 +31,9 @@
     <link rel="stylesheet" href="{{ asset('assets/css/semi-dark.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/header-colors.css') }}" />
     
+    <!-- Admin Custom CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/admin/css/admin-custom.css') }}" />
+    
     <!-- Dynamic CSS based on settings -->
     <!-- <link href="{{ route('dynamic-css') }}" rel="stylesheet" type="text/css"> -->
     
@@ -128,6 +131,9 @@
     <!--app JS-->
     <script src="{{ asset('assets/js/app.js') }}"></script>
     <script src="{{ asset('assets/js/suppress-errors.js') }}"></script>
+    
+    <!-- Admin Custom JS -->
+    <script src="{{ asset('assets/admin/js/admin-custom.js') }}"></script>
     
     @yield('scripts')
 </body>

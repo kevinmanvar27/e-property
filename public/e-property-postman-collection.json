@@ -1,0 +1,141 @@
+{
+  "info": {
+    "name": "E-Property API",
+    "description": "API documentation for E-Property project",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/settings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/settings/update",
+              "host": ["{{base_url}}"],
+              "path": ["api", "settings", "update"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "Land Jamin",
+          "item": [
+            {
+              "name": "Get All Land Jamin Properties",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/land-jamin",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "land-jamin"]
+                }
+              }
+            },
+            {
+              "name": "Create Land Jamin Property",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/land-jamin",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "land-jamin"]
+                }
+              }
+            },
+            {
+              "name": "Get Land Jamin Property",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/land-jamin/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "land-jamin", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update Land Jamin Property",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/land-jamin/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "land-jamin", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete Land Jamin Property",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/land-jamin/:id",
+                  "host": ["{{base_url}}"],
+                  "path": ["api", "land-jamin", ":id"],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

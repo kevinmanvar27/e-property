@@ -1,21 +1,21 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ManagementUserController;
-use App\Http\Controllers\RegularUserController;
-use App\Http\Controllers\UserPermissionController;
+use App\Http\Controllers\HouseController;
 use App\Http\Controllers\LandJaminController;
+use App\Http\Controllers\LocationController;
+use App\Http\Controllers\ManagementUserController;
+use App\Http\Controllers\MasterDataController;
+use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlotController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RegularUserController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShadController;
 use App\Http\Controllers\ShopController;
-use App\Http\Controllers\HouseController;
-use App\Http\Controllers\MasterDataController;
-use App\Http\Controllers\LocationController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\PermissionController;
+use App\Http\Controllers\UserPermissionController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/admin/login');
@@ -25,6 +25,7 @@ Route::get('/admin/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
+
     return redirect()->route('login');
 });
 
@@ -38,9 +39,6 @@ Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')
 Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh-csrf');
-
-// Dynamic CSS route
-Route::get('/css/dynamic-styles.css', [SettingsController::class, 'dynamicCss'])->name('dynamic-css');
 
 // Dashboard Route
 Route::get('/admin/dashboard', function () {
@@ -63,13 +61,13 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::patch('/admin/users/management/{management_user}/toggle-status', [ManagementUserController::class, 'toggleStatus'])->name('users.management.toggle-status');
     Route::get('/admin/users/management/{user}/permissions', [UserPermissionController::class, 'show'])->name('users.management.permissions');
     Route::post('/admin/users/management/{user}/permissions', [UserPermissionController::class, 'update'])->name('users.management.permissions.assign');
-    
+
     Route::get('/admin/users/regular', [RegularUserController::class, 'index'])->name('users.regular');
     Route::post('/admin/users/regular', [RegularUserController::class, 'store'])->name('users.regular.store');
     Route::put('/admin/users/regular/{regular_user}', [RegularUserController::class, 'update'])->name('users.regular.update');
     Route::delete('/admin/users/regular/{regular_user}', [RegularUserController::class, 'destroy'])->name('users.regular.delete');
     Route::patch('/admin/users/regular/{regular_user}/toggle-status', [RegularUserController::class, 'toggleStatus'])->name('users.regular.toggle-status');
-    
+
     // Role Management Routes
     Route::resource('/admin/roles', RoleController::class)->names([
         'index' => 'admin.roles.index',
@@ -80,10 +78,10 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
         'update' => 'admin.roles.update',
         'destroy' => 'admin.roles.destroy',
     ]);
-    
+
     // Add route for getting role permissions
     Route::get('/admin/roles/{id}/permissions', [RoleController::class, 'getRolePermissions'])->name('admin.roles.permissions');
-    
+
     // Permission Management Routes
     Route::resource('/admin/permissions', PermissionController::class)->names([
         'index' => 'admin.permissions.index',
@@ -94,7 +92,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
         'update' => 'admin.permissions.update',
         'destroy' => 'admin.permissions.destroy',
     ]);
-    
+
     // Master Data Routes
     Route::get('/admin/amenities', [MasterDataController::class, 'indexAmenities'])->name('admin.amenities.index');
     Route::get('/admin/amenities/create', [MasterDataController::class, 'createAmenity'])->name('admin.amenities.create');
@@ -102,44 +100,44 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/admin/amenities/{amenity}/edit', [MasterDataController::class, 'editAmenity'])->name('admin.amenities.edit');
     Route::put('/admin/amenities/{amenity}', [MasterDataController::class, 'updateAmenity'])->name('admin.amenities.update');
     Route::delete('/admin/amenities/{amenity}', [MasterDataController::class, 'destroyAmenity'])->name('admin.amenities.destroy');
-    
+
     Route::get('/admin/land-types', [MasterDataController::class, 'indexLandTypes'])->name('admin.land-types.index');
     Route::get('/admin/land-types/create', [MasterDataController::class, 'createLandType'])->name('admin.land-types.create');
     Route::post('/admin/land-types', [MasterDataController::class, 'storeLandType'])->name('admin.land-types.store');
     Route::get('/admin/land-types/{landType}/edit', [MasterDataController::class, 'editLandType'])->name('admin.land-types.edit');
     Route::put('/admin/land-types/{landType}', [MasterDataController::class, 'updateLandType'])->name('admin.land-types.update');
     Route::delete('/admin/land-types/{landType}', [MasterDataController::class, 'destroyLandType'])->name('admin.land-types.destroy');
-    
+
     // Location Management Routes
     // Countries
     Route::get('/admin/countries', [LocationController::class, 'indexCountries'])->name('admin.countries.index');
     Route::post('/admin/countries', [LocationController::class, 'storeCountry'])->name('admin.countries.store');
     Route::put('/admin/countries/{country}', [LocationController::class, 'updateCountry'])->name('admin.countries.update');
     Route::delete('/admin/countries/{country}', [LocationController::class, 'destroyCountry'])->name('admin.countries.destroy');
-    
+
     // States
     Route::get('/admin/states', [LocationController::class, 'indexStates'])->name('admin.states.index');
     Route::post('/admin/states', [LocationController::class, 'storeState'])->name('admin.states.store');
     Route::put('/admin/states/{state}', [LocationController::class, 'updateState'])->name('admin.states.update');
     Route::delete('/admin/states/{state}', [LocationController::class, 'destroyState'])->name('admin.states.destroy');
-    
+
     // Districts
     Route::get('/admin/districts', [LocationController::class, 'indexDistricts'])->name('admin.districts.index');
     Route::post('/admin/districts', [LocationController::class, 'storeDistrict'])->name('admin.districts.store');
     Route::put('/admin/districts/{district}', [LocationController::class, 'updateDistrict'])->name('admin.districts.update');
     Route::delete('/admin/districts/{district}', [LocationController::class, 'destroyDistrict'])->name('admin.districts.destroy');
-    
+
     // Cities/Talukas
     Route::get('/admin/cities', [LocationController::class, 'indexCities'])->name('admin.cities.index');
     Route::post('/admin/cities', [LocationController::class, 'storeCity'])->name('admin.cities.store');
     Route::put('/admin/cities/{city}', [LocationController::class, 'updateCity'])->name('admin.cities.update');
     Route::delete('/admin/cities/{city}', [LocationController::class, 'destroyCity'])->name('admin.cities.destroy');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/locations/states/{countryId}', [LocationController::class, 'getStatesByCountry'])->name('admin.locations.states');
     Route::get('/admin/locations/districts/{stateId}', [LocationController::class, 'getDistrictsByState'])->name('admin.locations.districts');
     Route::get('/admin/locations/cities/{districtId}', [LocationController::class, 'getCitiesByDistrict'])->name('admin.locations.cities');
-    
+
     // AJAX route for adding new entities
     Route::post('/admin/locations/entities', [LocationController::class, 'storeEntity'])->name('admin.locations.entities.store');
 });
@@ -147,7 +145,6 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
 // Settings routes
 Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::get('/admin/settings', [SettingsController::class, 'index'])->name('settings.index');
-    Route::post('/admin/settings/appearance', [SettingsController::class, 'updateAppearance'])->name('settings.appearance.update');
     Route::post('/admin/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.general.update');
     Route::post('/admin/settings/contact', [SettingsController::class, 'updateContact'])->name('settings.contact.update');
     Route::post('/admin/settings/social', [SettingsController::class, 'updateSocial'])->name('settings.social.update');
@@ -166,16 +163,16 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::put('/admin/land-jamin/{property}', [LandJaminController::class, 'update'])->name('land-jamin.update');
     Route::delete('/admin/land-jamin/{property}', [LandJaminController::class, 'destroy'])->name('land-jamin.destroy');
     Route::patch('/admin/land-jamin/{property}/update-status', [LandJaminController::class, 'updateStatus'])->name('land-jamin.update-status');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/land-jamin/states/{countryId}', [LandJaminController::class, 'getStatesByCountry'])->name('land-jamin.states');
     Route::get('/admin/land-jamin/districts/{stateId}', [LandJaminController::class, 'getDistrictsByState'])->name('land-jamin.districts');
     Route::get('/admin/land-jamin/talukas/{districtId}', [LandJaminController::class, 'getTalukasByDistrict'])->name('land-jamin.talukas');
-    
+
     // AJAX routes for amenities and land types
     Route::post('/admin/land-jamin/amenities', [LandJaminController::class, 'storeAmenity'])->name('land-jamin.amenities.store');
     Route::post('/admin/land-jamin/land-types', [LandJaminController::class, 'storeLandType'])->name('land-jamin.land-types.store');
-    
+
     // AJAX routes for photo management
     Route::post('/admin/land-jamin/{property}/photo-positions', [LandJaminController::class, 'updatePhotoPositions'])->name('land-jamin.photo-positions.update');
     Route::delete('/admin/land-jamin/{property}/photos/{photoIndex}', [LandJaminController::class, 'deletePhoto'])->name('land-jamin.photos.destroy');
@@ -191,16 +188,16 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::put('/admin/plot/{property}', [PlotController::class, 'update'])->name('plot.update');
     Route::delete('/admin/plot/{property}', [PlotController::class, 'destroy'])->name('plot.destroy');
     Route::patch('/admin/plot/{property}/update-status', [PlotController::class, 'updateStatus'])->name('plot.update-status');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/plot/states/{countryId}', [PlotController::class, 'getStatesByCountry'])->name('plot.states');
     Route::get('/admin/plot/districts/{stateId}', [PlotController::class, 'getDistrictsByState'])->name('plot.districts');
     Route::get('/admin/plot/talukas/{districtId}', [PlotController::class, 'getTalukasByDistrict'])->name('plot.talukas');
-    
+
     // AJAX routes for amenities and land types
     Route::post('/admin/plot/amenities', [PlotController::class, 'storeAmenity'])->name('plot.amenities.store');
     Route::post('/admin/plot/land-types', [PlotController::class, 'storeLandType'])->name('plot.land-types.store');
-    
+
     // AJAX routes for photo management
     Route::post('/admin/plot/{property}/photo-positions', [PlotController::class, 'updatePhotoPositions'])->name('plot.photo-positions.update');
     Route::delete('/admin/plot/{property}/photos/{photoIndex}', [PlotController::class, 'deletePhoto'])->name('plot.photos.destroy');
@@ -216,16 +213,16 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::put('/admin/shad/{property}', [ShadController::class, 'update'])->name('shad.update');
     Route::delete('/admin/shad/{property}', [ShadController::class, 'destroy'])->name('shad.destroy');
     Route::patch('/admin/shad/{property}/update-status', [ShadController::class, 'updateStatus'])->name('shad.update-status');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/shad/states/{countryId}', [ShadController::class, 'getStatesByCountry'])->name('shad.states');
     Route::get('/admin/shad/districts/{stateId}', [ShadController::class, 'getDistrictsByState'])->name('shad.districts');
     Route::get('/admin/shad/talukas/{districtId}', [ShadController::class, 'getTalukasByDistrict'])->name('shad.talukas');
-    
+
     // AJAX routes for amenities and land types
     Route::post('/admin/shad/amenities', [ShadController::class, 'storeAmenity'])->name('shad.amenities.store');
     Route::post('/admin/shad/land-types', [ShadController::class, 'storeLandType'])->name('shad.land-types.store');
-    
+
     // AJAX routes for photo management
     Route::post('/admin/shad/{property}/photo-positions', [ShadController::class, 'updatePhotoPositions'])->name('shad.photo-positions.update');
     Route::delete('/admin/shad/{property}/photos/{photoIndex}', [ShadController::class, 'deletePhoto'])->name('shad.photos.destroy');
@@ -241,16 +238,16 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::put('/admin/shop/{property}', [ShopController::class, 'update'])->name('shop.update');
     Route::delete('/admin/shop/{property}', [ShopController::class, 'destroy'])->name('shop.destroy');
     Route::patch('/admin/shop/{property}/update-status', [ShopController::class, 'updateStatus'])->name('shop.update-status');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/shop/states/{countryId}', [ShopController::class, 'getStatesByCountry'])->name('shop.states');
     Route::get('/admin/shop/districts/{stateId}', [ShopController::class, 'getDistrictsByState'])->name('shop.districts');
     Route::get('/admin/shop/talukas/{districtId}', [ShopController::class, 'getTalukasByDistrict'])->name('shop.talukas');
-    
+
     // AJAX routes for amenities and land types
     Route::post('/admin/shop/amenities', [ShopController::class, 'storeAmenity'])->name('shop.amenities.store');
     Route::post('/admin/shop/land-types', [ShopController::class, 'storeLandType'])->name('shop.land-types.store');
-    
+
     // AJAX routes for photo management
     Route::post('/admin/shop/{property}/photo-positions', [ShopController::class, 'updatePhotoPositions'])->name('shop.photo-positions.update');
     Route::delete('/admin/shop/{property}/photos/{photoIndex}', [ShopController::class, 'deletePhoto'])->name('shop.photos.destroy');
@@ -266,16 +263,16 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::put('/admin/house/{property}', [HouseController::class, 'update'])->name('house.update');
     Route::delete('/admin/house/{property}', [HouseController::class, 'destroy'])->name('house.destroy');
     Route::patch('/admin/house/{property}/update-status', [HouseController::class, 'updateStatus'])->name('house.update-status');
-    
+
     // AJAX routes for cascading dropdowns
     Route::get('/admin/house/states/{countryId}', [HouseController::class, 'getStatesByCountry'])->name('house.states');
     Route::get('/admin/house/districts/{stateId}', [HouseController::class, 'getDistrictsByState'])->name('house.districts');
     Route::get('/admin/house/talukas/{districtId}', [HouseController::class, 'getTalukasByDistrict'])->name('house.talukas');
-    
+
     // AJAX routes for amenities and land types
     Route::post('/admin/house/amenities', [HouseController::class, 'storeAmenity'])->name('house.amenities.store');
     Route::post('/admin/house/land-types', [HouseController::class, 'storeLandType'])->name('house.land-types.store');
-    
+
     // AJAX routes for photo management
     Route::post('/admin/house/{property}/photo-positions', [HouseController::class, 'updatePhotoPositions'])->name('house.photo-positions.update');
     Route::delete('/admin/house/{property}/photos/{photoIndex}', [HouseController::class, 'deletePhoto'])->name('house.photos.destroy');

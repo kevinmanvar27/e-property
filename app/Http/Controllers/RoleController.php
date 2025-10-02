@@ -2,18 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RoleStoreRequest;
+use App\Http\Requests\RoleUpdateRequest;
 use App\Models\Role;
-use App\Models\Permission;
-use Illuminate\Http\Request;
+use App\Services\RoleService;
 
 class RoleController extends Controller
 {
+    protected $roleService;
+
+    public function __construct(RoleService $roleService)
+    {
+        $this->roleService = $roleService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $roles = Role::with('permissions')->get();
+        $roles = $this->roleService->getAllRoles();
+
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -22,31 +31,28 @@ class RoleController extends Controller
      */
     public function create()
     {
-        $permissions = Permission::all();
+        $permissions = $this->roleService->getAllPermissions();
+
         return view('admin.roles.create', compact('permissions'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RoleStoreRequest $request)
     {
-        $request->validate([
-            'name' => 'required|unique:roles,name',
-            'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
-            'permissions' => 'array'
-        ]);
-
         $role = Role::create([
             'name' => $request->name,
             'description' => $request->description,
-            'status' => $request->status
+            'status' => $request->status,
         ]);
 
         if ($request->has('permissions')) {
             $role->permissions()->sync($request->permissions);
         }
+
+        // Clear cache
+        $this->roleService->clearCache();
 
         return redirect()->route('admin.roles.index')->with('success', 'Role created successfully.');
     }
@@ -57,6 +63,7 @@ class RoleController extends Controller
     public function show(string $id)
     {
         $role = Role::with('permissions')->findOrFail($id);
+
         return view('admin.roles.show', compact('role'));
     }
 
@@ -66,30 +73,23 @@ class RoleController extends Controller
     public function edit(string $id)
     {
         $role = Role::with('permissions')->findOrFail($id);
-        $permissions = Permission::all();
+        $permissions = $this->roleService->getAllPermissions();
         $rolePermissions = $role->permissions->pluck('id')->toArray();
-        
+
         return view('admin.roles.edit', compact('role', 'permissions', 'rolePermissions'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(RoleUpdateRequest $request, string $id)
     {
         $role = Role::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required|unique:roles,name,' . $role->id,
-            'description' => 'nullable|string',
-            'status' => 'required|in:active,inactive',
-            'permissions' => 'array'
-        ]);
 
         $role->update([
             'name' => $request->name,
             'description' => $request->description,
-            'status' => $request->status
+            'status' => $request->status,
         ]);
 
         if ($request->has('permissions')) {
@@ -97,6 +97,9 @@ class RoleController extends Controller
         } else {
             $role->permissions()->detach();
         }
+
+        // Clear cache
+        $this->roleService->clearCache();
 
         return redirect()->route('admin.roles.index')->with('success', 'Role updated successfully.');
     }
@@ -110,15 +113,19 @@ class RoleController extends Controller
         $role->permissions()->detach();
         $role->delete();
 
+        // Clear cache
+        $this->roleService->clearCache();
+
         return redirect()->route('admin.roles.index')->with('success', 'Role deleted successfully.');
     }
-    
+
     /**
      * Get role permissions
      */
     public function getRolePermissions($id)
     {
-        $role = Role::with('permissions')->findOrFail($id);
-        return response()->json(['permissions' => $role->permissions]);
+        $permissions = $this->roleService->getPermissionsByRole($id);
+
+        return response()->json(['permissions' => $permissions]);
     }
 }

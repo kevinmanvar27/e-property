@@ -20,7 +20,7 @@ class ManagementUserUpdateRequest extends FormRequest
     public function rules(): array
     {
         $userId = $this->route('management_user');
-        
+
         return [
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255|unique:users,username,'.$userId.'|regex:/^[a-zA-Z0-9_]+$/',
@@ -34,7 +34,7 @@ class ManagementUserUpdateRequest extends FormRequest
             'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
-    
+
     /**
      * Get custom messages for validator errors.
      */

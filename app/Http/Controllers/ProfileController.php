@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
-use App\Services\UserService;
-use App\Http\Requests\UserProfileUpdateRequest;
 use App\Http\Requests\UserPasswordUpdateRequest;
-use Illuminate\Http\Request;
+use App\Http\Requests\UserProfileUpdateRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -20,9 +19,10 @@ class ProfileController extends Controller
     public function show()
     {
         $user = Auth::user();
+
         return view('admin.profile.show', compact('user'));
     }
-    
+
     /**
      * Update the user profile.
      *
@@ -33,30 +33,31 @@ class ProfileController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             $user->name = $request->name;
             $user->username = $request->username;
             $user->email = $request->email;
             $user->contact = $request->contact;
             $user->dob = $request->dob;
-            
+
             // Handle photo upload
             if ($request->hasFile('photo')) {
                 $photo = $request->file('photo');
                 $filename = time() . '.' . $photo->getClientOriginalExtension();
-                $photo->move(public_path('assets/images/avatars'), $filename);
+                Storage::disk('photos')->putFileAs('', $photo, $filename);
                 $user->photo = $filename;
             }
-            
+
             $user->save();
 
             return redirect()->back()->with('success', 'Profile updated successfully');
         } catch (\Exception $e) {
             \Log::error('Error updating user profile: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'An error occurred while updating your profile. Please try again.');
         }
     }
-    
+
     /**
      * Update the user password.
      *
@@ -67,9 +68,9 @@ class ProfileController extends Controller
     {
         try {
             $user = Auth::user();
-            
+
             // Check if current password is correct
-            if (!Hash::check($request->current_password, $user->password)) {
+            if (! Hash::check($request->current_password, $user->password)) {
                 return redirect()->back()->withErrors(['current_password' => 'Current password is incorrect'])->withInput();
             }
 
@@ -80,6 +81,7 @@ class ProfileController extends Controller
             return redirect()->back()->with('success', 'Password updated successfully');
         } catch (\Exception $e) {
             \Log::error('Error updating user password: ' . $e->getMessage());
+
             return redirect()->back()->with('error', 'An error occurred while updating your password. Please try again.');
         }
     }

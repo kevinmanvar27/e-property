@@ -43,7 +43,7 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
-    
+
     /**
      * Indicate that the user is an admin.
      */
@@ -53,7 +53,7 @@ class UserFactory extends Factory
             'role' => 'admin',
         ]);
     }
-    
+
     /**
      * Indicate that the user is a super admin.
      */

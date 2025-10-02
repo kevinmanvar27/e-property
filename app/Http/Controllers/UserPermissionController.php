@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Models\Permission;
 use App\Models\Role;
-use App\Services\PermissionService;
+use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Validator;
 
 class UserPermissionController extends Controller
 {
@@ -23,10 +20,10 @@ class UserPermissionController extends Controller
         $user = User::with(['permissions', 'role'])->findOrFail($id);
         $permissions = Permission::all();
         $roles = Role::where('status', 'active')->get();
-        
+
         return view('admin.users.permissions', compact('user', 'permissions', 'roles'));
     }
-    
+
     /**
      * Assign permissions to a user
      *
@@ -37,17 +34,17 @@ class UserPermissionController extends Controller
     public function update(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        
+
         $request->validate([
             'role_id' => 'nullable|exists:roles,id',
             'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,id'
+            'permissions.*' => 'exists:permissions,id',
         ]);
-        
+
         // Update user's role_id
         $user->role_id = $request->role_id;
         $user->save();
-        
+
         // If a role is assigned, get its permissions
         $permissionIds = [];
         if ($request->role_id) {
@@ -56,15 +53,15 @@ class UserPermissionController extends Controller
                 $permissionIds = $role->permissions->pluck('id')->toArray();
             }
         }
-        
+
         // Merge with additional permissions
         if ($request->has('permissions')) {
             $permissionIds = array_unique(array_merge($permissionIds, $request->permissions));
         }
-        
+
         // Sync user permissions
         $user->permissions()->sync($permissionIds);
-        
+
         return redirect()->back()->with('success', 'User permissions updated successfully.');
     }
 }

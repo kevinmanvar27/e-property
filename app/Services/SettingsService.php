@@ -9,7 +9,7 @@ class SettingsService
 {
     protected $cacheKey = 'app_settings';
     protected $cacheDuration = 3600; // 1 hour
-    
+
     /**
      * Get all settings with caching
      *
@@ -21,7 +21,7 @@ class SettingsService
             return Setting::all()->groupBy('section')->toArray();
         });
     }
-    
+
     /**
      * Get a specific setting value
      *
@@ -33,7 +33,7 @@ class SettingsService
     public function getSetting($section, $key, $default = null)
     {
         $settings = $this->getAllSettings();
-        
+
         if (isset($settings[$section])) {
             foreach ($settings[$section] as $setting) {
                 if ($setting['key'] === $key) {
@@ -41,10 +41,10 @@ class SettingsService
                 }
             }
         }
-        
+
         return $default;
     }
-    
+
     /**
      * Clear settings cache
      *
@@ -54,7 +54,7 @@ class SettingsService
     {
         Cache::forget($this->cacheKey);
     }
-    
+
     /**
      * Get all settings as key-value pairs for API response
      *
@@ -64,13 +64,13 @@ class SettingsService
     {
         $settings = $this->getAllSettings();
         $result = [];
-        
+
         foreach ($settings as $section => $sectionSettings) {
             foreach ($sectionSettings as $setting) {
                 $result[$setting['key']] = $setting['value'];
             }
         }
-        
+
         return $result;
     }
 }
