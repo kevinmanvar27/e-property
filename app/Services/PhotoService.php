@@ -30,27 +30,48 @@ class PhotoService
     /**
      * Delete a specific photo from a property
      */
+    // public function deletePhoto(Property $property, $photoIndex)
+    // {
+    //     $photos = json_decode($property->photos, true);
+
+    //     if (! isset($photos[$photoIndex])) {
+    //         throw new \Exception('Photo not found');
+    //     }
+
+    //     // Delete the photo file
+    //     $photoPath = $photos[$photoIndex];
+    //     if (Storage::disk('photos')->exists($photoPath)) {
+    //         Storage::disk('photos')->delete($photoPath);
+    //     }
+
+    //     // Remove from array
+    //     unset($photos[$photoIndex]);
+
+    //     // Reindex array
+    //     $photos = array_values($photos);
+
+    //     $property->photos = json_encode($photos);
+    //     $property->save();
+
+    //     return $property;
+    // }
     public function deletePhoto(Property $property, $photoIndex)
     {
         $photos = json_decode($property->photos, true);
 
-        if (! isset($photos[$photoIndex])) {
+        if (!isset($photos[$photoIndex])) {
             throw new \Exception('Photo not found');
         }
 
-        // Delete the photo file
         $photoPath = $photos[$photoIndex];
-        if (Storage::disk('photos')->exists($photoPath)) {
-            Storage::disk('photos')->delete($photoPath);
+
+        // If using public disk
+        if (Storage::disk('public')->exists('photos/' . $photoPath)) {
+            Storage::disk('public')->delete('photos/' . $photoPath);
         }
 
-        // Remove from array
         unset($photos[$photoIndex]);
-
-        // Reindex array
-        $photos = array_values($photos);
-
-        $property->photos = json_encode($photos);
+        $property->photos = json_encode(array_values($photos));
         $property->save();
 
         return $property;

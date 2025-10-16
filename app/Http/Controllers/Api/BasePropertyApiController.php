@@ -12,6 +12,7 @@ use App\Services\MasterDataService;
 use App\Services\PhotoService;
 use App\Services\PropertyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 /**
  * @OA\Schema(
@@ -102,20 +103,72 @@ class BasePropertyApiController extends Controller
     /**
      * Display a listing of the resource.
      */
+    
+    // public function index(Request $request)
+    // {
+    //     try {
+    //         $properties = Property::with(['state', 'district', 'taluka'])
+    //             ->where('property_type', $this->propertyType)
+    //             ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at'])
+    //             ->get();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $properties,
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         \Log::error('Error loading properties: ' . $e->getMessage());
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'An error occurred while loading properties. Please try again.',
+    //         ], 500);
+    //     }
+    // }
+
     public function index(Request $request)
     {
         try {
-            $properties = Property::with(['state', 'district', 'taluka'])
+            // Get filter query params
+            $countryIds = $request->input('country_ids') ? explode(',', $request->input('country_ids')) : [];
+            $stateIds   = $request->input('state_ids') ? explode(',', $request->input('state_ids')) : [];
+            $districtIds = $request->input('district_ids') ? explode(',', $request->input('district_ids')) : [];
+            $cityIds = $request->input('city_ids') ? explode(',', $request->input('city_ids')) : [];
+            
+            // Get pagination params
+            $perPage = $request->input('per_page', 10); // Default to 10 items per page
+            $page = $request->input('page', 1); // Default to first page
+
+            $query = Property::with(['state', 'district', 'taluka'])
                 ->where('property_type', $this->propertyType)
-                ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at'])
-                ->get();
+                ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at', 'photos']);
+
+            // Apply filters only if arrays are not empty
+            if (!empty($countryIds)) {
+                $query->whereIn('country_id', $countryIds);
+            }
+
+            if (!empty($stateIds)) {
+                $query->whereIn('state_id', $stateIds);
+            }
+
+            if (!empty($districtIds)) {
+                $query->whereIn('district_id', $districtIds);
+            }
+
+            if (!empty($cityIds)) {
+                $query->whereIn('taluka_id', $cityIds);
+            }
+
+            // Apply pagination
+            $properties = $query->paginate($perPage, ['*'], 'page', $page);
 
             return response()->json([
                 'success' => true,
                 'data' => $properties,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error loading properties: ' . $e->getMessage());
+            Log::error('Error loading properties: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -174,9 +227,12 @@ class BasePropertyApiController extends Controller
                 'property_type',
                 'status',
                 'vavetar',
+                'vavetar_name',
                 'any_issue',
                 'issue_description',
                 'electric_poll',
+                'amenities',
+                'land_types',
                 'electric_poll_count',
                 'family_issue',
                 'family_issue_description',
@@ -205,7 +261,7 @@ class BasePropertyApiController extends Controller
                 'data' => $property,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error creating property: ' . $e->getMessage());
+            Log::error('Error creating property: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -269,7 +325,10 @@ class BasePropertyApiController extends Controller
                 'country_id',
                 'status',
                 'vavetar',
+                'vavetar_name',
                 'any_issue',
+                'amenities',
+                'land_types',
                 'issue_description',
                 'electric_poll',
                 'electric_poll_count',
@@ -311,7 +370,7 @@ class BasePropertyApiController extends Controller
                 'data' => $property,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating property: ' . $e->getMessage());
+            Log::error('Error updating property: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -344,7 +403,7 @@ class BasePropertyApiController extends Controller
                 'message' => 'Property deleted successfully',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error deleting property: ' . $e->getMessage());
+            Log::error('Error deleting property: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -423,7 +482,7 @@ class BasePropertyApiController extends Controller
                 ],
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating property status: ' . $e->getMessage());
+            Log::error('Error updating property status: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -532,7 +591,7 @@ class BasePropertyApiController extends Controller
                 'message' => 'Photo positions updated successfully',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating photo positions: ' . $e->getMessage());
+            Log::error('Error updating photo positions: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -562,7 +621,7 @@ class BasePropertyApiController extends Controller
                 'message' => 'Photo deleted successfully',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error deleting photo: ' . $e->getMessage());
+            Log::error('Error deleting photo: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

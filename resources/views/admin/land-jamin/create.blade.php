@@ -17,11 +17,12 @@
 <!-- Main Form Card -->
 <div class="card">
     <div class="card-header">
-        <h5 class="mb-0">Add New Land Record</h5>
+        <h5 class="mb-0">Add New Land/Jamin Record</h5>
     </div>
     <div class="card-body">
-        <form id="land-form" enctype="multipart/form-data" aria-label="Land Form">
+        <form id="shop-form" enctype="multipart/form-data">
             @csrf
+            <input type="hidden" name="property_type" value="land_jamin">
             
             <!-- Section 1: Basic Information -->
             <div class="section-card mb-4">
@@ -32,8 +33,8 @@
                 <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="owner_name" class="form-label">Owner Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="owner_name" name="owner_name" required aria-describedby="owner_name_error">
-                        <div class="invalid-feedback" id="owner_name_error" role="alert"></div>
+                        <input type="text" class="form-control" id="owner_name" name="owner_name" required>
+                        <div class="invalid-feedback" id="owner_name_error"></div>
                     </div>
                     <div class="col-md-4">
                         <label for="contact_number" class="form-label">Contact Number</label>
@@ -53,21 +54,6 @@
                             <option value="coming_soon">Coming Soon</option>
                             <option value="price_reduced">Price Reduced</option>
                         </select>
-                    </div>
-                </div>
-                
-                <div class="row mb-3">
-                    <div class="col-md-6">
-                        <label for="property_type" class="form-label">Property Type <span class="text-danger">*</span></label>
-                        <select class="form-select" id="property_type" name="property_type" required aria-describedby="property_type_error">
-                            <option value="">Select Property Type</option>
-                            <option value="land_jamin">Land/Jamin</option>
-                            <option value="shop">Shop</option>
-                            <option value="plot">Plot</option>
-                            <option value="shade">Shade</option>
-                            <option value="flat">Flat</option>
-                        </select>
-                        <div class="invalid-feedback" id="property_type_error" role="alert"></div>
                     </div>
                 </div>
             </div>
@@ -98,7 +84,7 @@
                     </div>
                     <div class="col-md-4">
                         <label for="state_id" class="form-label">State <span class="text-danger">*</span></label>
-                        <select class="form-select" id="state_id" name="state_id" required data-add-new="true" data-entity-type="state">
+                        <select class="form-select" id="state_id" name="state_id" required>
                             <option value="">Select State</option>
                             @foreach($states as $stateId => $stateName)
                             <option value="{{ $stateId }}">{{ $stateName }}</option>
@@ -108,14 +94,17 @@
                     </div>
                     <div class="col-md-4">
                         <label for="district_id" class="form-label">District <span class="text-danger">*</span></label>
-                        <select class="form-select" id="district_id" name="district_id" required data-add-new="true" data-entity-type="district">
+                        <select class="form-select" id="district_id" name="district_id" required>
                             <option value="">Select District</option>
                         </select>
                         <div class="invalid-feedback" id="district_id_error"></div>
                     </div>
+                </div>
+                
+                <div class="row mb-3">
                     <div class="col-md-4">
                         <label for="taluka_id" class="form-label">Taluka</label>
-                        <select class="form-select" id="taluka_id" name="taluka_id" data-add-new="true" data-entity-type="city">
+                        <select class="form-select" id="taluka_id" name="taluka_id">
                             <option value="">Select Taluka</option>
                         </select>
                     </div>
@@ -137,7 +126,6 @@
                 </div>
             </div>
             
-            <!-- Section 3: Documents -->
             <div class="section-card mb-4">
                 <div class="section-header bg-light p-3 mb-3 rounded">
                     <h6 class="mb-0">Documents</h6>
@@ -158,8 +146,8 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Section 4: Photographs -->
+
+            <!-- Section 3: Photographs -->
             <div class="section-card mb-4">
                 <div class="section-header bg-light p-3 mb-3 rounded">
                     <h6 class="mb-0">Photographs</h6>
@@ -168,13 +156,14 @@
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <label for="photos" class="form-label">Photographs (Multiple uploads supported)</label>
-                        <input type="file" class="form-control" id="photos" name="photos[]" multiple accept=".jpg,.jpeg,.png" aria-describedby="photos_error">
-                        <div class="invalid-feedback" id="photos_error" role="alert"></div>
+                        <input type="file" class="form-control" id="photos" name="photos[]" multiple accept=".jpg,.jpeg,.png">
+                        <div class="file-size-info text-muted small mt-1" id="photos_size"></div>
+                        <div class="invalid-feedback" id="photos_error"></div>
                         
                         <!-- Preview area for selected photos with repositioning -->
-                        <div class="row mt-3" id="photo-preview" style="display: none;" aria-live="polite">
+                        <div class="row mt-3" id="photo-preview" style="display: none;">
                             <div class="col-12">
-                                <h6>Selected Photos:</h6>
+                                <h6>Newly Selected Photos:</h6>
                                 <div class="row" id="preview-container"></div>
                             </div>
                         </div>
@@ -182,7 +171,7 @@
                 </div>
             </div>
             
-            <!-- Section 5: Property Details -->
+            <!-- Section 4: Property Details -->
             <div class="section-card mb-4">
                 <div class="section-header bg-light p-3 mb-3 rounded">
                     <h6 class="mb-0">Property Details</h6>
@@ -219,11 +208,92 @@
                         <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addLandTypeModal">Add New Land Type</button>
                     </div>
                 </div>
+            </div>
+
+            <div class="section-card mb-4">
+                <div class="section-header bg-light p-3 mb-3 rounded">
+                    <h6 class="mb-0">Issues and Conditions</h6>
+                </div>
                 
+                <!-- Vavetar -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="vavetar" class="form-label">Vavetar</label>
+                        <select class="form-select" id="vavetar" name="vavetar">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" id="vavetar_name_container" style="display: none;">
+                        <label for="electric_poll_count" class="form-label">Vavetar Name</label>
+                        <input type="text" class="form-control" id="vavetar" name="vavetar_name" value="{{ $property->vavetar_name ?? '' }}">
+                        <div class="invalid-feedback" id="vavetar_name_error"></div>
+                    </div>
+                </div>
+
+                <!-- Any Issue in Land -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="any_issue" class="form-label">Any Issue in Land</label>
+                        <select class="form-select" id="any_issue" name="any_issue">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="family_issue" class="form-label">Any Family Issue in Land</label>
+                        <select class="form-select" id="family_issue" name="family_issue">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Second Row: Descriptions -->
+                <div class="row mb-3">
+                    <div class="col-md-6" id="issue_description_container" style="visibility:hidden; height:0; overflow:hidden;">
+                        <label for="issue_description" class="form-label">Issue Description (Max 500 characters)</label>
+                        <textarea class="form-control" id="issue_description" name="issue_description" rows="3" maxlength="500"></textarea>
+                        <div class="invalid-feedback" id="issue_description_error"></div>
+                    </div>
+                    <div class="col-md-6" id="family_issue_description_container" style="visibility:hidden; height:0; overflow:hidden;">
+                        <label for="family_issue_description" class="form-label">Family Issue Description (Max 500 characters)</label>
+                        <textarea class="form-control" id="family_issue_description" name="family_issue_description" rows="3" maxlength="500"></textarea>
+                        <div class="invalid-feedback" id="family_issue_description_error"></div>
+                    </div>
+                </div>
+
+                <!-- Any Electric Poll in Land -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="electric_poll" class="form-label">Any Electric Poll in Land</label>
+                        <select class="form-select" id="electric_poll" name="electric_poll">
+                            <option value="">Select</option>
+                            <option value="Yes">Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6" id="electric_poll_count_container" style="display: none;">
+                        <label for="electric_poll_count" class="form-label">Number of Electric Polls</label>
+                        <input type="number" class="form-control" id="electric_poll_count" name="electric_poll_count" min="1">
+                        <div class="invalid-feedback" id="electric_poll_count_error"></div>
+                    </div>
+                </div>
+                
+                <!-- Any Road Near to Land -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="road_distance" class="form-label">Distance of Road from Land (in feet)</label>
+                        <input type="number" class="form-control" id="road_distance" name="road_distance" step="0.01" min="0">
+                        <div class="invalid-feedback" id="road_distance_error"></div>
+                    </div>
                 </div>
             </div>
             
-            <!-- Section 6: Additional Information -->
+            <!-- Section 5: Additional Information -->
             <div class="section-card mb-4">
                 <div class="section-header bg-light p-3 mb-3 rounded">
                     <h6 class="mb-0">Additional Information</h6>
@@ -239,7 +309,7 @@
             
             <div class="d-flex justify-content-end">
                 <a href="{{ route('land-jamin.index') }}" class="btn btn-secondary me-2">Cancel</a>
-                <button type="submit" class="btn btn-primary">Save Land Record</button>
+                <button type="submit" class="btn btn-primary">Save Land/Jamin Record</button>
             </div>
         </form>
     </div>
@@ -253,21 +323,21 @@
                 <h5 class="modal-title" id="addAmenityModalLabel">Add New Amenity</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form id="add-amenity-form" aria-label="Add Amenity Form">
-                @csrf
-                <div class="modal-body">
+            <div class="modal-body">
+                <form id="add-amenity-form">
+                    @csrf
                     <div class="mb-3">
-                        <label for="amenity-name" class="form-label">Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="amenity-name" name="name" required aria-describedby="amenity-name-error">
-                        <div class="invalid-feedback" id="amenity-name-error"></div>
+                        <label for="amenity_name" class="form-label">Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="amenity_name" name="name" required>
+                        <div class="invalid-feedback" id="amenity_name_error"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="amenity-description" class="form-label">Description</label>
-                        <textarea class="form-control" id="amenity-description" name="description" rows="3"></textarea>
+                        <label for="amenity_description" class="form-label">Description</label>
+                        <textarea class="form-control" id="amenity_description" name="description" rows="3"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Amenity</button>
-                </div>
-            </form>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -298,46 +368,6 @@
         </div>
     </div>
 </div>
-
-<!-- Document Viewer Modal -->
-<div class="modal fade" id="documentViewerModal" tabindex="-1" aria-labelledby="documentViewerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="documentViewerModalLabel">Document Viewer</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <iframe id="documentViewer" src="" width="100%" height="500px" style="display: none;"></iframe>
-                <img id="imageViewer" src="" alt="Image Preview" style="max-width: 100%; max-height: 500px; display: none;">
-                <a href="#" id="downloadDocument" class="btn btn-primary mt-3" download>Download Document</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Image Preview Modal -->
-<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-labelledby="imagePreviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body text-center">
-                <img id="previewImage" src="" alt="Preview" class="img-fluid" style="max-height: 70vh;">
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <a href="#" id="downloadImage" class="btn btn-primary" download>Download</a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Include the add new modal -->
-@include('admin.layouts.add-new-modal')
-
 @endsection
 
 @section('styles')
@@ -349,12 +379,6 @@
     margin-bottom: 15px;
     background: #f8f9fa;
     transition: all 0.3s ease;
-    max-width: 200px;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    height: 220px; /* Fixed height for consistent sizing */
 }
 
 .photo-item:hover {
@@ -364,9 +388,8 @@
 
 .photo-item img {
     width: 100%;
-    max-width: 200px;
-    height: 150px; /* Fixed height */
-    object-fit: cover; /* Maintain aspect ratio while covering the area */
+    height: 150px;
+    object-fit: cover;
     border-radius: 5px 5px 0 0;
     cursor: pointer;
 }
@@ -374,14 +397,6 @@
 .photo-item .photo-info {
     padding: 10px;
     font-size: 0.85rem;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .photo-item .photo-actions {
@@ -427,25 +442,12 @@
     border: 2px dashed #007bff;
     background-color: #e3f2fd;
 }
-
-/* Additional styles for consistent photo display */
-#preview-container .col-md-3 {
-    display: flex;
-    justify-content: center;
-}
-
-/* Ensure consistent sizing for photo previews */
-#preview-container img {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
-    object-fit: cover;
-}
 </style>
 @endsection
 
 @section('scripts')
 <script>
+
 // Handle country change to load states
 document.getElementById('country_id').addEventListener('change', function() {
     const countryId = this.value;
@@ -460,20 +462,30 @@ document.getElementById('country_id').addEventListener('change', function() {
     
     if (countryId) {
         fetch("{{ url('admin/land-jamin/states') }}/" + countryId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(state => {
-                    const option = document.createElement('option');
-                    option.value = state.state_id;
-                    option.textContent = state.state_title;
-                    stateSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New State';
-                addNewOption.setAttribute('data-entity', 'state');
-                stateSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.state_id;
+                        option.textContent = state.state_title;
+                        stateSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New State';
+                    addNewOption.setAttribute('data-entity', 'state');
+                    stateSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading states:', error);
@@ -481,19 +493,28 @@ document.getElementById('country_id').addEventListener('change', function() {
     }
 });
 
-// Load states for default selected country (India) on page load
 document.addEventListener('DOMContentLoaded', function() {
-    const countrySelect = document.getElementById('country_id');
-    const selectedCountryId = countrySelect.value;
-    
-    if (selectedCountryId) {
-        // Trigger the change event to load states
-        const event = new Event('change');
-        countrySelect.dispatchEvent(event);
+    const stateSelect = document.getElementById('state_id');
+
+    // Append "+ Add New State" option if not exists
+    if (!stateSelect.querySelector('option[value="add_new"]')) {
+        const addNewOption = document.createElement('option');
+        addNewOption.value = 'add_new';
+        addNewOption.textContent = '+ Add New State';
+        addNewOption.setAttribute('data-entity', 'state');
+        stateSelect.appendChild(addNewOption);
     }
+
+    // Open modal if "Add New" is selected
+    stateSelect.addEventListener('change', function() {
+        if (this.value === 'add_new') {
+            openAddNewModal('state', 'state_id');
+            this.value = '';
+        }
+    });
 });
 
-// Handle cascading dropdowns
+// Handle state change to load districts
 document.getElementById('state_id').addEventListener('change', function() {
     const stateId = this.value;
     const districtSelect = document.getElementById('district_id');
@@ -505,20 +526,30 @@ document.getElementById('state_id').addEventListener('change', function() {
     
     if (stateId && stateId !== 'add_new') {
         fetch("{{ url('admin/land-jamin/districts') }}/" + stateId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.districtid;
-                    option.textContent = district.district_title;
-                    districtSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New District';
-                addNewOption.setAttribute('data-entity', 'district');
-                districtSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.districtid;
+                        option.textContent = district.district_title;
+                        districtSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New District';
+                    addNewOption.setAttribute('data-entity', 'district');
+                    districtSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading districts:', error);
@@ -531,6 +562,7 @@ document.getElementById('state_id').addEventListener('change', function() {
     }
 });
 
+// Handle district change to load talukas
 document.getElementById('district_id').addEventListener('change', function() {
     const districtId = this.value;
     const talukaSelect = document.getElementById('taluka_id');
@@ -540,20 +572,30 @@ document.getElementById('district_id').addEventListener('change', function() {
     
     if (districtId && districtId !== 'add_new') {
         fetch("{{ url('admin/land-jamin/talukas') }}/" + districtId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(taluka => {
-                    const option = document.createElement('option');
-                    option.value = taluka.id;
-                    option.textContent = taluka.name;
-                    talukaSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New Taluka';
-                addNewOption.setAttribute('data-entity', 'city');
-                talukaSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(taluka => {
+                        const option = document.createElement('option');
+                        option.value = taluka.id;
+                        option.textContent = taluka.name;
+                        talukaSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New Taluka';
+                    addNewOption.setAttribute('data-entity', 'city');
+                    talukaSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading talukas:', error);
@@ -576,6 +618,46 @@ document.getElementById('taluka_id').addEventListener('change', function() {
         // Reset to placeholder
         this.value = '';
     }
+});
+
+document.addEventListener('DOMContentLoaded', function() { 
+    $('#any_issue').change(function() {
+        const c = $('#issue_description_container');
+        if ($(this).val() === 'Yes') {
+        c.css({ visibility: 'visible', height: 'auto', overflow: 'visible' });
+        } else {
+        c.css({ visibility: 'hidden', height: '0', overflow: 'hidden' });
+        $('#issue_description').val('');
+        }
+    });
+
+    $('#family_issue').change(function() {
+        const c = $('#family_issue_description_container');
+        if ($(this).val() === 'Yes') {
+        c.css({ visibility: 'visible', height: 'auto', overflow: 'visible' });
+        } else {
+        c.css({ visibility: 'hidden', height: '0', overflow: 'hidden' });
+        $('#family_issue_description').val('');
+        }
+    });
+    
+    $('#electric_poll').change(function() {
+        if ($(this).val() === 'Yes') {
+            $('#electric_poll_count_container').show();
+        } else {
+            $('#electric_poll_count_container').hide();
+            $('#electric_poll_count').val('');
+        }
+    });
+    
+    $('#vavetar').change(function() {
+        if ($(this).val() === 'Yes') {
+            $('#vavetar_name_container').show();
+        } else {
+            $('#vavetar_name_container').hide();
+            $('#vavetar_name_container').val('');
+        }
+    });
 });
 
 // Function to open the Add New modal
@@ -690,7 +772,7 @@ function openAddNewModal(entityType, dropdownId) {
             newCityStateSelect.addEventListener('change', function() {
                 const stateId = this.value;
                 if (stateId) {
-                    fetch("{{ url('admin/land-jamin/districts') }}/" + stateId)
+                    fetch("{{ url('admin/shad/districts') }}/" + stateId)
                         .then(response => response.json())
                         .then(data => {
                             newDistrictSelect.innerHTML = '<option value="">Select District</option>';
@@ -729,13 +811,9 @@ function openAddNewModal(entityType, dropdownId) {
     modal.show();
 }
 
-// Handle add new form submission
-document.getElementById('add-new-form').addEventListener('submit', function(e) {
+// Handle add amenity form submission
+document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
     e.preventDefault();
-    
-    const formData = new FormData(this);
-    const entityType = document.getElementById('add-new-entity-type').value;
-    const dropdownId = document.getElementById('add-new-dropdown-id').value;
     
     // Show loading state
     const submitButton = this.querySelector('button[type="submit"]');
@@ -747,7 +825,59 @@ document.getElementById('add-new-form').addEventListener('submit', function(e) {
     document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
     document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
     
-    fetch("{{ route('admin.locations.entities.store') }}", {
+    const formData = new FormData(this);
+    
+    const addAmenityUrl = "{{ route('land-jamin.amenities.store') }}";
+    fetch(addAmenityUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin' // <--- important!
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const amenityContainer = document.getElementById('amenities-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
+            <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
+        `;
+        amenityContainer.appendChild(div);
+
+        // Close modal reliably
+        const modalEl = document.getElementById('addAmenityModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+
+        // Reset form
+        document.getElementById('add-amenity-form').reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the amenity. Please try again.');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+    });
+
+});
+
+// Handle add land type form submission
+document.getElementById('add-land-type-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    
+    fetch("{{ route('land-jamin.land-types.store') }}", {
         method: 'POST',
         body: formData,
         headers: {
@@ -756,249 +886,84 @@ document.getElementById('add-new-form').addEventListener('submit', function(e) {
     })
     .then(response => response.json())
     .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('add-new-' + field + '-error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                    document.getElementById('add-new-' + field).classList.add('is-invalid');
-                }
-            });
-        } else if (data.success) {
-            // Success - add new entity to the dropdown and select it
-            const dropdown = document.getElementById(dropdownId);
-            const option = document.createElement('option');
-            let entityId, entityName;
-            
-            switch (entityType) {
-                case 'state':
-                    entityId = data.entity.state_id;
-                    entityName = data.entity.state_title;
-                    break;
-                case 'district':
-                    entityId = data.entity.districtid;
-                    entityName = data.entity.district_title;
-                    break;
-                case 'city':
-                    entityId = data.entity.id;
-                    entityName = data.entity.name;
-                    break;
-            }
-            
-            option.value = entityId;
-            option.textContent = entityName;
-            option.selected = true;
-            
-            // Add the option to the dropdown
-            dropdown.appendChild(option);
-            
-            // Add "Add New" option back
-            const addNewOption = document.createElement('option');
-            addNewOption.value = 'add_new';
-            addNewOption.textContent = '+ Add New ' + entityType.charAt(0).toUpperCase() + entityType.slice(1);
-            addNewOption.setAttribute('data-entity', entityType);
-            dropdown.appendChild(addNewOption);
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addNewModal'));
-            modal.hide();
-            
-            // Trigger change event for cascading dropdowns if needed
-            if (entityType === 'state') {
-                const event = new Event('change');
-                dropdown.dispatchEvent(event);
-            } else if (entityType === 'district') {
-                const event = new Event('change');
-                dropdown.dispatchEvent(event);
-            }
-        }
+        // Success - add new land type to the list and select it
+        const container = document.getElementById('land-types-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        const landTypeId = data.landType.id;
+        const landTypeName = data.landType.name;
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="land_types[]" value="${landTypeId}" id="land_type_${landTypeId}" checked>
+            <label class="form-check-label" for="land_type_${landTypeId}">${landTypeName}</label>
+        `;
+        container.appendChild(div);
+        
+        // Close modal and reset form
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addLandTypeModal'));
+        modal.hide();
+        this.reset();
     })
     .catch(error => {
         console.error('Error:', error);
-    })
-    .finally(() => {
-        // Reset loading state
-        submitButton.disabled = false;
-        submitButton.textContent = originalText;
     });
 });
 
-// Handle conditional fields
-document.getElementById('any_issue').addEventListener('change', function() {
-    const container = document.getElementById('issue_description_container');
-    container.style.display = this.value === 'Yes' ? 'block' : 'none';
-});
-
-document.getElementById('electric_poll').addEventListener('change', function() {
-    const container = document.getElementById('electric_poll_count_container');
-    container.style.display = this.value === 'Yes' ? 'block' : 'none';
-});
-
-document.getElementById('family_issue').addEventListener('change', function() {
-    const container = document.getElementById('family_issue_description_container');
-    container.style.display = this.value === 'Yes' ? 'block' : 'none';
-});
-
-// Handle pincode validation
-document.getElementById('pincode').addEventListener('input', function() {
-    // Remove any non-digit characters
-    this.value = this.value.replace(/\D/g, '');
-    
-    // Limit to 6 digits
-    if (this.value.length > 6) {
-        this.value = this.value.slice(0, 6);
-    }
-});
-
-// Handle photo selection preview with repositioning
-let selectedPhotos = [];
-let draggedItem = null;
-
-document.getElementById('photos').addEventListener('change', function() {
-    const files = Array.from(this.files);
-    if (files.length > 0) {
-        // Add new files to the existing array
-        files.forEach(file => {
-            if (file.type.startsWith('image/')) {
-                selectedPhotos.push({
-                    file: file,
-                    name: file.name,
-                    url: URL.createObjectURL(file)
-                });
+// Handle district dropdown change in taluka modal
+document.addEventListener('DOMContentLoaded', function() {
+    const talukaStateSelect = document.getElementById('taluka_state_id');
+    if (talukaStateSelect) {
+        talukaStateSelect.addEventListener('change', function() {
+            const stateId = this.value;
+            const districtSelect = document.getElementById('taluka_district_id');
+            
+            // Clear existing options
+            if (districtSelect) {
+                districtSelect.innerHTML = '<option value="">Select District</option>';
+                
+                if (stateId) {
+                    fetch("{{ url('admin/land-jamin/districts') }}/" + stateId)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.districtid;
+                                option.textContent = district.district_title;
+                                districtSelect.appendChild(option);
+                            });
+                        });
+                }
             }
         });
-        
-        // Display the photos
-        displaySelectedPhotos();
     }
 });
 
-function displaySelectedPhotos() {
-    const previewContainer = document.getElementById('preview-container');
-    const photoPreview = document.getElementById('photo-preview');
-    
-    if (selectedPhotos.length > 0) {
-        photoPreview.style.display = 'block';
-        previewContainer.innerHTML = '';
-        
-        selectedPhotos.forEach((photo, index) => {
-            const col = document.createElement('div');
-            col.className = 'col-md-3 mb-3 photo-item draggable';
-            col.setAttribute('data-index', index);
-            col.setAttribute('draggable', 'true');
-            
-            col.innerHTML = `
-                <img src="${photo.url}" alt="Preview" onclick="viewImage(${index})">
-                <div class="photo-info">
-                    <small class="text-muted">${photo.name.substring(0, 20)}${photo.name.length > 20 ? '...' : ''}</small>
-                </div>
-                <div class="photo-actions">
-                    <button type="button" class="btn-move" title="Drag to reposition"><i class='bx bx-move'></i></button>
-                    <button type="button" class="btn-view" onclick="viewImage(${index})" title="View"><i class='bx bx-show'></i></button>
-                    <button type="button" class="btn-delete" onclick="deletePhoto(${index})" title="Delete"><i class='bx bx-trash'></i></button>
-                </div>
-            `;
-            
-            // Add drag events
-            col.addEventListener('dragstart', handleDragStart);
-            col.addEventListener('dragover', handleDragOver);
-            col.addEventListener('dragenter', handleDragEnter);
-            col.addEventListener('dragleave', handleDragLeave);
-            col.addEventListener('drop', handleDrop);
-            col.addEventListener('dragend', handleDragEnd);
-            
-            previewContainer.appendChild(col);
-        });
+// Handle photos file selection
+document.getElementById('photos').addEventListener('change', function() {
+    const files = this.files;
+    const sizeElement = document.getElementById('photos_size');
+    if (files.length > 0) {
+        let totalSize = 0;
+        for (let i = 0; i < files.length; i++) {
+            totalSize += files[i].size;
+        }
+        const fileSize = formatFileSize(totalSize);
+        sizeElement.textContent = `${files.length} file(s) selected, Total size: ${fileSize}`;
     } else {
-        photoPreview.style.display = 'none';
+        sizeElement.textContent = '';
     }
-}
+});
 
-function handleDragStart(e) {
-    draggedItem = this;
-    setTimeout(() => {
-        this.style.opacity = '0.5';
-    }, 0);
-}
-
-function handleDragOver(e) {
-    e.preventDefault();
-}
-
-function handleDragEnter(e) {
-    e.preventDefault();
-    this.classList.add('drag-over');
-}
-
-function handleDragLeave() {
-    this.classList.remove('drag-over');
-}
-
-function handleDrop(e) {
-    e.preventDefault();
-    this.classList.remove('drag-over');
-    
-    if (draggedItem !== this) {
-        const draggedIndex = parseInt(draggedItem.getAttribute('data-index'));
-        const targetIndex = parseInt(this.getAttribute('data-index'));
-        
-        // Remove the dragged item from its original position
-        const draggedItemData = selectedPhotos.splice(draggedIndex, 1)[0];
-        
-        // Insert the dragged item at the new position
-        selectedPhotos.splice(targetIndex, 0, draggedItemData);
-        
-        // Update data-index attributes
-        selectedPhotos.forEach((photo, index) => {
-            photo.index = index;
-        });
-        
-        // Redisplay the photos
-        displaySelectedPhotos();
-    }
-}
-
-function handleDragEnd() {
-    this.style.opacity = '1';
-    document.querySelectorAll('.photo-item').forEach(item => {
-        item.classList.remove('drag-over');
-    });
-    draggedItem = null;
-}
-
-function viewImage(index) {
-    const photo = selectedPhotos[index];
-    const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
-    const previewImage = document.getElementById('previewImage');
-    const downloadLink = document.getElementById('downloadImage');
-    
-    previewImage.src = photo.url;
-    previewImage.alt = photo.name;
-    downloadLink.href = photo.url;
-    downloadLink.download = photo.name;
-    
-    document.getElementById('imagePreviewModalLabel').textContent = photo.name;
-    modal.show();
-}
-
-function deletePhoto(index) {
-    if (confirm('Are you sure you want to delete this photo?')) {
-        // Remove the photo from the array
-        selectedPhotos.splice(index, 1);
-        
-        // Update indices
-        selectedPhotos.forEach((photo, i) => {
-            photo.index = i;
-        });
-        
-        // Redisplay the photos
-        displaySelectedPhotos();
-    }
+// Format file size for display
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 // Handle form submission
-document.getElementById('land-form').addEventListener('submit', function(e) {
+document.getElementById('shop-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
     // Validate pincode
@@ -1013,11 +978,6 @@ document.getElementById('land-form').addEventListener('submit', function(e) {
     const formData = new FormData(this);
     const submitButton = this.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
-    
-    // Append selected photos to formData
-    selectedPhotos.forEach((photo, index) => {
-        formData.append('photos[]', photo.file);
-    });
     
     // Show loading state
     submitButton.disabled = true;
@@ -1056,7 +1016,7 @@ document.getElementById('land-form').addEventListener('submit', function(e) {
                     generalError.style.marginBottom = '20px';
                     
                     // Insert at the top of the form
-                    const form = document.getElementById('land-form');
+                    const form = document.getElementById('shop-form');
                     if (form.firstChild) {
                         form.insertBefore(generalError, form.firstChild);
                     } else {
@@ -1093,11 +1053,11 @@ document.getElementById('land-form').addEventListener('submit', function(e) {
         // Display a user-friendly error message
         const generalError = document.createElement('div');
         generalError.className = 'alert alert-danger';
-        generalError.textContent = 'An error occurred while saving the land record. Please check that your files are under 100MB and try again.';
+        generalError.textContent = 'An error occurred while saving the land/jamin record. Please check that your files are under 100MB and try again.';
         generalError.style.marginBottom = '20px';
         
         // Insert at the top of the form
-        const form = document.getElementById('land-form');
+        const form = document.getElementById('shop-form');
         if (form.firstChild) {
             form.insertBefore(generalError, form.firstChild);
         } else {
@@ -1114,175 +1074,5 @@ document.getElementById('land-form').addEventListener('submit', function(e) {
     });
 });
 
-// Handle add amenity form submission
-document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch("{{ route('land-jamin.amenities.store') }}", {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('amenity_' + field + '_error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                }
-            });
-        } else if (data.success) {
-            // Success - add new amenity to the list and select it
-            const container = document.getElementById('amenities-container');
-            const div = document.createElement('div');
-            div.className = 'form-check me-3 mb-2';
-            const amenityId = data.amenity.id;
-            const amenityName = data.amenity.name;
-            div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="amenities[]" value="${amenityId}" id="amenity_${amenityId}" checked>
-                <label class="form-check-label" for="amenity_${amenityId}">${amenityName}</label>
-            `;
-            container.appendChild(div);
-            
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addAmenityModal'));
-            modal.hide();
-            this.reset();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
-// Handle add land type form submission
-document.getElementById('add-land-type-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-    
-    fetch("{{ route('land-jamin.land-types.store') }}", {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('land_type_' + field + '_error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                }
-            });
-        } else if (data.success) {
-            // Success - add new land type to the list and select it
-            const container = document.getElementById('land-types-container');
-            const div = document.createElement('div');
-            div.className = 'form-check me-3 mb-2';
-            const landTypeId = data.landType.id;
-            const landTypeName = data.landType.name;
-            div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="land_types[]" value="${landTypeId}" id="land_type_${landTypeId}" checked>
-                <label class="form-check-label" for="land_type_${landTypeId}">${landTypeName}</label>
-            `;
-            container.appendChild(div);
-            
-            // Close modal and reset form
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addLandTypeModal'));
-            modal.hide();
-            this.reset();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-});
-
-// Document viewer function
-function viewDocument(url) {
-    const documentViewer = document.getElementById('documentViewer');
-    const imageViewer = document.getElementById('imageViewer');
-    const downloadButton = document.getElementById('downloadDocument');
-    const modalTitle = document.getElementById('documentViewerModalLabel');
-    
-    // Hide both viewers initially
-    documentViewer.style.display = 'none';
-    imageViewer.style.display = 'none';
-    
-    // Set download link
-    downloadButton.href = url;
-    
-    // Check if it's an image or document
-    if (url.match(/\.(jpeg|jpg|png|gif)$/i)) {
-        // It's an image
-        modalTitle.textContent = 'Image Viewer';
-        imageViewer.src = url;
-        imageViewer.style.display = 'block';
-    } else {
-        // It's a document
-        modalTitle.textContent = 'Document Viewer';
-        documentViewer.src = url;
-        documentViewer.style.display = 'block';
-    }
-
-    new bootstrap.Modal(document.getElementById('documentViewerModal')).show();
-}
-
-// Handle document 7/12 file selection
-document.getElementById('document_7_12').addEventListener('change', function() {
-    const file = this.files[0];
-    const sizeElement = document.getElementById('document_7_12_size');
-    if (file) {
-        const fileSize = formatFileSize(file.size);
-        sizeElement.textContent = `File size: ${fileSize}`;
-    } else {
-        sizeElement.textContent = '';
-    }
-});
-
-// Handle document 8a file selection
-document.getElementById('document_8a').addEventListener('change', function() {
-    const file = this.files[0];
-    const sizeElement = document.getElementById('document_8a_size');
-    if (file) {
-        const fileSize = formatFileSize(file.size);
-        sizeElement.textContent = `File size: ${fileSize}`;
-    } else {
-        sizeElement.textContent = '';
-    }
-});
-
-// Handle photos file selection
-document.getElementById('photos').addEventListener('change', function() {
-    const files = this.files;
-    const sizeElement = document.getElementById('photos_size');
-    if (files.length > 0) {
-        let totalSize = 0;
-        for (let i = 0; i < files.length; i++) {
-            totalSize += files[i].size;
-        }
-        const fileSize = formatFileSize(totalSize);
-        sizeElement.textContent = `${files.length} file(s) selected, Total size: ${fileSize}`;
-    } else {
-        sizeElement.textContent = '';
-    }
-});
-
-// Format file size for display
-function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
+</script>
+@endsection

@@ -39,9 +39,10 @@ class MasterDataApiController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255|unique:amenities,name',
+                'description' => 'nullable|string|max:255',
             ]);
 
-            $amenity = Amenity::create($request->only('name'));
+            $amenity = Amenity::create($request->only('name', 'description'));
 
             return response()->json([
                 'success' => true,
@@ -66,9 +67,11 @@ class MasterDataApiController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255|unique:amenities,name,' . $amenity->id,
+                'description' => 'nullable|string|max:255'
+                
             ]);
 
-            $amenity->update($request->only('name'));
+            $amenity->update($request->only('name', 'description'));
 
             return response()->json([
                 'success' => true,
@@ -137,9 +140,10 @@ class MasterDataApiController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255|unique:land_types,name',
+                'description' => 'nullable|string|max:255'
             ]);
 
-            $landType = LandType::create($request->only('name'));
+            $landType = LandType::create($request->only('name', 'description'));
 
             return response()->json([
                 'success' => true,
@@ -164,9 +168,10 @@ class MasterDataApiController extends Controller
         try {
             $request->validate([
                 'name' => 'required|string|max:255|unique:land_types,name,' . $landType->id,
+                'description' => 'nullable|string|max:255'
             ]);
 
-            $landType->update($request->only('name'));
+            $landType->update($request->only('name', 'description'));
 
             return response()->json([
                 'success' => true,

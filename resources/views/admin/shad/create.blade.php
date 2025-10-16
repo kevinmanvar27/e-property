@@ -167,10 +167,12 @@
                         <label class="form-label">Amenities</label>
                         <div class="d-flex flex-wrap" id="amenities-container">
                             @foreach($amenities as $amenity)
-                            <div class="form-check me-3 mb-2">
-                                <input class="form-check-input" type="checkbox" name="amenities[]" value="{{ $amenity->id }}" id="amenity_{{ $amenity->id }}">
-                                <label class="form-check-label" for="amenity_{{ $amenity->id }}">{{ $amenity->name }}</label>
-                            </div>
+                                <div class="form-check me-3 mb-2">
+                                    <input class="form-check-input" type="checkbox" name="amenities[]" value="{{ $amenity->id }}" 
+                                        id="amenity_{{ $amenity->id }}"
+                                        {{ in_array($amenity->id, old('amenities', [])) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="amenity_{{ $amenity->id }}">{{ $amenity->name }}</label>
+                                </div>
                             @endforeach
                         </div>
                         <button type="button" class="btn btn-sm btn-outline-primary mt-2" data-bs-toggle="modal" data-bs-target="#addAmenityModal">Add New Amenity</button>
@@ -341,6 +343,7 @@
 
 @section('scripts')
 <script>
+
 // Handle country change to load states
 document.getElementById('country_id').addEventListener('change', function() {
     const countryId = this.value;
@@ -355,20 +358,30 @@ document.getElementById('country_id').addEventListener('change', function() {
     
     if (countryId) {
         fetch("{{ url('admin/shad/states') }}/" + countryId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(state => {
-                    const option = document.createElement('option');
-                    option.value = state.state_id;
-                    option.textContent = state.state_title;
-                    stateSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New State';
-                addNewOption.setAttribute('data-entity', 'state');
-                stateSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.state_id;
+                        option.textContent = state.state_title;
+                        stateSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New State';
+                    addNewOption.setAttribute('data-entity', 'state');
+                    stateSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading states:', error);
@@ -376,19 +389,7 @@ document.getElementById('country_id').addEventListener('change', function() {
     }
 });
 
-// Load states for default selected country (India) on page load
-document.addEventListener('DOMContentLoaded', function() {
-    const countrySelect = document.getElementById('country_id');
-    const selectedCountryId = countrySelect.value;
-    
-    if (selectedCountryId) {
-        // Trigger the change event to load states
-        const event = new Event('change');
-        countrySelect.dispatchEvent(event);
-    }
-});
-
-// Handle cascading dropdowns
+// Handle state change to load districts
 document.getElementById('state_id').addEventListener('change', function() {
     const stateId = this.value;
     const districtSelect = document.getElementById('district_id');
@@ -400,20 +401,30 @@ document.getElementById('state_id').addEventListener('change', function() {
     
     if (stateId && stateId !== 'add_new') {
         fetch("{{ url('admin/shad/districts') }}/" + stateId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.districtid;
-                    option.textContent = district.district_title;
-                    districtSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New District';
-                addNewOption.setAttribute('data-entity', 'district');
-                districtSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.districtid;
+                        option.textContent = district.district_title;
+                        districtSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New District';
+                    addNewOption.setAttribute('data-entity', 'district');
+                    districtSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading districts:', error);
@@ -426,6 +437,7 @@ document.getElementById('state_id').addEventListener('change', function() {
     }
 });
 
+// Handle district change to load talukas
 document.getElementById('district_id').addEventListener('change', function() {
     const districtId = this.value;
     const talukaSelect = document.getElementById('taluka_id');
@@ -435,20 +447,30 @@ document.getElementById('district_id').addEventListener('change', function() {
     
     if (districtId && districtId !== 'add_new') {
         fetch("{{ url('admin/shad/talukas') }}/" + districtId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(taluka => {
-                    const option = document.createElement('option');
-                    option.value = taluka.id;
-                    option.textContent = taluka.name;
-                    talukaSelect.appendChild(option);
-                });
-                // Add "Add New" option
-                const addNewOption = document.createElement('option');
-                addNewOption.value = 'add_new';
-                addNewOption.textContent = '+ Add New Taluka';
-                addNewOption.setAttribute('data-entity', 'city');
-                talukaSelect.appendChild(addNewOption);
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(taluka => {
+                        const option = document.createElement('option');
+                        option.value = taluka.id;
+                        option.textContent = taluka.name;
+                        talukaSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New Taluka';
+                    addNewOption.setAttribute('data-entity', 'city');
+                    talukaSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading talukas:', error);
@@ -471,6 +493,66 @@ document.getElementById('taluka_id').addEventListener('change', function() {
         // Reset to placeholder
         this.value = '';
     }
+});
+
+// Handle add amenity form submission
+document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Adding...';
+    
+    // Clear previous errors
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    const formData = new FormData(this);
+    
+    const addAmenityUrl = "{{ route('shad.amenities.store') }}";
+    fetch(addAmenityUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin' // <--- important!
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const amenityContainer = document.getElementById('amenities-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
+            <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
+        `;
+        amenityContainer.appendChild(div);
+
+        // Close modal reliably
+        const modalEl = document.getElementById('addAmenityModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+
+        // Reset form
+        document.getElementById('add-amenity-form').reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the amenity. Please try again.');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+    });
+
 });
 
 // Function to open the Add New modal
@@ -747,9 +829,6 @@ document.getElementById('photos').addEventListener('change', function() {
                 });
             }
         });
-        
-        // Display the photos
-        displaySelectedPhotos();
     }
 });
 
@@ -893,6 +972,9 @@ document.getElementById('shad-form').addEventListener('submit', function(e) {
     // Create FormData object
     const formData = new FormData(this);
     
+    // Remove the photos field from formData to prevent duplication
+    formData.delete('photos[]');
+    
     // Add selected photos to form data
     selectedPhotos.forEach((photo, index) => {
         formData.append('photos[]', photo.file);
@@ -937,68 +1019,7 @@ document.getElementById('shad-form').addEventListener('submit', function(e) {
     });
 });
 
-// Handle add amenity form submission
-document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Show loading state
-    const submitButton = this.querySelector('button[type="submit"]');
-    const originalText = submitButton.textContent;
-    submitButton.disabled = true;
-    submitButton.textContent = 'Adding...';
-    
-    // Clear previous errors
-    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
-    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
-    
-    const formData = new FormData(this);
-    
-    fetch("{{ route('shad.amenities.store') }}", {
-        method: 'POST',
-        body: formData,
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('amenity-' + field + '-error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                    document.getElementById('amenity-' + field).classList.add('is-invalid');
-                }
-            });
-        } else if (data.success) {
-            // Success - add new amenity to the list
-            const amenityContainer = document.getElementById('amenities-container');
-            const div = document.createElement('div');
-            div.className = 'form-check me-3 mb-2';
-            div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
-                <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
-            `;
-            amenityContainer.appendChild(div);
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addAmenityModal'));
-            modal.hide();
-            
-            // Reset form
-            document.getElementById('add-amenity-form').reset();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('An error occurred while adding the amenity. Please try again.');
-    })
-    .finally(() => {
-        // Reset loading state
-        submitButton.disabled = false;
-        submitButton.textContent = originalText;
-    });
-});
+
+
 </script>
 @endsection

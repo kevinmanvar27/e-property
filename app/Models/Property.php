@@ -32,6 +32,7 @@ class Property extends Model
         'pincode',
         'country_id',
         'vavetar',
+        'vavetar_name',
         'any_issue',
         'issue_description',
         'electric_poll',
@@ -115,6 +116,22 @@ class Property extends Model
 
         // If amenities is null or any other type, return empty array
         return [];
+    }
+
+    public function getAmenitiesListAttribute()
+    {
+        $ids = [];
+
+        // Decode JSON if stored as string
+        if (is_string($this->amenities)) {
+            $decoded = json_decode($this->amenities, true);
+            $ids = is_array($decoded) ? $decoded : [];
+        } elseif (is_array($this->amenities)) {
+            $ids = $this->amenities;
+        }
+
+        // Fetch names from Amenity table
+        return Amenity::whereIn('id', $ids)->pluck('name')->toArray();
     }
 
     public function getLandTypesList()

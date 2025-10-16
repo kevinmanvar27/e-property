@@ -196,7 +196,7 @@
                                             @foreach($property->getPhotosList() as $index => $photo)
                                                 <div class="col-6 col-md-4">
                                                     <div class="card border-0 shadow-sm h-100 overflow-hidden position-relative photo-container">
-                                                        <img src="{{ asset('assets/photos/' . $photo['photo_path']) }}" 
+                                                        <img src="{{ asset('storage/photos/' . $photo) }}" 
                                                              class="card-img-top img-fluid" 
                                                              alt="Shop Photo" 
                                                              style="height: 150px; width: 100%; object-fit: cover; cursor: pointer;" 
@@ -205,6 +205,9 @@
                                                             <div class="d-flex">
                                                                 <div class="bg-white rounded-circle p-2 me-2 photo-action-btn d-flex align-items-center justify-content-center" onclick="openGallery({{ $index }}); event.stopPropagation();" style="width: 35px; height: 35px;">
                                                                     <i class='bx bx-show text-primary fs-6'></i>
+                                                                </div>
+                                                                <div class="bg-white rounded-circle p-2 photo-action-btn d-flex align-items-center justify-content-center" onclick="deletePhoto({{ $property->id }}, {{ $index }}); event.stopPropagation();" style="width: 35px; height: 35px;">
+                                                                    <i class='bx bx-trash text-danger fs-6'></i>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -375,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function() {
         galleryPhotos = [
             @foreach($property->getPhotosList() as $index => $photo)
                 {
-                    url: '{{ asset('assets/photos/' . $photo['photo_path']) }}',
+                    url: '{{ asset('storage/photos/' . $photo) }}',
                     name: 'Photo #{{ $index + 1 }}',
                     index: {{ $index }}
                 },
@@ -502,5 +505,31 @@ $(document).ready(function() {
         }
     });
 });
+
+
+function deletePhoto(propertyId, photoIndex) {
+    if (confirm('Are you sure you want to delete this photo?')) {
+        // Create a form element for AJAX request
+        fetch('{{ url("admin/shop") }}/' + propertyId + '/photos/' + photoIndex, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            // if (data.success) {
+                location.reload();
+            // } else {
+            //     alert('Failed to delete photo');
+            // }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the photo');
+        });
+    }
+}
 </script>
 @endsection

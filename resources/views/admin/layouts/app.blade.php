@@ -34,8 +34,6 @@
     <!-- Admin Custom CSS -->
     <link rel="stylesheet" href="{{ asset('assets/admin/css/admin-custom.css') }}" />
     
-    <!-- Dynamic CSS based on settings -->
-    <!-- <link href="{{ route('dynamic-css') }}" rel="stylesheet" type="text/css"> -->
     
     <!-- Set page title with format: Page | title - tagline -->
     @php
@@ -63,14 +61,9 @@
         }
     </style>
     
-    <!-- Auto Logout Timeout Setting -->
-    <script>
-        window.autoLogoutTimeout = {{ \App\Models\Setting::get('general', 'auto_logout_timeout', 30) }};
-    </script>
-    
     <!-- Vite assets -->
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-        @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/auto-logout.js'])
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 </head>
 
@@ -130,12 +123,22 @@
     <script src="{{ asset('assets/js/index.js') }}"></script>
     <!--app JS-->
     <script src="{{ asset('assets/js/app.js') }}"></script>
-    <script src="{{ asset('assets/js/suppress-errors.js') }}"></script>
+    <!-- <script src="{{ asset('assets/js/suppress-errors.js') }}"></script> -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
     
     <!-- Admin Custom JS -->
     <script src="{{ asset('assets/admin/js/admin-custom.js') }}"></script>
     
     @yield('scripts')
+    
+    <!-- Auto Logout Timeout Setting -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the auto logout timeout from the settings
+            var autoLogoutTimeout = parseInt("{{ \App\Models\Setting::get('general', 'auto_logout_timeout', 30) }}");
+            window.autoLogoutTimeout = autoLogoutTimeout;
+        });
+    </script>
 </body>
 
 </html>

@@ -14,7 +14,9 @@ class DocumentService
     {
         if ($document) {
             $filename = $prefix . '_' . time() . '.' . $document->getClientOriginalExtension();
-            Storage::disk('documents')->putFileAs('', $document, $filename);
+            // Storage::disk('documents')->putFileAs('', $document, $filename);
+
+            Storage::disk('public')->putFileAs('documents', $document, $filename);
 
             return $filename;
         }
@@ -27,9 +29,13 @@ class DocumentService
      */
     public function deleteDocumentFile($filename)
     {
-        if ($filename && Storage::disk('documents')->exists($filename)) {
-            Storage::disk('documents')->delete($filename);
-        }
+        // if ($filename && Storage::disk('documents')->exists($filename)) {
+        //     Storage::disk('documents')->delete($filename);
+        // }
+
+        if (Storage::disk('public')->exists('documents/' . $filename) && $filename) {
+            Storage::disk('public')->delete('documents/' . $filename);
+        } 
     }
 
     /**

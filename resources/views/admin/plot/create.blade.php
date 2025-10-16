@@ -325,8 +325,6 @@ document.getElementById('photos').addEventListener('change', function() {
             }
         });
         
-        // Display the photos
-        displaySelectedPhotos();
     }
 });
 
@@ -612,51 +610,60 @@ document.getElementById('taluka_id').addEventListener('change', function() {
 document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
     e.preventDefault();
     
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Adding...';
+    
+    // Clear previous errors
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
     const formData = new FormData(this);
     
-    fetch("{{ route('plot.amenities.store') }}", {
+    const addAmenityUrl = "{{ route('shad.amenities.store') }}";
+    fetch(addAmenityUrl, {
         method: 'POST',
         body: formData,
         headers: {
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        }
+        },
+        credentials: 'same-origin' // <--- important!
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('amenity_' + field + '_error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                }
-            });
-        } else if (data.success) {
-            // Success - add new amenity to the list and select it
-            const container = document.getElementById('amenities-container');
-            const div = document.createElement('div');
-            div.className = 'form-check me-3 mb-2';
-            const amenityId = data.amenity.id;
-            const amenityName = data.amenity.name;
-            div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="amenities[]" value="${amenityId}" id="amenity_${amenityId}" checked>
-                <label class="form-check-label" for="amenity_${amenityId}">${amenityName}</label>
-            `;
-            container.appendChild(div);
-            
-            // Reset form and close modal
-            document.getElementById('add-amenity-form').reset();
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addAmenityModal'));
-            modal.hide();
-            
-            // Clear any previous errors
-            document.getElementById('amenity_name_error').textContent = '';
-            document.getElementById('amenity_description_error').textContent = '';
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
         }
+        return response.json();
+    })
+    .then(data => {
+        const amenityContainer = document.getElementById('amenities-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
+            <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
+        `;
+        amenityContainer.appendChild(div);
+
+        // Close modal reliably
+        const modalEl = document.getElementById('addAmenityModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+
+        // Reset form
+        document.getElementById('add-amenity-form').reset();
     })
     .catch(error => {
-        console.error('Error adding amenity:', error);
+        console.error('Error:', error);
+        alert('An error occurred while adding the amenity. Please try again.');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
     });
+
 });
 
 // Handle form submission
@@ -666,6 +673,9 @@ document.getElementById('plot-form').addEventListener('submit', function(e) {
     const formData = new FormData(this);
     const submitButton = this.querySelector('button[type="submit"]');
     const originalText = submitButton.textContent;
+    
+    // Remove the photos field from formData to prevent duplication
+    formData.delete('photos[]');
     
     // Append selected photos to formData
     selectedPhotos.forEach((photo, index) => {
@@ -717,13 +727,164 @@ document.getElementById('plot-form').addEventListener('submit', function(e) {
 });
 
 // Open add new modal function
-function openAddNewModal(entityType, targetSelectId) {
-    // Set the entity type and target select in the modal
-    document.getElementById('add-new-entity-type').value = entityType;
-    document.getElementById('add-new-target-select').value = targetSelectId;
+// function openAddNewModal(entityType, targetSelectId) {
+//     // Set the entity type and target select in the modal
+//     document.getElementById('add-new-entity-type').value = entityType;
+//     document.getElementById('add-new-target-select').value = targetSelectId;
     
-    // Open the modal
+//     // Open the modal
+//     const modal = new bootstrap.Modal(document.getElementById('addNewModal'));
+//     modal.show();
+// }
+
+// Function to open the Add New modal
+function openAddNewModal(entityType, dropdownId) {
     const modal = new bootstrap.Modal(document.getElementById('addNewModal'));
+    const modalTitle = document.getElementById('addNewModalLabel');
+    const entityTypeInput = document.getElementById('add-new-entity-type');
+    const dropdownIdInput = document.getElementById('add-new-dropdown-id');
+    const nameInput = document.getElementById('add-new-name');
+    const descriptionInput = document.getElementById('add-new-description');
+    const additionalFields = document.getElementById('add-new-additional-fields');
+    
+    // Reset form
+    document.getElementById('add-new-form').reset();
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    // Set modal title and inputs
+    modalTitle.textContent = 'Add New ' + entityType.charAt(0).toUpperCase() + entityType.slice(1);
+    entityTypeInput.value = entityType;
+    dropdownIdInput.value = dropdownId;
+    nameInput.value = '';
+    descriptionInput.value = '';
+    additionalFields.innerHTML = '';
+    
+    // Add additional fields based on entity type
+    switch (entityType) {
+        case 'state':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-country-id" class="form-label">Country <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-country-id" name="country_id" required>
+                        <option value="">Select Country</option>
+                        @foreach($countries as $countryId => $countryName)
+                        <option value="{{ $countryId }}">{{ $countryName }}</option>
+                        @endforeach
+                    </select>
+                    <div class="invalid-feedback" id="add-new-country-id-error"></div>
+                </div>
+            `;
+            
+            // Pre-select current country if available
+            const countrySelect = document.getElementById('country_id');
+            if (countrySelect && countrySelect.value) {
+                document.getElementById('add-new-country-id').value = countrySelect.value;
+            }
+            break;
+            
+        case 'district':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate and pre-select state
+            const stateSelect = document.getElementById('state_id');
+            const newStateSelect = document.getElementById('add-new-state-id');
+            newStateSelect.innerHTML = stateSelect.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newStateSelect.remove(option.index);
+                }
+            });
+            
+            if (stateSelect && stateSelect.value && stateSelect.value !== 'add_new') {
+                newStateSelect.value = stateSelect.value;
+            }
+            break;
+            
+        case 'city':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-district-id" class="form-label">District <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-district-id" name="districtid" required>
+                        <option value="">Select District</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-district-id-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="add-new-city-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-city-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-city-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate states
+            const stateSelectForCity = document.getElementById('state_id');
+            const districtSelect = document.getElementById('district_id');
+            const newDistrictSelect = document.getElementById('add-new-district-id');
+            const newCityStateSelect = document.getElementById('add-new-city-state-id');
+            
+            // Copy options from existing state select
+            newCityStateSelect.innerHTML = stateSelectForCity.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newCityStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newCityStateSelect.remove(option.index);
+                }
+            });
+            
+            // Set state selection handler
+            newCityStateSelect.addEventListener('change', function() {
+                const stateId = this.value;
+                if (stateId) {
+                    fetch("{{ url('admin/shad/districts') }}/" + stateId)
+                        .then(response => response.json())
+                        .then(data => {
+                            newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                            data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.districtid;
+                                option.textContent = district.district_title;
+                                newDistrictSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading districts:', error);
+                        });
+                } else {
+                    newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                }
+            });
+            
+            // Pre-select current state and load districts
+            if (stateSelectForCity.value && stateSelectForCity.value !== 'add_new') {
+                newCityStateSelect.value = stateSelectForCity.value;
+                // Trigger change event to load districts
+                const event = new Event('change');
+                newCityStateSelect.dispatchEvent(event);
+                
+                // Pre-select current district after a short delay to allow districts to load
+                setTimeout(() => {
+                    if (districtSelect.value && districtSelect.value !== 'add_new') {
+                        newDistrictSelect.value = districtSelect.value;
+                    }
+                }, 500); // Increased delay to ensure districts are loaded
+            }
+            break;
+    }
+    
     modal.show();
 }
 </script>

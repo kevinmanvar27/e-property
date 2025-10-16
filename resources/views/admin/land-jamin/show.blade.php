@@ -21,17 +21,17 @@
                 <!-- Header with actions -->
                 <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
                     <div>
-                        <h5 class="mb-1">{{ $land->owner_name }}</h5>
-                        <p class="text-muted mb-0">{{ $land->village }}, {{ $land->district ? $land->district->district_title : 'N/A' }}</p>
+                        <h5 class="mb-1">{{ $property->owner_name }}</h5>
+                        <p class="text-muted mb-0">{{ $property->village }}, {{ $property->district ? $property->district->district_title : 'N/A' }}</p>
                     </div>
                     <div>
                         <a href="{{ route('land-jamin.index') }}" class="btn btn-light btn-sm me-2">
                             <i class='bx bx-arrow-back me-1'></i>Back
                         </a>
-                        <a href="{{ route('land-jamin.edit', $land->id) }}" class="btn btn-warning btn-sm me-2">
+                        <a href="{{ route('land-jamin.edit', $property->id) }}" class="btn btn-warning btn-sm me-2">
                             <i class='bx bx-edit me-1'></i>Edit
                         </a>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteLand({{ $land->id }})">
+                        <button type="button" class="btn btn-danger btn-sm"  id="delete-btn">
                             <i class='bx bx-trash me-1'></i>Delete
                         </button>
                     </div>
@@ -45,7 +45,7 @@
                         </div>
                         <div class="mt-2">
                             <h6 class="mb-0">
-                                {{ is_countable($land->getPhotosList()) ? count($land->getPhotosList()) : 0 }}
+                                {{ is_countable($property->getPhotosList()) ? count($property->getPhotosList()) : 0 }}
                             </h6>
                             <p class="text-muted small mb-0">Photos</p>
                         </div>
@@ -56,7 +56,7 @@
                         </div>
                         <div class="mt-2">
                             <h6 class="mb-0">
-                                {{ ($land->document_7_12 ? 1 : 0) + ($land->document_8a ? 1 : 0) }}
+                                {{ ($property->document_7_12 ? 1 : 0) + ($property->document_8a ? 1 : 0) }}
                             </h6>
                             <p class="text-muted small mb-0">Documents</p>
                         </div>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="mt-2">
                             <h6 class="mb-0">
-                                @switch($land->status)
+                                @switch($property->status)
                                     @case('active') <span class="badge bg-success">Active</span> @break
                                     @case('inactive') <span class="badge bg-danger">Inactive</span> @break
                                     @case('urgent') <span class="badge bg-danger">Urgent</span> @break
@@ -98,16 +98,16 @@
                                         <span>Address Information</span>
                                     </h6>
                                     <div class="ps-4">
-                                        <p class="mb-1"><strong>First Line:</strong> {{ $land->first_line }}</p>
-                                        @if($land->second_line)
-                                        <p class="mb-1"><strong>Second Line:</strong> {{ $land->second_line }}</p>
+                                        <p class="mb-1"><strong>First Line:</strong> {{ $property->first_line }}</p>
+                                        @if($property->second_line)
+                                        <p class="mb-1"><strong>Second Line:</strong> {{ $property->second_line }}</p>
                                         @endif
-                                        <p class="mb-1"><strong>Village:</strong> {{ $land->village }}</p>
-                                        <p class="mb-1"><strong>Taluka:</strong> {{ $land->taluka ? $land->taluka->name : 'N/A' }}</p>
-                                        <p class="mb-1"><strong>District:</strong> {{ $land->district ? $land->district->district_title : 'N/A' }}</p>
-                                        <p class="mb-1"><strong>State:</strong> {{ $land->state ? $land->state->state_title : 'N/A' }}</p>
-                                        <p class="mb-1"><strong>Pincode:</strong> {{ $land->pincode }}</p>
-                                        <p class="mb-0"><strong>Country:</strong> {{ $land->country ? $land->country->country_name : 'N/A' }}</p>
+                                        <p class="mb-1"><strong>Village:</strong> {{ $property->village }}</p>
+                                        <p class="mb-1"><strong>Taluka:</strong> {{ $property->taluka ? $property->taluka->name : 'N/A' }}</p>
+                                        <p class="mb-1"><strong>District:</strong> {{ $property->district ? $property->district->district_title : 'N/A' }}</p>
+                                        <p class="mb-1"><strong>State:</strong> {{ $property->state ? $property->state->state_title : 'N/A' }}</p>
+                                        <p class="mb-1"><strong>Pincode:</strong> {{ $property->pincode }}</p>
+                                        <p class="mb-0"><strong>Country:</strong> {{ $property->country ? $property->country->country_name : 'N/A' }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@
                                     </h6>
                                     <div class="ps-4">
                                         <div class="row g-3">
-                                            @if($land->document_7_12)
+                                            @if($property->document_7_12)
                                             <div class="col-12">
                                                 <div class="d-flex align-items-center border rounded p-3 bg-light">
                                                     <div class="flex-shrink-0">
@@ -132,7 +132,7 @@
                                                         <p class="text-muted mb-0 small">Property ownership document</p>
                                                     </div>
                                                     <div class="flex-shrink-0">
-                                                        <button type="button" class="btn btn-sm btn-primary" onclick="viewDocument('{{ asset('assets/documents/' . $land->document_7_12) }}')">
+                                                        <button type="button" class="btn btn-sm btn-primary" onclick="viewDocument('{{ asset('storage/documents/' . $property->document_7_12) }}')">
                                                             <i class='bx bx-show me-1'></i>View
                                                         </button>
                                                     </div>
@@ -157,7 +157,7 @@
                                             </div>
                                             @endif
                                             
-                                            @if($land->document_8a)
+                                            @if($property->document_8a)
                                             <div class="col-12">
                                                 <div class="d-flex align-items-center border rounded p-3 bg-light">
                                                     <div class="flex-shrink-0">
@@ -168,7 +168,7 @@
                                                         <p class="text-muted mb-0 small">Property tax document</p>
                                                     </div>
                                                     <div class="flex-shrink-0">
-                                                        <button type="button" class="btn btn-sm btn-primary" onclick="viewDocument('{{ asset('assets/documents/' . $land->document_8a) }}')">
+                                                        <button type="button" class="btn btn-sm btn-primary" onclick="viewDocument('{{ asset('storage/documents/' . $property->document_8a) }}')">
                                                             <i class='bx bx-show me-1'></i>View
                                                         </button>
                                                     </div>
@@ -205,9 +205,9 @@
                                         <span>Additional Notes</span>
                                     </h6>
                                     <div class="ps-4">
-                                        @if($land->additional_notes)
+                                        @if($property->additional_notes)
                                             <div class="bg-light p-3 rounded">
-                                                <p class="mb-0">{{ $land->additional_notes }}</p>
+                                                <p class="mb-0">{{ $property->additional_notes }}</p>
                                             </div>
                                         @else
                                             <div class="text-muted">No additional notes provided</div>
@@ -227,11 +227,11 @@
                                         <span>Categories</span>
                                     </h6>
                                     <div class="ps-4">
-                                        @if(is_array($land->amenities) && count($land->amenities) > 0)
+                                        @if(is_array($property->amenities) && count($property->amenities) > 0)
                                             <div class="mb-3">
                                                 <strong class="d-block mb-2">Amenities:</strong>
                                                 <div>
-                                                    @foreach($land->amenities as $amenityId)
+                                                    @foreach($property->amenities as $amenityId)
                                                         @php $amenity = \App\Models\Amenity::find($amenityId); @endphp
                                                         @if($amenity)
                                                             <span class="badge bg-primary me-1 mb-1">{{ $amenity->name }}</span>
@@ -241,11 +241,11 @@
                                             </div>
                                         @endif
                                         
-                                        @if(is_array($land->landTypes) && count($land->landTypes) > 0)
+                                        @if(is_array($property->landTypes) && count($property->landTypes) > 0)
                                             <div>
                                                 <strong class="d-block mb-2">Type of Land:</strong>
                                                 <div>
-                                                    @foreach($land->landTypes as $landTypeId)
+                                                    @foreach($property->landTypes as $landTypeId)
                                                         @php $landType = \App\Models\LandType::find($landTypeId); @endphp
                                                         @if($landType)
                                                             <span class="badge bg-success me-1 mb-1">{{ $landType->name }}</span>
@@ -255,7 +255,7 @@
                                             </div>
                                         @endif
                                         
-                                        @if((!is_array($land->amenities) || count($land->amenities) == 0) && (!is_array($land->landTypes) || count($land->landTypes) == 0))
+                                        @if((!is_array($property->amenities) || count($property->amenities) == 0) && (!is_array($property->landTypes) || count($property->landTypes) == 0))
                                             <div class="text-muted">No categories selected</div>
                                         @endif
                                     </div>
@@ -272,20 +272,23 @@
                                     <div class="ps-4">
                                         <!-- First row with 3 parts -->
                                         <div class="row mb-3">
-                                            @if($land->vavetar)
+                                            @if($property->vavetar)
                                             <div class="col-md-4">
                                                 <strong>Vavetar:</strong>
-                                                <div class="text-muted">{{ $land->vavetar }}</div>
+                                                <div class="text-muted">{{ $property->vavetar }}</div>
+                                                @if($property->vavetar == 'Yes' && $property->vavetar_name)
+                                                    <div class="text-danger small">{{ $property->vavetar_name }}</div>
+                                                @endif
                                             </div>
                                             @endif
                                             
-                                            @if($land->electric_poll)
+                                            @if($property->electric_poll)
                                             <div class="col-md-4">
                                                 <strong>Electric Poll:</strong>
-                                                <div class="text-muted">{{ $land->electric_poll }}
+                                                <div class="text-muted">{{ $property->electric_poll }}
 
-                                                @if($land->electric_poll == 'Yes' && $land->electric_poll_count)
-                                                    (<span class="small">{{ $land->electric_poll_count }}</span>)
+                                                @if($property->electric_poll == 'Yes' && $property->electric_poll_count)
+                                                    (<span class="small">{{ $property->electric_poll_count }}</span>)
                                                 @endif
 
                                                 </div>
@@ -293,35 +296,35 @@
                                             </div>
                                             @endif
                                             
-                                            @if($land->road_distance)
+                                            @if($property->road_distance)
                                             <div class="col-md-4">
                                                 <strong>Road Distance:</strong>
-                                                <div class="text-muted">{{ $land->road_distance }} feet</div>
+                                                <div class="text-muted">{{ $property->road_distance }} feet</div>
                                             </div>
                                             @endif
                                         </div>
                                         
                                         <!-- Second row with 1 part -->
-                                        @if($land->any_issue)
+                                        @if($property->any_issue)
                                         <div class="row mb-3">
                                             <div class="col-12">
                                                 <strong>Any Issue:</strong>
-                                                <div class="text-muted">{{ $land->any_issue }}</div>
-                                                @if($land->any_issue == 'Yes' && $land->issue_description)
-                                                    <div class="text-danger small">{{ $land->issue_description }}</div>
+                                                <div class="text-muted">{{ $property->any_issue }}</div>
+                                                @if($property->any_issue == 'Yes' && $property->issue_description)
+                                                    <div class="text-danger small">{{ $property->issue_description }}</div>
                                                 @endif
                                             </div>
                                         </div>
                                         @endif
                                         
                                         <!-- Third row with 1 part -->
-                                        @if($land->family_issue)
+                                        @if($property->family_issue)
                                         <div class="row">
                                             <div class="col-12">
                                                 <strong>Family Issue:</strong>
-                                                <div class="text-muted">{{ $land->family_issue }}</div>
-                                                @if($land->family_issue == 'Yes' && $land->family_issue_description)
-                                                    <div class="text-danger small">{{ $land->family_issue_description }}</div>
+                                                <div class="text-muted">{{ $property->family_issue }}</div>
+                                                @if($property->family_issue == 'Yes' && $property->family_issue_description)
+                                                    <div class="text-danger small">{{ $property->family_issue_description }}</div>
                                                 @endif
                                             </div>
                                         </div>
@@ -335,14 +338,14 @@
                                 <div class="card-body">
                                     <h6 class="card-title mb-3 d-flex align-items-center">
                                         <i class='bx bx-image text-primary me-2'></i>
-                                        <span>Photographs ({{ is_countable($land->getPhotosList()) ? count($land->getPhotosList()) : 0 }})</span>
+                                        <span>Photographs ({{ is_countable($property->getPhotosList()) ? count($property->getPhotosList()) : 0 }})</span>
                                     </h6>
-                                    @if(is_countable($land->getPhotosList()) && count($land->getPhotosList()) > 0)
+                                    @if(is_countable($property->getPhotosList()) && count($property->getPhotosList()) > 0)
                                         <div class="row g-2">
-                                            @foreach($land->getPhotosList() as $index => $photo)
+                                            @foreach($property->getPhotosList() as $index => $photo)
                                                 <div class="col-6 col-md-4">
                                                     <div class="card border-0 shadow-sm h-100 overflow-hidden position-relative photo-container">
-                                                        <img src="{{ asset('assets/photos/' . $photo['photo_path']) }}" 
+                                                        <img src="{{ asset('storage/photos/' . $photo) }}" 
                                                              class="card-img-top img-fluid" 
                                                              alt="Land Photo" 
                                                              style="height: 150px; width: 100%; object-fit: cover; cursor: pointer;" 
@@ -352,7 +355,7 @@
                                                                 <div class="bg-white rounded-circle p-2 me-2 photo-action-btn d-flex align-items-center justify-content-center" onclick="openGallery({{ $index }}); event.stopPropagation();" style="width: 35px; height: 35px;">
                                                                     <i class='bx bx-show text-primary fs-6'></i>
                                                                 </div>
-                                                                <div class="bg-white rounded-circle p-2 photo-action-btn d-flex align-items-center justify-content-center" onclick="deletePhoto({{ $land->id }}, {{ $index }}); event.stopPropagation();" style="width: 35px; height: 35px;">
+                                                                <div class="bg-white rounded-circle p-2 photo-action-btn d-flex align-items-center justify-content-center" onclick="deletePhoto({{ $property->id }}, {{ $index }}); event.stopPropagation();" style="width: 35px; height: 35px;">
                                                                     <i class='bx bx-trash text-danger fs-6'></i>
                                                                 </div>
                                                             </div>
@@ -512,10 +515,36 @@
 .photo-overlay .photo-action-btn:nth-child(2) {
     transition-delay: 0.2s;
 }
+
+/* Center the gallery image */
+.modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+}
+
+.gallery-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#galleryImage {
+    max-height: 70vh;
+    max-width: 100%;
+    object-fit: contain;
+    margin: auto;
+}
 </style>
 @endsection
 
 @section('scripts')
+<!-- Toastr JS -->
+<script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
 <script>
 // Initialize gallery with photo data
 let galleryPhotos = [];
@@ -523,11 +552,11 @@ let currentPhotoIndex = 0;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Collect all photo URLs and data
-    @if(is_countable($land->getPhotosList()) && count($land->getPhotosList()) > 0)
+    @if(is_countable($property->getPhotosList()) && count($property->getPhotosList()) > 0)
         galleryPhotos = [
-            @foreach($land->getPhotosList() as $index => $photo)
+            @foreach($property->getPhotosList() as $index => $photo)
                 {
-                    url: '{{ asset('assets/photos/' . $photo['photo_path']) }}',
+                    url: '{{ asset('storage/photos/' . $photo) }}',
                     name: 'Photo #{{ $index + 1 }}',
                     index: {{ $index }}
                 },
@@ -627,55 +656,97 @@ function viewDocument(url) {
     new bootstrap.Modal(document.getElementById('documentViewerModal')).show();
 }
 
-// Delete land function
-function deleteLand(landId) {
-    if (confirm('Are you sure you want to delete this land record?')) {
-        const form = document.getElementById('delete-form');
-        form.action = `/admin/land-jamin/${landId}`;
-        form.submit();
-    }
-}
-
 // Delete photo function
 function deletePhoto(propertyId, photoIndex) {
     if (confirm('Are you sure you want to delete this photo?')) {
-        fetch(`/admin/land-jamin/${propertyId}/photos/${photoIndex}`, {
+        // Create a form element for AJAX request
+        fetch('{{ url("admin/land-jamin") }}/' + propertyId + '/photos/' + photoIndex, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Remove the photo element from the DOM
-                const photoElements = document.querySelectorAll(`[onclick*="openGallery"][onclick*="deletePhoto(${photoIndex})"], [onclick*="deletePhoto(${photoIndex})"][onclick*="openGallery"]`);
-                photoElements.forEach(element => {
-                    if (element.closest('.col-md-4, .col-6')) {
-                        element.closest('.col-md-4, .col-6').remove();
-                    }
-                });
-                
-                // Also try to remove by photo ID if the above doesn't work
-                const photoContainers = document.querySelectorAll('.photo-container');
-                photoContainers.forEach(container => {
-                    if (container.querySelector(`[onclick*="deletePhoto(${photoIndex})"]`)) {
-                        container.closest('.col-md-4, .col-6').remove();
-                    }
-                });
-                
-                // Update gallery photos array
-                galleryPhotos = galleryPhotos.filter(photo => photo.index !== photoIndex);
-            } else {
-                // Show error message
-                alert('Error deleting photo: ' + (data.message || 'Unknown error'));
-            }
+            // if (data.success) {
+                location.reload();
+            // } else {
+            //     alert('Failed to delete photo');
+            // }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error deleting photo: ' + error.message);
+            alert('An error occurred while deleting the photo');
         });
     }
 }
+
+// Delete land function
+// function deleteLand(landId) {
+//     if (confirm('Are you sure you want to delete this land record?')) {
+//         const form = document.getElementById('delete-form');
+//         form.action = `/admin/land-jamin/${landId}`;
+//         form.submit();
+//     }
+// }
+
+$(document).ready(function() {
+    // Initialize Toastr
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+    
+    // Delete functionality
+    $('#delete-btn').click(function() {
+        var id = {{ $property->id }};
+        var url = '{{ url("admin/land-jamin") }}/' + id;
+        console.log(url);
+        if (confirm('Are you sure you want to delete this shad record?')) {
+            // Show loading state
+            var button = $(this);
+            var originalText = button.text();
+            button.prop('disabled', true).text('Deleting...');
+            
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success('land record deleted successfully.');
+                        // Redirect to the index page
+                        window.location.href = '{{ route("land-jamin.index") }}';
+                    } else {
+                        toastr.error('Failed to delete land record.');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('An error occurred while deleting the land record.');
+                },
+                complete: function() {
+                    // Restore button state
+                    button.prop('disabled', false).text(originalText);
+                }
+            });
+        }
+    });
+});
 </script>
 @endsection

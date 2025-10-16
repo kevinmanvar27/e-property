@@ -147,6 +147,8 @@
                     <h6 class="mb-0">Photographs</h6>
                 </div>
                 
+                
+                
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <label for="photos" class="form-label">Photographs (Multiple uploads supported)</label>
@@ -163,23 +165,17 @@
                         </div>
                         
                         <!-- Existing photos gallery -->
-                        @if(isset($property->photos) && is_array($property->getPhotosList()) && count($property->getPhotosList()) > 0)
+                        @if($property->getPhotosList())
                         <div class="mt-3">
                             <h6>Existing Photos:</h6>
                             <div class="row" id="photo-gallery">
-                                @php
-                                    // Sort photos by position if it exists
-                                    $sortedPhotos = collect($property->getPhotosList())->sortBy(function($photo) {
-                                        return isset($photo['position']) ? $photo['position'] : 0;
-                                    });
-                                @endphp
-                                @foreach($sortedPhotos as $index => $photo)
-                                <div class="col-md-3 mb-3 photo-item" data-position="{{ $index }}">
+                                @foreach($property->getPhotosList() as $index => $photo)
+                                <div class="col-md-3 mb-3 photo-item" data-index="{{ $index }}">
                                     <div class="card">
-                                        <img src="{{ asset('assets/photos/' . $photo['photo_path']) }}" class="card-img-top" alt="Shad Photo" style="height: 150px; object-fit: cover; cursor: pointer;" onclick="viewImage('{{ asset('assets/photos/' . $photo['photo_path']) }}')">
+                                        <img src="{{ asset('storage/photos/' . $photo) }}" class="card-img-top" alt="Shop Photo" style="height: 150px; object-fit: cover; cursor: pointer;" onclick="viewImage('{{ asset('storage/photos/' . $photo) }}')">
                                         <div class="card-body p-2">
                                             <div class="d-flex justify-content-between">
-                                                <button type="button" class="btn btn-sm btn-view" onclick="viewImage('{{ asset('assets/photos/' . $photo['photo_path']) }}')" title="View"><i class='bx bx-show'></i></button>
+                                                <button type="button" class="btn btn-sm btn-view" onclick="viewImage('{{ asset('storage/photos/' . $photo) }}')" title="View"><i class='bx bx-show'></i></button>
                                                 <button type="button" class="btn btn-sm btn-delete" onclick="deletePhoto({{ $index }})" title="Delete"><i class='bx bx-trash'></i></button>
                                             </div>
                                         </div>
@@ -277,8 +273,10 @@
                 <h5 class="modal-title" id="imagePreviewModalLabel">Image Preview</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <img id="previewImage" src="" alt="Preview" class="img-fluid" style="max-height: 70vh;">
+            <div class="modal-body d-flex justify-content-center align-items-center">
+                <div class="gallery-container">
+                    <img id="previewImage" src="" alt="Preview" class="img-fluid" style="max-height: 70vh;">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -299,12 +297,6 @@
     margin-bottom: 15px;
     background: #f8f9fa;
     transition: all 0.3s ease;
-    max-width: 200px;
-    margin-left: auto;
-    margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    height: 220px; /* Fixed height for consistent sizing */
 }
 
 .photo-item:hover {
@@ -314,9 +306,8 @@
 
 .photo-item img {
     width: 100%;
-    max-width: 200px;
-    height: 150px; /* Fixed height */
-    object-fit: cover; /* Maintain aspect ratio while covering the area */
+    height: 150px;
+    object-fit: cover;
     border-radius: 5px 5px 0 0;
     cursor: pointer;
 }
@@ -324,14 +315,6 @@
 .photo-item .photo-info {
     padding: 10px;
     font-size: 0.85rem;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex-grow: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .photo-item .photo-actions {
@@ -378,18 +361,20 @@
     background-color: #e3f2fd;
 }
 
-/* Additional styles for consistent photo display */
-#preview-container .col-md-3 {
+.gallery-container {
     display: flex;
+    align-items: center;
     justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
-/* Ensure consistent sizing for photo previews */
-#preview-container img {
-    width: 100%;
-    max-width: 200px;
-    height: 150px;
-    object-fit: cover;
+#previewImage{
+    max-height: 70vh;
+    max-width: 100%;
+    object-fit: contain;
+    margin: auto;
 }
 </style>
 @endsection
@@ -410,14 +395,30 @@ document.getElementById('country_id').addEventListener('change', function() {
     
     if (countryId) {
         fetch("{{ url('admin/shad/states') }}/" + countryId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
-                data.forEach(state => {
-                    const option = document.createElement('option');
-                    option.value = state.state_id;
-                    option.textContent = state.state_title;
-                    stateSelect.appendChild(option);
-                });
+                // Check if data is an array
+                if (Array.isArray(data)) {
+                    data.forEach(state => {
+                        const option = document.createElement('option');
+                        option.value = state.state_id;
+                        option.textContent = state.state_title;
+                        stateSelect.appendChild(option);
+                    });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New State';
+                    addNewOption.setAttribute('data-entity', 'state');
+                    stateSelect.appendChild(addNewOption);
+                } else {
+                    console.error('Expected array but received:', data);
+                }
             })
             .catch(error => {
                 console.error('Error loading states:', error);
@@ -425,56 +426,132 @@ document.getElementById('country_id').addEventListener('change', function() {
     }
 });
 
-// Handle cascading dropdowns
-document.getElementById('state_id').addEventListener('change', function() {
-    const stateId = this.value;
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('state_id');
+
+    // Append "+ Add New State" option if not exists
+    if (!stateSelect.querySelector('option[value="add_new"]')) {
+        const addNewOption = document.createElement('option');
+        addNewOption.value = 'add_new';
+        addNewOption.textContent = '+ Add New State';
+        addNewOption.setAttribute('data-entity', 'state');
+        stateSelect.appendChild(addNewOption);
+    }
+
+    // Open modal if "Add New" is selected
+    stateSelect.addEventListener('change', function() {
+        if (this.value === 'add_new') {
+            openAddNewModal('state', 'state_id');
+            this.value = '';
+        }
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('state_id');
     const districtSelect = document.getElementById('district_id');
     const talukaSelect = document.getElementById('taluka_id');
-    
-    // Clear existing options but keep the placeholder
-    districtSelect.innerHTML = '<option value="">Select District</option>';
-    talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
-    
-    if (stateId) {
+
+    const selectedDistrictId = "{{ old('district_id', $property->district_id) }}";
+    const selectedTalukaId = "{{ old('taluka_id', $property->taluka_id) }}";
+
+    function loadDistricts(stateId, preselectDistrictId = null, callback = null) {
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
+
+        if (!stateId || stateId === 'add_new') return;
+
         fetch("{{ url('admin/shad/districts') }}/" + stateId)
             .then(response => response.json())
             .then(data => {
-                data.forEach(district => {
-                    const option = document.createElement('option');
-                    option.value = district.districtid;
-                    option.textContent = district.district_title;
-                    districtSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading districts:', error);
+                if (Array.isArray(data)) {
+                    data.forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district.districtid;
+                        option.textContent = district.district_title;
+                        if (district.districtid == preselectDistrictId) option.selected = true;
+                        districtSelect.appendChild(option);
+                    });
+
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New District';
+                    addNewOption.setAttribute('data-entity', 'district');
+                    districtSelect.appendChild(addNewOption);
+
+                    if (callback) callback();
+                }
             });
     }
-});
 
-document.getElementById('district_id').addEventListener('change', function() {
-    const districtId = this.value;
-    const talukaSelect = document.getElementById('taluka_id');
-    
-    // Clear existing options but keep the placeholder
-    talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
-    
-    if (districtId) {
+    function loadTalukas(districtId, preselectTalukaId = null) {
+        talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
+        if (!districtId || districtId === 'add_new') return;
+
         fetch("{{ url('admin/shad/talukas') }}/" + districtId)
             .then(response => response.json())
             .then(data => {
-                data.forEach(taluka => {
-                    const option = document.createElement('option');
-                    option.value = taluka.id;
-                    option.textContent = taluka.name;
-                    talukaSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error loading talukas:', error);
+                if (Array.isArray(data)) {
+                    data.forEach(taluka => {
+                        const option = document.createElement('option');
+                        option.value = taluka.id;
+                        option.textContent = taluka.name;
+                        if (taluka.id == preselectTalukaId) option.selected = true;
+                        talukaSelect.appendChild(option);
+                    });
+
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New Taluka';
+                    addNewOption.setAttribute('data-entity', 'city');
+                    talukaSelect.appendChild(addNewOption);
+                }
             });
     }
+
+    // On page load: load districts first, then talukas
+    if (stateSelect.value) {
+        loadDistricts(stateSelect.value, selectedDistrictId, function() {
+            if (selectedDistrictId) loadTalukas(selectedDistrictId, selectedTalukaId);
+        });
+    }
+
+    // On state change
+    stateSelect.addEventListener('change', function() {
+        loadDistricts(this.value);
+    });
+
+    // On district change
+    districtSelect.addEventListener('change', function() {
+        if (this.value === 'add_new') {
+            openAddNewModal('district', 'district_id');
+            this.value = '';
+            return;
+        }
+        loadTalukas(this.value);
+    });
+
+    // On taluka change
+    talukaSelect.addEventListener('change', function() {
+        if (this.value === 'add_new') {
+            openAddNewModal('city', 'taluka_id');
+            this.value = '';
+        }
+    });
 });
+
+// Add event listener for taluka dropdown
+document.getElementById('taluka_id').addEventListener('change', function() {
+    const talukaId = this.value;
+    
+    if (talukaId === 'add_new') {
+        // Open add new modal for city (taluka)
+        openAddNewModal('city', 'taluka_id');
+        // Reset to placeholder
+        this.value = '';
+    }
+});
+
 
 // Handle pincode validation
 document.getElementById('pincode').addEventListener('input', function() {
@@ -504,11 +581,19 @@ document.getElementById('photos').addEventListener('change', function() {
                 });
             }
         });
-        
-        // Display the photos
-        displaySelectedPhotos();
+        const fileSize = formatFileSize(totalSize);
+        sizeElement.textContent = `${files.length} file(s) selected, Total size: ${fileSize}`;
     }
 });
+
+// Format file size for display
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
 
 function displaySelectedPhotos() {
     const previewContainer = document.getElementById('preview-container');
@@ -603,17 +688,22 @@ function handleDragEnd() {
     draggedItem = null;
 }
 
+// Image viewer function
 function viewImage(url) {
     const modal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
     const previewImage = document.getElementById('previewImage');
     const downloadLink = document.getElementById('downloadImage');
     
     previewImage.src = url;
+    previewImage.alt = 'Image Preview';
     downloadLink.href = url;
+    downloadLink.download = url.split('/').pop();
     
+    document.getElementById('imagePreviewModalLabel').textContent = 'Image Preview';
     modal.show();
 }
 
+// Delete photo function
 function deletePhoto(photoIndex) {
     if (confirm('Are you sure you want to delete this photo?')) {
         fetch(`/admin/shad/{{ $property->id }}/photos/${photoIndex}`, {
@@ -624,9 +714,9 @@ function deletePhoto(photoIndex) {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
+            if (data.message === "Photo deleted successfully") {
                 // Remove the photo from the DOM
-                const photoElement = document.querySelector(`[data-position="${photoIndex}"]`);
+                const photoElement = document.querySelector(`[data-index="${photoIndex}"]`);
                 if (photoElement) {
                     photoElement.closest('.col-md-3').remove();
                 }
@@ -657,6 +747,9 @@ document.getElementById('shad-form').addEventListener('submit', function(e) {
     
     // Create FormData object
     const formData = new FormData(this);
+    
+    // Remove the photos field from formData to prevent duplication
+    formData.delete('photos[]');
     
     // Add selected photos to form data
     selectedPhotos.forEach((photo, index) => {
@@ -689,7 +782,7 @@ document.getElementById('shad-form').addEventListener('submit', function(e) {
             }
         } else if (data.success) {
             // Success - redirect to index page
-            window.location.href = "{{ route('shad.index') }}";
+            window.location.href = "{{ route('shad.show', $property->id) }}";
         }
     })
     .catch(error => {
@@ -728,33 +821,21 @@ document.getElementById('add-amenity-form').addEventListener('submit', function(
     })
     .then(response => response.json())
     .then(data => {
-        if (data.errors) {
-            // Handle validation errors
-            Object.keys(data.errors).forEach(field => {
-                const errorElement = document.getElementById('amenity-' + field + '-error');
-                if (errorElement) {
-                    errorElement.textContent = data.errors[field][0];
-                    document.getElementById('amenity-' + field).classList.add('is-invalid');
-                }
-            });
-        } else if (data.success) {
-            // Success - add new amenity to the list
-            const amenityContainer = document.getElementById('amenities-container');
-            const div = document.createElement('div');
-            div.className = 'form-check me-3 mb-2';
-            div.innerHTML = `
-                <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
-                <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
-            `;
-            amenityContainer.appendChild(div);
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('addAmenityModal'));
-            modal.hide();
-            
-            // Reset form
-            document.getElementById('add-amenity-form').reset();
-        }
+        const amenityContainer = document.getElementById('amenities-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
+            <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
+        `;
+        amenityContainer.appendChild(div);
+        
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addAmenityModal'));
+        modal.hide();
+        
+        // Reset form
+        document.getElementById('add-amenity-form').reset();
     })
     .catch(error => {
         console.error('Error:', error);
@@ -766,5 +847,156 @@ document.getElementById('add-amenity-form').addEventListener('submit', function(
         submitButton.textContent = originalText;
     });
 });
+
+// Function to open the Add New modal
+function openAddNewModal(entityType, dropdownId) {
+    const modal = new bootstrap.Modal(document.getElementById('addNewModal'));
+    const modalTitle = document.getElementById('addNewModalLabel');
+    const entityTypeInput = document.getElementById('add-new-entity-type');
+    const dropdownIdInput = document.getElementById('add-new-dropdown-id');
+    const nameInput = document.getElementById('add-new-name');
+    const descriptionInput = document.getElementById('add-new-description');
+    const additionalFields = document.getElementById('add-new-additional-fields');
+    
+    // Reset form
+    document.getElementById('add-new-form').reset();
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    // Set modal title and inputs
+    modalTitle.textContent = 'Add New ' + entityType.charAt(0).toUpperCase() + entityType.slice(1);
+    entityTypeInput.value = entityType;
+    dropdownIdInput.value = dropdownId;
+    nameInput.value = '';
+    descriptionInput.value = '';
+    additionalFields.innerHTML = '';
+    
+    // Add additional fields based on entity type
+    switch (entityType) {
+        case 'state':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-country-id" class="form-label">Country <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-country-id" name="country_id" required>
+                        <option value="">Select Country</option>
+                        @foreach($countries as $countryId => $countryName)
+                        <option value="{{ $countryId }}">{{ $countryName }}</option>
+                        @endforeach
+                    </select>
+                    <div class="invalid-feedback" id="add-new-country-id-error"></div>
+                </div>
+            `;
+            
+            // Pre-select current country if available
+            const countrySelect = document.getElementById('country_id');
+            if (countrySelect && countrySelect.value) {
+                document.getElementById('add-new-country-id').value = countrySelect.value;
+            }
+            break;
+            
+        case 'district':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate and pre-select state
+            const stateSelect = document.getElementById('state_id');
+            const newStateSelect = document.getElementById('add-new-state-id');
+            newStateSelect.innerHTML = stateSelect.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newStateSelect.remove(option.index);
+                }
+            });
+            
+            if (stateSelect && stateSelect.value && stateSelect.value !== 'add_new') {
+                newStateSelect.value = stateSelect.value;
+            }
+            break;
+            
+        case 'city':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-district-id" class="form-label">District <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-district-id" name="districtid" required>
+                        <option value="">Select District</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-district-id-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="add-new-city-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-city-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-city-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate states
+            const stateSelectForCity = document.getElementById('state_id');
+            const districtSelect = document.getElementById('district_id');
+            const newDistrictSelect = document.getElementById('add-new-district-id');
+            const newCityStateSelect = document.getElementById('add-new-city-state-id');
+            
+            // Copy options from existing state select
+            newCityStateSelect.innerHTML = stateSelectForCity.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newCityStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newCityStateSelect.remove(option.index);
+                }
+            });
+            
+            // Set state selection handler
+            newCityStateSelect.addEventListener('change', function() {
+                const stateId = this.value;
+                if (stateId) {
+                    fetch("{{ url('admin/shad/districts') }}/" + stateId)
+                        .then(response => response.json())
+                        .then(data => {
+                            newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                            data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.districtid;
+                                option.textContent = district.district_title;
+                                newDistrictSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading districts:', error);
+                        });
+                } else {
+                    newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                }
+            });
+            
+            // Pre-select current state and load districts
+            if (stateSelectForCity.value && stateSelectForCity.value !== 'add_new') {
+                newCityStateSelect.value = stateSelectForCity.value;
+                // Trigger change event to load districts
+                const event = new Event('change');
+                newCityStateSelect.dispatchEvent(event);
+                
+                // Pre-select current district after a short delay to allow districts to load
+                setTimeout(() => {
+                    if (districtSelect.value && districtSelect.value !== 'add_new') {
+                        newDistrictSelect.value = districtSelect.value;
+                    }
+                }, 500); // Increased delay to ensure districts are loaded
+            }
+            break;
+    }
+    
+    modal.show();
+}
 </script>
 @endsection

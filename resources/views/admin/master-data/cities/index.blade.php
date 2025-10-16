@@ -68,7 +68,9 @@
                                                data-district="{{ $city->districtid }}" 
                                                data-state="{{ $city->state_id }}" 
                                                data-country="{{ $city->state->country_id ?? '' }}"
-                                               data-description="{{ $city->description }}">
+                                               data-description="{{ $city->description }}"
+                                               data-bs-toggle="modal" 
+                                               data-bs-target="#cityModal">
                                                 <i class='bx bxs-edit bx-sm'></i>
                                             </a>
                                             <a href="javascript:;" class="ms-3 delete-city text-danger" 
@@ -282,19 +284,18 @@ document.addEventListener('DOMContentLoaded', function() {
     cityModal.addEventListener('show.bs.modal', function (event) {
         const button = event.relatedTarget;
         const action = button.getAttribute('data-action');
-        
+
         // Reset form
         cityForm.reset();
         document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
         document.querySelectorAll('.form-control').forEach(el => el.classList.remove('is-invalid'));
-        
+
         if (action === 'create') {
-            // Create new city
             modalTitle.textContent = 'Add New City/Taluka';
             document.getElementById('city-id').value = '';
             document.getElementById('form-method').value = 'POST';
+            document.getElementById('city-district').innerHTML = '<option value="">Select District</option>';
         } else {
-            // Edit existing city
             modalTitle.textContent = 'Edit City/Taluka';
             const id = button.getAttribute('data-id');
             const name = button.getAttribute('data-name');
@@ -302,57 +303,54 @@ document.addEventListener('DOMContentLoaded', function() {
             const state = button.getAttribute('data-state');
             const country = button.getAttribute('data-country');
             const description = button.getAttribute('data-description');
-            
+
             document.getElementById('city-id').value = id;
             document.getElementById('city-name').value = name;
             document.getElementById('city-country').value = country;
-            document.getElementById('city-state').value = state;
-            document.getElementById('city-district').value = district;
             document.getElementById('city-description').value = description || '';
             document.getElementById('form-method').value = 'PUT';
-            
-            // Load states for the selected country
+
             if (country) {
                 fetch(`/admin/locations/states/${country}`)
-                    .then(response => response.json())
+                    .then(res => res.json())
                     .then(states => {
                         const stateSelect = document.getElementById('city-state');
                         stateSelect.innerHTML = '<option value="">Select State</option>';
-                        states.forEach(state => {
+                        states.forEach(st => {
                             const option = document.createElement('option');
-                            option.value = state.state_id;
-                            option.textContent = state.state_title;
-                            if (state.state_id == button.getAttribute('data-state')) {
-                                option.selected = true;
-                            }
+                            option.value = st.state_id;
+                            option.textContent = st.state_title;
                             stateSelect.appendChild(option);
                         });
-                        
-                        // Load districts for the selected state
+
+                        // Now set the selected state
+                        stateSelect.value = state;
+
+                        // Fetch districts for this state
                         if (state) {
                             fetch(`/admin/locations/districts/${state}`)
-                                .then(response => response.json())
+                                .then(res => res.json())
                                 .then(districts => {
                                     const districtSelect = document.getElementById('city-district');
                                     districtSelect.innerHTML = '<option value="">Select District</option>';
-                                    districts.forEach(district => {
+                                    districts.forEach(dist => {
                                         const option = document.createElement('option');
-                                        option.value = district.districtid;
-                                        option.textContent = district.district_title;
-                                        if (district.districtid == button.getAttribute('data-district')) {
-                                            option.selected = true;
-                                        }
+                                        option.value = dist.districtid;
+                                        option.textContent = dist.district_title;
                                         districtSelect.appendChild(option);
                                     });
+
+                                    // Now set the selected district
+                                    districtSelect.value = district;
                                 })
-                                .catch(error => {
-                                    console.error('Error:', error);
+                                .catch(err => {
+                                    console.error('Error loading districts:', err);
                                     toastr.error('Error loading districts.');
                                 });
                         }
                     })
-                    .catch(error => {
-                        console.error('Error:', error);
+                    .catch(err => {
+                        console.error('Error loading states:', err);
                         toastr.error('Error loading states.');
                     });
             }
@@ -465,79 +463,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveButton.disabled = false;
             saveButton.textContent = originalSaveText;
         });
-    });
-    
-    // Handle edit buttons
-    document.addEventListener('click', function(e) {
-        if (e.target.closest('.edit-city')) {
-            const button = e.target.closest('.edit-city');
-            const id = button.getAttribute('data-id');
-            const name = button.getAttribute('data-name');
-            const district = button.getAttribute('data-district');
-            const state = button.getAttribute('data-state');
-            const country = button.getAttribute('data-country');
-            const description = button.getAttribute('data-description');
-            
-            // Set form values
-            document.getElementById('city-id').value = id;
-            document.getElementById('city-name').value = name;
-            document.getElementById('city-country').value = country;
-            document.getElementById('city-state').value = state;
-            document.getElementById('city-district').value = district;
-            document.getElementById('city-description').value = description || '';
-            document.getElementById('form-method').value = 'PUT';
-            document.getElementById('cityModalLabel').textContent = 'Edit City/Taluka';
-            
-            // Load states for the selected country
-            if (country) {
-                fetch(`/admin/locations/states/${country}`)
-                    .then(response => response.json())
-                    .then(states => {
-                        const stateSelect = document.getElementById('city-state');
-                        stateSelect.innerHTML = '<option value="">Select State</option>';
-                        states.forEach(state => {
-                            const option = document.createElement('option');
-                            option.value = state.state_id;
-                            option.textContent = state.state_title;
-                            if (state.state_id == button.getAttribute('data-state')) {
-                                option.selected = true;
-                            }
-                            stateSelect.appendChild(option);
-                        });
-                        
-                        // Load districts for the selected state
-                        if (state) {
-                            fetch(`/admin/locations/districts/${state}`)
-                                .then(response => response.json())
-                                .then(districts => {
-                                    const districtSelect = document.getElementById('city-district');
-                                    districtSelect.innerHTML = '<option value="">Select District</option>';
-                                    districts.forEach(district => {
-                                        const option = document.createElement('option');
-                                        option.value = district.districtid;
-                                        option.textContent = district.district_title;
-                                        if (district.districtid == button.getAttribute('data-district')) {
-                                            option.selected = true;
-                                        }
-                                        districtSelect.appendChild(option);
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('Error:', error);
-                                    toastr.error('Error loading districts.');
-                                });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        toastr.error('Error loading states.');
-                    });
-            }
-            
-            // Show modal
-            const modal = new bootstrap.Modal(document.getElementById('cityModal'));
-            modal.show();
-        }
     });
     
     // Handle delete buttons

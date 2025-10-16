@@ -35,7 +35,7 @@
                         <a href="{{ route('plot.edit', $property->id) }}" class="btn btn-warning btn-sm me-2">
                             <i class='bx bx-edit me-1'></i>Edit
                         </a>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="deletePlot({{ $property->id }})">
+                        <button type="button" class="btn btn-danger btn-sm"  id="delete-btn">
                             <i class='bx bx-trash me-1'></i>Delete
                         </button>
                     </div>
@@ -261,7 +261,7 @@
                                             @foreach($property->getPhotosList() as $index => $photo)
                                                 <div class="col-6 col-md-4">
                                                     <div class="card border-0 shadow-sm h-100 overflow-hidden position-relative photo-container">
-                                                        <img src="{{ asset('assets/photos/' . $photo['photo_path']) }}" 
+                                                        <img src="{{ asset('storage/photos/' . $photo) }}" 
                                                              class="card-img-top img-fluid" 
                                                              alt="Plot Photo" 
                                                              style="height: 150px; width: 100%; object-fit: cover; cursor: pointer;" 
@@ -406,10 +406,37 @@
 .photo-overlay .photo-action-btn:nth-child(2) {
     transition-delay: 0.2s;
 }
+
+
+/* Center the gallery image */
+.modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+}
+
+.gallery-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#galleryImage {
+    max-height: 70vh;
+    max-width: 100%;
+    object-fit: contain;
+    margin: auto;
+}
 </style>
 @endsection
 
 @section('scripts')
+<!-- Toastr JS -->
+<script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
 <script>
 // Initialize gallery with photo data
 let galleryPhotos = [];
@@ -421,7 +448,7 @@ document.addEventListener('DOMContentLoaded', function() {
         galleryPhotos = [
             @foreach($property->getPhotosList() as $index => $photo)
                 {
-                    url: '{{ asset('assets/photos/' . $photo['photo_path']) }}',
+                    url: '{{ asset('storage/photos/' . $photo) }}',
                     name: 'Photo #{{ $index + 1 }}',
                     index: {{ $index }}
                 },
@@ -499,44 +526,85 @@ function deletePlot(id) {
     }
 }
 
-// Delete photo function
+$(document).ready(function() {
+    // Initialize Toastr
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+    
+    // Delete functionality
+    $('#delete-btn').click(function() {
+        var id = {{ $property->id }};
+        var url = '{{ url("admin/plot") }}/' + id;
+        console.log(url);
+        if (confirm('Are you sure you want to delete this plot record?')) {
+            // Show loading state
+            var button = $(this);
+            var originalText = button.text();
+            button.prop('disabled', true).text('Deleting...');
+            
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success('Plot record deleted successfully.');
+                        // Redirect to the index page
+                        window.location.href = '{{ route("plot.index") }}';
+                    } else {
+                        toastr.error('Failed to delete plot record.');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('An error occurred while deleting the plot record.');
+                },
+                complete: function() {
+                    // Restore button state
+                    button.prop('disabled', false).text(originalText);
+                }
+            });
+        }
+    });
+});
+
 function deletePhoto(propertyId, photoIndex) {
     if (confirm('Are you sure you want to delete this photo?')) {
-        fetch(`/admin/plot/${propertyId}/photos/${photoIndex}`, {
+        // Create a form element for AJAX request
+        fetch('{{ url("admin/plot") }}/' + propertyId + '/photos/' + photoIndex, {
             method: 'DELETE',
             headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Remove the photo element from the DOM
-                const photoElements = document.querySelectorAll(`[onclick*="openGallery"][onclick*="deletePhoto(${photoIndex})"], [onclick*="deletePhoto(${photoIndex})"][onclick*="openGallery"]`);
-                photoElements.forEach(element => {
-                    if (element.closest('.col-md-4, .col-6')) {
-                        element.closest('.col-md-4, .col-6').remove();
-                    }
-                });
-                
-                // Also try to remove by photo ID if the above doesn't work
-                const photoContainers = document.querySelectorAll('.photo-container');
-                photoContainers.forEach(container => {
-                    if (container.querySelector(`[onclick*="deletePhoto(${photoIndex})"]`)) {
-                        container.closest('.col-md-4, .col-6').remove();
-                    }
-                });
-                
-                // Update gallery photos array
-                galleryPhotos = galleryPhotos.filter(photo => photo.index !== photoIndex);
+            if (data.message === "Photo deleted successfully") {
+                location.reload();
             } else {
-                // Show error message
-                alert('Error deleting photo: ' + (data.message || 'Unknown error'));
+                alert('Failed to delete photo');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error deleting photo: ' + error.message);
+            alert('An error occurred while deleting the photo');
         });
     }
 }

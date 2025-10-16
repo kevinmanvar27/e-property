@@ -35,7 +35,7 @@
                         <a href="{{ route('shad.edit', $property->id) }}" class="btn btn-warning btn-sm me-2">
                             <i class='bx bx-edit me-1'></i>Edit
                         </a>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="deleteShad({{ $property->id }})">
+                        <button type="button" class="btn btn-danger btn-sm"  id="delete-btn">
                             <i class='bx bx-trash me-1'></i>Delete
                         </button>
                     </div>
@@ -205,7 +205,7 @@
                                             @foreach($property->getPhotosList() as $index => $photo)
                                                 <div class="col-6 col-md-4">
                                                     <div class="card border-0 shadow-sm h-100 overflow-hidden position-relative photo-container">
-                                                        <img src="{{ asset('assets/photos/' . $photo['photo_path']) }}" 
+                                                        <img src="{{ asset('storage/photos/' . $photo) }}" 
                                                              class="card-img-top img-fluid" 
                                                              alt="Shad Photo" 
                                                              style="height: 150px; width: 100%; object-fit: cover; cursor: pointer;" 
@@ -329,10 +329,36 @@
 .gallery-controls button:hover {
     opacity: 1;
 }
+
+/* Center the gallery image */
+.modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 70vh;
+}
+
+.gallery-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+#galleryImage {
+    max-height: 70vh;
+    max-width: 100%;
+    object-fit: contain;
+    margin: auto;
+}
 </style>
 @endsection
 
 @section('scripts')
+<!-- Toastr JS -->
+<script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
 <script>
 let currentPhotoIndex = 0;
 let photoList = [];
@@ -376,8 +402,7 @@ function deletePhoto(propertyId, photoIndex) {
         })
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                // Reload the page to reflect changes
+            if (data.message === "Photo deleted successfully") {
                 location.reload();
             } else {
                 alert('Failed to delete photo');
@@ -390,47 +415,183 @@ function deletePhoto(propertyId, photoIndex) {
     }
 }
 
-// Gallery functions
-function openGallery(index) {
-    photoList = @json($property->getPhotosList());
-    currentPhotoIndex = index;
-    showPhoto(index);
-    new bootstrap.Modal(document.getElementById('galleryModal')).show();
-}
+// // Gallery functions
+// function openGallery(index) {
+//     photoList = @json($property->getPhotosList());
+//     currentPhotoIndex = index;
+//     showPhoto(index);
+//     new bootstrap.Modal(document.getElementById('galleryModal')).show();
+// }
 
-function showPhoto(index) {
-    if (photoList.length === 0) return;
+// function showPhoto(index) {
+//     if (photoList.length === 0) return;
     
-    const photo = photoList[index];
-    const imageUrl = '{{ asset("assets/photos/") }}/' + photo.photo_path;
+//     const photo = photoList[index];
+//     const imageUrl = '{{ asset("storage/photos/") }}/' + photo.photo_path;
+//     console.log(imageUrl);
     
-    document.getElementById('galleryImage').src = imageUrl;
-    document.getElementById('downloadGalleryImage').href = imageUrl;
-    document.getElementById('photoInfo').textContent = 'Photo ' + (index + 1);
-    document.getElementById('photoCounter').textContent = (index + 1) + ' of ' + photoList.length;
-}
+//     document.getElementById('galleryImage').src = imageUrl;
+//     document.getElementById('downloadGalleryImage').href = imageUrl;
+//     document.getElementById('photoInfo').textContent = 'Photo ' + (index + 1);
+//     document.getElementById('photoCounter').textContent = (index + 1) + ' of ' + photoList.length;
+// }
+
+// document.addEventListener('DOMContentLoaded', function() {
+//     // Previous button
+//     document.getElementById('prevBtn').addEventListener('click', function() {
+//         if (photoList.length === 0) return;
+//         currentPhotoIndex = (currentPhotoIndex - 1 + photoList.length) % photoList.length;
+//         showPhoto(currentPhotoIndex);
+//     });
+    
+//     // Next button
+//     document.getElementById('nextBtn').addEventListener('click', function() {
+//         if (photoList.length === 0) return;
+//         currentPhotoIndex = (currentPhotoIndex + 1) % photoList.length;
+//         showPhoto(currentPhotoIndex);
+//     });
+    
+//     // Keyboard navigation
+//     document.getElementById('galleryModal').addEventListener('keydown', function(e) {
+//         if (e.key === 'ArrowLeft') {
+//             document.getElementById('prevBtn').click();
+//         } else if (e.key === 'ArrowRight') {
+//             document.getElementById('nextBtn').click();
+//         }
+//     });
+// });
+
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Previous button
-    document.getElementById('prevBtn').addEventListener('click', function() {
-        if (photoList.length === 0) return;
-        currentPhotoIndex = (currentPhotoIndex - 1 + photoList.length) % photoList.length;
-        showPhoto(currentPhotoIndex);
-    });
+    // Collect all photo URLs and data
+    @if(is_countable($property->getPhotosList()) && count($property->getPhotosList()) > 0)
+        galleryPhotos = [
+            @foreach($property->getPhotosList() as $index => $photo)
+                {
+                    url: '{{ asset('storage/photos/' . $photo) }}',
+                    name: 'Photo #{{ $index + 1 }}',
+                    index: {{ $index }}
+                },
+            @endforeach
+        ];
+    @endif
+});
+
+function openGallery(index) {
+    currentPhotoIndex = index;
+    showPhoto();
+    const modal = new bootstrap.Modal(document.getElementById('galleryModal'));
+    modal.show();
+}
+
+function showPhoto() {
+    if (galleryPhotos.length === 0) return;
     
-    // Next button
-    document.getElementById('nextBtn').addEventListener('click', function() {
-        if (photoList.length === 0) return;
-        currentPhotoIndex = (currentPhotoIndex + 1) % photoList.length;
-        showPhoto(currentPhotoIndex);
-    });
+    const photo = galleryPhotos[currentPhotoIndex];
+    const galleryImage = document.getElementById('galleryImage');
+    const downloadLink = document.getElementById('downloadGalleryImage');
+    const photoInfo = document.getElementById('photoInfo');
+    const photoCounter = document.getElementById('photoCounter');
     
-    // Keyboard navigation
-    document.getElementById('galleryModal').addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowLeft') {
-            document.getElementById('prevBtn').click();
-        } else if (e.key === 'ArrowRight') {
-            document.getElementById('nextBtn').click();
+    galleryImage.src = photo.url;
+    galleryImage.alt = photo.name;
+    downloadLink.href = photo.url;
+    downloadLink.download = photo.name;
+    
+    photoInfo.textContent = photo.name;
+    photoCounter.textContent = (currentPhotoIndex + 1) + ' of ' + galleryPhotos.length;
+    
+    document.getElementById('galleryModalLabel').textContent = 'Photo Gallery';
+}
+
+function nextPhoto() {
+    if (galleryPhotos.length === 0) return;
+    
+    currentPhotoIndex = (currentPhotoIndex + 1) % galleryPhotos.length;
+    showPhoto();
+}
+
+function prevPhoto() {
+    if (galleryPhotos.length === 0) return;
+    
+    currentPhotoIndex = (currentPhotoIndex - 1 + galleryPhotos.length) % galleryPhotos.length;
+    showPhoto();
+}
+
+// Keyboard navigation
+document.addEventListener('keydown', function(e) {
+    const galleryModal = document.getElementById('galleryModal');
+    
+    // Handle gallery navigation
+    if (galleryModal && galleryModal.classList.contains('show')) {
+        if (e.key === 'ArrowRight') {
+            nextPhoto();
+        } else if (e.key === 'ArrowLeft') {
+            prevPhoto();
+        }
+    }
+});
+
+// Button event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('nextBtn').addEventListener('click', nextPhoto);
+    document.getElementById('prevBtn').addEventListener('click', prevPhoto);
+});
+
+$(document).ready(function() {
+    // Initialize Toastr
+    toastr.options = {
+        "closeButton": true,
+        "debug": false,
+        "newestOnTop": false,
+        "progressBar": true,
+        "positionClass": "toast-top-right",
+        "preventDuplicates": false,
+        "onclick": null,
+        "showDuration": "300",
+        "hideDuration": "1000",
+        "timeOut": "5000",
+        "extendedTimeOut": "1000",
+        "showEasing": "swing",
+        "hideEasing": "linear",
+        "showMethod": "fadeIn",
+        "hideMethod": "fadeOut"
+    };
+    
+    // Delete functionality
+    $('#delete-btn').click(function() {
+        var id = {{ $property->id }};
+        var url = '{{ url("admin/shad") }}/' + id;
+        console.log(url);
+        if (confirm('Are you sure you want to delete this shad record?')) {
+            // Show loading state
+            var button = $(this);
+            var originalText = button.text();
+            button.prop('disabled', true).text('Deleting...');
+            
+            $.ajax({
+                url: url,
+                type: 'DELETE',
+                data: {
+                    '_token': '{{ csrf_token() }}'
+                },
+                success: function(response) {
+                    if (response.success) {
+                        toastr.success('shad record deleted successfully.');
+                        // Redirect to the index page
+                        window.location.href = '{{ route("shad.index") }}';
+                    } else {
+                        toastr.error('Failed to delete shad record.');
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error('An error occurred while deleting the shad record.');
+                },
+                complete: function() {
+                    // Restore button state
+                    button.prop('disabled', false).text(originalText);
+                }
+            });
         }
     });
 });

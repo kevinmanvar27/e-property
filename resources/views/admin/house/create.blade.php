@@ -341,14 +341,19 @@ document.getElementById('country_id').addEventListener('change', function() {
     const districtSelect = document.getElementById('district_id');
     const talukaSelect = document.getElementById('taluka_id');
     
-    // Clear existing options
+    // Clear existing options but keep the placeholder
     stateSelect.innerHTML = '<option value="">Select State</option>';
     districtSelect.innerHTML = '<option value="">Select District</option>';
     talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
     
     if (countryId) {
         fetch("{{ url('admin/house/states') }}/" + countryId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 // Check if data is an array
                 if (Array.isArray(data)) {
@@ -358,8 +363,14 @@ document.getElementById('country_id').addEventListener('change', function() {
                         option.textContent = state.state_title;
                         stateSelect.appendChild(option);
                     });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New State';
+                    addNewOption.setAttribute('data-entity', 'state');
+                    stateSelect.appendChild(addNewOption);
                 } else {
-                    console.error('States data is not an array:', data);
+                    console.error('Expected array but received:', data);
                 }
             })
             .catch(error => {
@@ -368,19 +379,45 @@ document.getElementById('country_id').addEventListener('change', function() {
     }
 });
 
-// Handle cascading dropdowns
+document.addEventListener('DOMContentLoaded', function() {
+    const stateSelect = document.getElementById('state_id');
+
+    // Append "+ Add New State" option if not exists
+    if (!stateSelect.querySelector('option[value="add_new"]')) {
+        const addNewOption = document.createElement('option');
+        addNewOption.value = 'add_new';
+        addNewOption.textContent = '+ Add New State';
+        addNewOption.setAttribute('data-entity', 'state');
+        stateSelect.appendChild(addNewOption);
+    }
+
+    // Open modal if "Add New" is selected
+    stateSelect.addEventListener('change', function() {
+        if (this.value === 'add_new') {
+            openAddNewModal('state', 'state_id');
+            this.value = '';
+        }
+    });
+});
+
+// Handle state change to load districts
 document.getElementById('state_id').addEventListener('change', function() {
     const stateId = this.value;
     const districtSelect = document.getElementById('district_id');
     const talukaSelect = document.getElementById('taluka_id');
     
-    // Clear existing options
+    // Clear existing options but keep the placeholder
     districtSelect.innerHTML = '<option value="">Select District</option>';
     talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
     
-    if (stateId) {
+    if (stateId && stateId !== 'add_new') {
         fetch("{{ url('admin/house/districts') }}/" + stateId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 // Check if data is an array
                 if (Array.isArray(data)) {
@@ -390,26 +427,43 @@ document.getElementById('state_id').addEventListener('change', function() {
                         option.textContent = district.district_title;
                         districtSelect.appendChild(option);
                     });
+                    // Add "Add New" option
+                    const addNewOption = document.createElement('option');
+                    addNewOption.value = 'add_new';
+                    addNewOption.textContent = '+ Add New District';
+                    addNewOption.setAttribute('data-entity', 'district');
+                    districtSelect.appendChild(addNewOption);
                 } else {
-                    console.error('Districts data is not an array:', data);
+                    console.error('Expected array but received:', data);
                 }
             })
             .catch(error => {
                 console.error('Error loading districts:', error);
             });
+    } else if (stateId === 'add_new') {
+        // Open add new modal
+        openAddNewModal('state', 'state_id');
+        // Reset to placeholder
+        this.value = '';
     }
 });
 
+// Handle district change to load talukas
 document.getElementById('district_id').addEventListener('change', function() {
     const districtId = this.value;
     const talukaSelect = document.getElementById('taluka_id');
     
-    // Clear existing options
+    // Clear existing options but keep the placeholder
     talukaSelect.innerHTML = '<option value="">Select Taluka</option>';
     
-    if (districtId) {
+    if (districtId && districtId !== 'add_new') {
         fetch("{{ url('admin/house/talukas') }}/" + districtId)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok: ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 // Check if data is an array
                 if (Array.isArray(data)) {
@@ -426,7 +480,7 @@ document.getElementById('district_id').addEventListener('change', function() {
                     addNewOption.setAttribute('data-entity', 'city');
                     talukaSelect.appendChild(addNewOption);
                 } else {
-                    console.error('Talukas data is not an array:', data);
+                    console.error('Expected array but received:', data);
                 }
             })
             .catch(error => {
@@ -450,6 +504,217 @@ document.getElementById('taluka_id').addEventListener('change', function() {
         // Reset to placeholder
         this.value = '';
     }
+});
+
+// Function to open the Add New modal
+function openAddNewModal(entityType, dropdownId) {
+    const modal = new bootstrap.Modal(document.getElementById('addNewModal'));
+    const modalTitle = document.getElementById('addNewModalLabel');
+    const entityTypeInput = document.getElementById('add-new-entity-type');
+    const dropdownIdInput = document.getElementById('add-new-dropdown-id');
+    const nameInput = document.getElementById('add-new-name');
+    const descriptionInput = document.getElementById('add-new-description');
+    const additionalFields = document.getElementById('add-new-additional-fields');
+    
+    // Reset form
+    document.getElementById('add-new-form').reset();
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    // Set modal title and inputs
+    modalTitle.textContent = 'Add New ' + entityType.charAt(0).toUpperCase() + entityType.slice(1);
+    entityTypeInput.value = entityType;
+    dropdownIdInput.value = dropdownId;
+    nameInput.value = '';
+    descriptionInput.value = '';
+    additionalFields.innerHTML = '';
+    
+    // Add additional fields based on entity type
+    switch (entityType) {
+        case 'state':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-country-id" class="form-label">Country <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-country-id" name="country_id" required>
+                        <option value="">Select Country</option>
+                        @foreach($countries as $countryId => $countryName)
+                        <option value="{{ $countryId }}">{{ $countryName }}</option>
+                        @endforeach
+                    </select>
+                    <div class="invalid-feedback" id="add-new-country-id-error"></div>
+                </div>
+            `;
+            
+            // Pre-select current country if available
+            const countrySelect = document.getElementById('country_id');
+            if (countrySelect && countrySelect.value) {
+                document.getElementById('add-new-country-id').value = countrySelect.value;
+            }
+            break;
+            
+        case 'district':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate and pre-select state
+            const stateSelect = document.getElementById('state_id');
+            const newStateSelect = document.getElementById('add-new-state-id');
+            newStateSelect.innerHTML = stateSelect.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newStateSelect.remove(option.index);
+                }
+            });
+            
+            if (stateSelect && stateSelect.value && stateSelect.value !== 'add_new') {
+                newStateSelect.value = stateSelect.value;
+            }
+            break;
+            
+        case 'city':
+            additionalFields.innerHTML = `
+                <div class="mb-3">
+                    <label for="add-new-district-id" class="form-label">District <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-district-id" name="districtid" required>
+                        <option value="">Select District</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-district-id-error"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="add-new-city-state-id" class="form-label">State <span class="text-danger">*</span></label>
+                    <select class="form-select" id="add-new-city-state-id" name="state_id" required>
+                        <option value="">Select State</option>
+                    </select>
+                    <div class="invalid-feedback" id="add-new-city-state-id-error"></div>
+                </div>
+            `;
+            
+            // Populate states
+            const stateSelectForCity = document.getElementById('state_id');
+            const districtSelect = document.getElementById('district_id');
+            const newDistrictSelect = document.getElementById('add-new-district-id');
+            const newCityStateSelect = document.getElementById('add-new-city-state-id');
+            
+            // Copy options from existing state select
+            newCityStateSelect.innerHTML = stateSelectForCity.innerHTML;
+            
+            // Remove the "Add New" option
+            Array.from(newCityStateSelect.options).forEach(option => {
+                if (option.value === 'add_new') {
+                    newCityStateSelect.remove(option.index);
+                }
+            });
+            
+            // Set state selection handler
+            newCityStateSelect.addEventListener('change', function() {
+                const stateId = this.value;
+                if (stateId) {
+                    fetch("{{ url('admin/shad/districts') }}/" + stateId)
+                        .then(response => response.json())
+                        .then(data => {
+                            newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                            data.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.districtid;
+                                option.textContent = district.district_title;
+                                newDistrictSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error loading districts:', error);
+                        });
+                } else {
+                    newDistrictSelect.innerHTML = '<option value="">Select District</option>';
+                }
+            });
+            
+            // Pre-select current state and load districts
+            if (stateSelectForCity.value && stateSelectForCity.value !== 'add_new') {
+                newCityStateSelect.value = stateSelectForCity.value;
+                // Trigger change event to load districts
+                const event = new Event('change');
+                newCityStateSelect.dispatchEvent(event);
+                
+                // Pre-select current district after a short delay to allow districts to load
+                setTimeout(() => {
+                    if (districtSelect.value && districtSelect.value !== 'add_new') {
+                        newDistrictSelect.value = districtSelect.value;
+                    }
+                }, 500); // Increased delay to ensure districts are loaded
+            }
+            break;
+    }
+    
+    modal.show();
+}
+
+// Handle add amenity form submission
+document.getElementById('add-amenity-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Show loading state
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = 'Adding...';
+    
+    // Clear previous errors
+    document.querySelectorAll('.invalid-feedback').forEach(el => el.textContent = '');
+    document.querySelectorAll('.is-invalid').forEach(el => el.classList.remove('is-invalid'));
+    
+    const formData = new FormData(this);
+    
+    const addAmenityUrl = "{{ route('house.amenities.store') }}";
+    fetch(addAmenityUrl, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        credentials: 'same-origin' // <--- important!
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok: ' + response.status);
+        }
+        return response.json();
+    })
+    .then(data => {
+        const amenityContainer = document.getElementById('amenities-container');
+        const div = document.createElement('div');
+        div.className = 'form-check me-3 mb-2';
+        div.innerHTML = `
+            <input class="form-check-input" type="checkbox" name="amenities[]" value="${data.amenity.id}" id="amenity_${data.amenity.id}" checked>
+            <label class="form-check-label" for="amenity_${data.amenity.id}">${data.amenity.name}</label>
+        `;
+        amenityContainer.appendChild(div);
+
+        // Close modal reliably
+        const modalEl = document.getElementById('addAmenityModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+
+        // Reset form
+        document.getElementById('add-amenity-form').reset();
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while adding the amenity. Please try again.');
+    })
+    .finally(() => {
+        submitButton.disabled = false;
+        submitButton.textContent = originalText;
+    });
+
 });
 
 // Handle district dropdown change in taluka modal

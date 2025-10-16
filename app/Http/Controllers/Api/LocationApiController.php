@@ -1118,7 +1118,8 @@ class LocationApiController extends Controller
     public function getStatesByCountry($countryId)
     {
         try {
-            $states = State::where('country_id', $countryId)->get();
+            $states = State::where('country_id', $countryId)
+                ->get(['state_id', 'state_title']);
 
             return response()->json([
                 'success' => true,
@@ -1133,6 +1134,7 @@ class LocationApiController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * @OA\Get(
@@ -1222,7 +1224,7 @@ class LocationApiController extends Controller
     public function getCitiesByDistrict($districtId)
     {
         try {
-            $cities = City::where('district_id', $districtId)->get();
+            $cities = City::where('districtid', $districtId)->get();
 
             return response()->json([
                 'success' => true,

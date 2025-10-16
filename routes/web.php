@@ -16,6 +16,11 @@ use App\Http\Controllers\ShadController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserPermissionController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\UserAuthController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+use App\Models\Property;
+
 
 Route::get('/', function () {
     return redirect('/admin/login');
@@ -50,6 +55,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/admin/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::put('/admin/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/admin/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
+});
+
+// User Profile Routes for regular users
+Route::middleware('auth')->group(function () {
+    Route::put('/user/profile', [ProfileController::class, 'update'])->name('user.profile.update');
+    Route::put('/user/profile/password', [ProfileController::class, 'updatePassword'])->name('user.profile.password.update');
 });
 
 // User Management Routes
@@ -277,3 +288,68 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::post('/admin/house/{property}/photo-positions', [HouseController::class, 'updatePhotoPositions'])->name('house.photo-positions.update');
     Route::delete('/admin/house/{property}/photos/{photoIndex}', [HouseController::class, 'deletePhoto'])->name('house.photos.destroy');
 });
+
+
+// routes for user pages
+Route::get('/contact', function() {
+    return view('user.contact');
+})->name('contact');
+
+Route::get('/properties', function() {
+    return view('user.properties');
+})->name('properties');
+
+Route::get('/user-profile', function() {
+    return view('user.user-profile');
+})->name('user-profile');
+
+Route::get('/property-details/{id}', function($id) {
+    $property = Property::with('state', 'district', 'taluka')->find($id);
+    if (app('request')->ajax()) {
+        // Ensure photos data is properly formatted
+        if ($property) {
+            $property->photos = $property->getPhotosList();
+            $property->amenities = $property->getAmenitiesListAttribute();
+        }
+        return response()->json($property);
+    }
+    return view('user.property-details', compact('property'));
+})->name('property-details');
+
+
+Route::put('/user/update/{id}', [ManagementUserController::class, 'update'])->name('users.update');
+
+// Auth routes
+Route::get('/login', [UserAuthController::class, 'showLoginForm'])->name('user-login');
+Route::post('/login', [UserAuthController::class, 'login']);
+Route::get('/sign-up', [UserAuthController::class, 'showRegisterForm'])->name('register');
+Route::post('/sign-up', [UserAuthController::class, 'register'])->name('register.post');
+Route::post('/logout', [UserAuthController::class, 'logout'])->name('user-logout');
+
+Route::get('/email/verify', fn() => view('user.verify-email'))
+    // ->middleware('auth')
+    ->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', [UserAuthController::class, 'verify'])
+    ->middleware(['signed', 'guest:web'])
+    ->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email|exists:users,email',
+    ]);
+
+    $user = \App\Models\User::where('email', $request->email)->first();
+
+    if ($user->hasVerifiedEmail()) {
+        return response()->json([
+            'message' => 'Email already verified.'
+        ]);
+    }
+
+    $user->sendEmailVerificationNotification();
+
+    return response()->json([
+        'message' => 'Verification link sent!'
+    ]);
+})->name('verification.send');

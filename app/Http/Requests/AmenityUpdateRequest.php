@@ -20,6 +20,16 @@ class AmenityUpdateRequest extends FormRequest
     public function rules(): array
     {
         $amenityId = $this->route('amenity');
+        
+        // If it's a model instance, get the ID
+        if (is_object($amenityId) && method_exists($amenityId, 'getKey')) {
+            $amenityId = $amenityId->getKey();
+        }
+        
+        // If it's not found in the route, try to get it from the request
+        if (!$amenityId) {
+            $amenityId = $this->input('id') ?? $this->route('id');
+        }
 
         return [
             'name' => 'required|string|max:255|unique:amenities,name,' . $amenityId,

@@ -14,6 +14,7 @@ class MasterDataService
     {
         return Amenity::create([
             'name' => $data['name'],
+            'description' => $data['description'],
         ]);
     }
 
@@ -24,6 +25,7 @@ class MasterDataService
     {
         return LandType::create([
             'name' => $data['name'],
+            'description' => $data['description'],
         ]);
     }
 }

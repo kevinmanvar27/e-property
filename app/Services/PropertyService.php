@@ -36,7 +36,9 @@ class PropertyService
     public function getStatesByCountry($countryId)
     {
         return Cache::remember('states_list_country_' . $countryId, 3600, function () use ($countryId) {
-            return \App\Models\State::where('country_id', $countryId)->pluck('state_title', 'state_id');
+           return \App\Models\State::where('country_id', $countryId)
+                       ->select('state_id', 'state_title')
+                       ->get();
         });
     }
 
@@ -46,7 +48,9 @@ class PropertyService
     public function getDistrictsByState($stateId)
     {
         return Cache::remember('districts_list_' . $stateId, 3600, function () use ($stateId) {
-            return \App\Models\District::where('state_id', $stateId)->pluck('district_name', 'districtid');
+           return \App\Models\District::where('state_id', $stateId)
+                       ->select('districtid', 'district_title')
+                       ->get();
         });
     }
 
@@ -56,7 +60,9 @@ class PropertyService
     public function getTalukasByDistrict($districtId)
     {
         return Cache::remember('talukas_list_' . $districtId, 3600, function () use ($districtId) {
-            return \App\Models\City::where('district_id', $districtId)->pluck('city_name', 'id');
+            return \App\Models\City::where('districtid', $districtId)
+                                    ->select('id', 'name')
+                                    ->get();
         });
     }
 
@@ -65,7 +71,7 @@ class PropertyService
      */
     public function getAmenities()
     {
-        return Cache::remember('amenities_list', 3600, function () {
+        return Cache::remember('amenities_list', 00, function () {
             return Amenity::select('id', 'name')->get();
         });
     }
@@ -75,7 +81,7 @@ class PropertyService
      */
     public function getLandTypes()
     {
-        return Cache::remember('land_types_list', 3600, function () {
+        return Cache::remember('land_types_list', 00, function () {
             return LandType::select('id', 'name')->get();
         });
     }
@@ -87,8 +93,8 @@ class PropertyService
     {
         if ($document) {
             $filename = $prefix . '_' . time() . '.' . $document->getClientOriginalExtension();
-            Storage::disk('documents')->putFileAs('', $document, $filename);
-
+            // Storage::disk('documents')->putFileAs('', $document, $filename);
+            Storage::disk('public')->putFileAs('documents', $document, $filename);
             return $filename;
         }
 
@@ -98,6 +104,21 @@ class PropertyService
     /**
      * Handle photo uploads
      */
+    // public function handlePhotoUploads($photos, $existingPhotos = [])
+    // {
+    //     $photoPaths = $existingPhotos;
+
+    //     if ($photos) {
+    //         foreach ($photos as $index => $photo) {
+    //             $filename = 'photo_' . time() . '_' . $index . '.' . $photo->getClientOriginalExtension();
+    //             Storage::disk('photos')->putFileAs('', $photo, $filename);
+    //             $photoPaths[] = $filename;
+    //         }
+    //     }
+
+    //     return $photoPaths;
+    // }
+
     public function handlePhotoUploads($photos, $existingPhotos = [])
     {
         $photoPaths = $existingPhotos;
@@ -105,7 +126,7 @@ class PropertyService
         if ($photos) {
             foreach ($photos as $index => $photo) {
                 $filename = 'photo_' . time() . '_' . $index . '.' . $photo->getClientOriginalExtension();
-                Storage::disk('photos')->putFileAs('', $photo, $filename);
+                Storage::disk('public')->putFileAs('photos', $photo, $filename);
                 $photoPaths[] = $filename;
             }
         }
@@ -113,27 +134,48 @@ class PropertyService
         return $photoPaths;
     }
 
+
     /**
      * Delete property files
      */
+    // public function deletePropertyFiles(Property $property)
+    // {
+    //     // Delete associated documents
+    //     if ($property->document_7_12 && Storage::disk('documents')->exists($property->document_7_12)) {
+    //         Storage::disk('documents')->delete($property->document_7_12);
+    //     }
+
+    //     if ($property->document_8a && Storage::disk('documents')->exists($property->document_8a)) {
+    //         Storage::disk('documents')->delete($property->document_8a);
+    //     }
+
+    //     // Delete photo files
+    //     if ($property->photos) {
+    //         $photos = json_decode($property->photos, true);
+    //         foreach ($photos as $photo) {
+    //             if (Storage::disk('photos')->exists($photo)) {
+    //                 Storage::disk('photos')->delete($photo);
+    //             }
+    //         }
+    //     }
+    // }
     public function deletePropertyFiles(Property $property)
     {
-        // Delete associated documents
-        if ($property->document_7_12 && Storage::disk('documents')->exists($property->document_7_12)) {
-            Storage::disk('documents')->delete($property->document_7_12);
+        // Delete documents
+        foreach (['document_7_12', 'document_8a'] as $doc) {
+            if ($property->$doc && Storage::disk('public')->exists('documents/' . $property->$doc)) {
+                // Storage::disk('documents')->delete($property->$doc);
+                Storage::disk('public')->delete('documents/' . $property->$doc);
+            }
         }
 
-        if ($property->document_8a && Storage::disk('documents')->exists($property->document_8a)) {
-            Storage::disk('documents')->delete($property->document_8a);
-        }
-
-        // Delete photo files
-        if ($property->photos) {
-            $photos = json_decode($property->photos, true);
-            foreach ($photos as $photo) {
-                if (Storage::disk('photos')->exists($photo)) {
-                    Storage::disk('photos')->delete($photo);
-                }
+        // Delete photos from 'public/photos'
+        $photos = json_decode($property->photos, true) ?: [];
+        foreach ($photos as $photo) {
+            if (Storage::disk('public')->exists('photos/' . $photo)) {
+                Storage::disk('public')->delete('photos/' . $photo);
+            } else {
+                \Illuminate\Support\Facades\Log::warning("Photo not found for deletion: " . $photo);
             }
         }
     }

@@ -19,7 +19,18 @@ class LandTypeUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Get the land type ID from the route
         $landTypeId = $this->route('landType');
+        
+        // If it's a model instance, get the ID
+        if (is_object($landTypeId) && method_exists($landTypeId, 'getKey')) {
+            $landTypeId = $landTypeId->getKey();
+        }
+        
+        // If it's not found in the route, try to get it from the request
+        if (!$landTypeId) {
+            $landTypeId = $this->input('id') ?? $this->route('id');
+        }
 
         return [
             'name' => 'required|string|max:255|unique:land_types,name,' . $landTypeId,

@@ -11,6 +11,7 @@ use App\Services\MasterDataService;
 use App\Services\PhotoService;
 use App\Services\PropertyService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\log;
 
 class BasePropertyController extends Controller
 {
@@ -48,7 +49,7 @@ class BasePropertyController extends Controller
 
             return view('admin.' . str_replace('_', '-', $this->propertyType) . '.index', compact('properties'));
         } catch (\Exception $e) {
-            \Log::error('Error loading properties: ' . $e->getMessage());
+            Log::error('Error loading properties: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'An error occurred while loading properties. Please try again.');
         }
@@ -67,7 +68,7 @@ class BasePropertyController extends Controller
 
             return view('admin.' . str_replace('_', '-', $this->propertyType) . '.create', compact('countries', 'states', 'amenities', 'landTypes'));
         } catch (\Exception $e) {
-            \Log::error('Error loading create property form: ' . $e->getMessage());
+            Log::error('Error loading create property form: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'An error occurred while loading the form. Please try again.');
         }
@@ -124,9 +125,12 @@ class BasePropertyController extends Controller
                 'property_type',
                 'status',
                 'vavetar',
+                'vavetar_name',
                 'any_issue',
                 'issue_description',
                 'electric_poll',
+                'amenities',
+                'land_types',
                 'electric_poll_count',
                 'family_issue',
                 'family_issue_description',
@@ -141,7 +145,7 @@ class BasePropertyController extends Controller
             // Handle photo uploads
             $photoPaths = [];
             if ($request->hasFile('photos')) {
-                $photoPaths = $this->propertyService->handlePhotoUploads($request->file('photos'));
+                $photoPaths = $this->propertyService->handlePhotoUploads($request->file('photos'), []);
             }
 
             $data['property_type'] = $this->propertyType;
@@ -149,11 +153,11 @@ class BasePropertyController extends Controller
 
             $property = Property::create($data);
 
-            return response()->json(['message' => 'Property created successfully', 'property' => $property]);
+            return response()->json(['success' => true, 'message' => 'Property created successfully', 'property' => $property]);
         } catch (\Exception $e) {
-            \Log::error('Error creating property: ' . $e->getMessage());
+            Log::error('Error creating property: ' . $e->getMessage());
 
-            return response()->json(['errors' => ['general' => ['An error occurred while creating the property. Please try again.']]], 500);
+            return response()->json(['success' => false, 'errors' => ['general' => ['An error occurred while creating the property. Please try again.']]], 500);
         }
     }
 
@@ -167,7 +171,9 @@ class BasePropertyController extends Controller
             abort(404);
         }
 
-        $property->load(['state', 'district', 'taluka', 'amenities', 'landTypes']);
+        $property->load(['state', 'district', 'taluka']);
+        $property->amenitiesList = $property->getAmenitiesList();
+        $property->landTypesList = $property->getLandTypesList();
 
         return view('admin.' . str_replace('_', '-', $this->propertyType) . '.show', compact('property'));
     }
@@ -177,7 +183,6 @@ class BasePropertyController extends Controller
      */
     public function edit(Property $property)
     {
-        // Ensure property is of the correct type
         if ($property->property_type !== $this->propertyType) {
             abort(404);
         }
@@ -189,11 +194,23 @@ class BasePropertyController extends Controller
         $amenities = $this->propertyService->getAmenities();
         $landTypes = $this->propertyService->getLandTypes();
 
-        $property->load(['amenities', 'landTypes']);
+        // Get selected amenities from property (JSON or array)
+        $selectedAmenities = $property->amenities;
+        if (is_string($selectedAmenities)) {
+            $selectedAmenities = json_decode($selectedAmenities, true);
+        }
+        $selectedAmenities = is_array($selectedAmenities) ? $selectedAmenities : [];
 
-        return view('admin.' . str_replace('_', '-', $this->propertyType) . '.edit', compact('property', 'countries', 'states', 'districts', 'talukas', 'amenities', 'landTypes'));
+        $selectedLandTypes = $property->land_types;
+        if (is_string($selectedLandTypes)) {
+            $selectedLandTypes = json_decode($selectedLandTypes, true);
+        }
+        $selectedLandTypes = is_array($selectedLandTypes) ? $selectedLandTypes : [];
+
+        return view('admin.' . str_replace('_', '-', $this->propertyType) . '.edit', compact(
+            'property', 'countries', 'states', 'districts', 'talukas', 'amenities', 'landTypes', 'selectedAmenities', 'selectedLandTypes'
+        ));
     }
-
     /**
      * Update the specified resource in storage.
      */
@@ -225,9 +242,12 @@ class BasePropertyController extends Controller
                 'country_id',
                 'status',
                 'vavetar',
+                'vavetar_name',
                 'any_issue',
                 'issue_description',
                 'electric_poll',
+                'amenities',
+                'land_types',
                 'electric_poll_count',
                 'family_issue',
                 'family_issue_description',
@@ -254,18 +274,18 @@ class BasePropertyController extends Controller
 
             // Sync amenities and land types
             if ($request->has('amenities')) {
-                $property->amenities()->sync($request->amenities);
+                $property->amenities = $request->amenities;
             }
 
             if ($request->has('land_types')) {
-                $property->landTypes()->sync($request->land_types);
+                $property->land_types = $request->land_types;
             }
 
-            return response()->json(['message' => 'Property updated successfully', 'property' => $property]);
+            return response()->json(['success' => true, 'message' => 'Property updated successfully', 'property' => $property]);
         } catch (\Exception $e) {
-            \Log::error('Error updating property: ' . $e->getMessage());
+            Log::error('Error updating property: ' . $e->getMessage());
 
-            return response()->json(['errors' => ['general' => ['An error occurred while updating the property. Please try again.']]], 500);
+            return response()->json(['success' => false, 'errors' => ['general' => ['An error occurred while updating the property. Please try again.']]], 500);
         }
     }
 
@@ -285,11 +305,11 @@ class BasePropertyController extends Controller
 
             $property->delete();
 
-            return response()->json(['message' => 'Property deleted successfully']);
+            return response()->json(['success' => true, 'message' => 'Property deleted successfully']);
         } catch (\Exception $e) {
-            \Log::error('Error deleting property: ' . $e->getMessage());
+            Log::error('Error deleting property: ' . $e->getMessage());
 
-            return response()->json(['message' => 'An error occurred while deleting the property. Please try again.'], 500);
+            return response()->json(['success' => false, 'message' => 'An error occurred while deleting the property. Please try again.'], 500);
         }
     }
 
@@ -357,7 +377,7 @@ class BasePropertyController extends Controller
                 'status_text' => $statusText,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating property status: ' . $e->getMessage());
+            Log::error('Error updating property status: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred while updating the property status. Please try again.'], 500);
         }
@@ -400,9 +420,10 @@ class BasePropertyController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:amenities,name',
+            'description' => 'nullable|string|max:255'
         ]);
 
-        $amenity = $this->masterDataService->storeAmenity($request->only('name'));
+        $amenity = $this->masterDataService->storeAmenity($request->only('name', 'description'));
 
         return response()->json(['message' => 'Amenity created successfully', 'amenity' => $amenity]);
     }
@@ -414,9 +435,11 @@ class BasePropertyController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:land_types,name',
+            'description' => 'nullable|string|max:255'
+            
         ]);
 
-        $landType = $this->masterDataService->storeLandType($request->only('name'));
+        $landType = $this->masterDataService->storeLandType($request->only('name', 'description'));
 
         return response()->json(['message' => 'Land type created successfully', 'landType' => $landType]);
     }
@@ -440,7 +463,7 @@ class BasePropertyController extends Controller
 
             return response()->json(['message' => 'Photo positions updated successfully']);
         } catch (\Exception $e) {
-            \Log::error('Error updating photo positions: ' . $e->getMessage());
+            Log::error('Error updating photo positions: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred while updating photo positions. Please try again.'], 500);
         }
@@ -461,7 +484,7 @@ class BasePropertyController extends Controller
 
             return response()->json(['message' => 'Photo deleted successfully']);
         } catch (\Exception $e) {
-            \Log::error('Error deleting photo: ' . $e->getMessage());
+            Log::error('Error deleting photo: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred while deleting the photo. Please try again.'], 500);
         }
