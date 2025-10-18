@@ -436,7 +436,7 @@
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
                                 <a href="#" class="ms-3">
-                                    <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle" data-property-id="${property.id}">
+                                    <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle p-3" data-property-id="${property.id}">
                                         <i class="icon-6"></i>
                                     </button>
                                 </a>
