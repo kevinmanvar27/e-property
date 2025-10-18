@@ -456,7 +456,7 @@ img {
   color: #fff !important;
   text-align: center;
   border-radius: 50px;
-  padding: 10px 40px;
+  padding: 10px 50px;
   z-index: 1;
   transition: all 500ms ease;
 }
@@ -2014,7 +2014,7 @@ button.ltr {
 
 .shop-six .shop-block-two{
   float: left;
-  width: 20%;
+  width: 25%;
 }
 
 .shop-six .discount-product,

@@ -42,7 +42,7 @@
                     </div>
                     @else
                     <div class="support-box">
-                        <a href="{{ route('user-login') }}">Login</a>
+                        <a href="{{ route('user-login') }}"  class="d-flex align-items-center"><i class="fas fa-sign-in-alt me-2"></i> Login</a>
                     </div>
                     @endif
                 </div>
@@ -87,13 +87,12 @@
                 @if(Auth::check())
                     <div class="menu-right-content">
                         <ul class="info-list">
-                            <li><a href="#"><i class="icon-6"></i></a></li>
                             <li>
                                 <form id="logout-form" action="{{ route('user-logout') }}" method="POST" style="display: none;">
                                     @csrf
                                 </form>
-                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                    Logout
+                                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="d-flex align-items-center">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
                                 </a>
                             </li>
                         </ul>

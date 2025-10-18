@@ -180,4 +180,12 @@ class Property extends Model
             'house' => 'House',
         ];
     }
+
+    /**
+     * Get the users who have wishlisted this property
+     */
+    public function wishlistedBy()
+    {
+        return $this->belongsToMany(User::class, 'wishlists', 'property_id', 'user_id');
+    }
 }

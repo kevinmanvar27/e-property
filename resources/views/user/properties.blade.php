@@ -2,6 +2,17 @@
 
 @section('content') 
     
+    <style>
+        .favourite-btn.active {
+            background-color: #003085 !important;
+            color: #F5B020 !important;
+        }
+        .favourite-btn{
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+    </style>
     <!-- page-title -->
     <section class="page-title pt_20 pb_18">
         <div class="large-container">
@@ -180,6 +191,13 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Set up CSRF token for AJAX requests
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            
             const apiUrls = {
                 shop: '/api/shop',
                 landJamin: '/api/land-jamin',
@@ -194,6 +212,29 @@
             let viewType = localStorage.getItem('viewMode') || 'list';
             let currentPage = 1;
             let currentPerPage = 10;
+            let userWishlistIds = []; // Initialize the wishlist array
+
+            // Fetch user's wishlist on page load
+            $.ajax({
+                url: '/wishlist',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Wishlist loaded:', response);
+                    // Ensure no duplicates in the wishlist array
+                    userWishlistIds = [...new Set(response.wishlist || [])];
+                    // Reload properties to update the favorite buttons
+                    // loadProperties();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error loading wishlist:", error);
+                    console.log("Response:", xhr);
+                    // Try to get more details about the error
+                    if (xhr.responseJSON) {
+                        console.log("Error details:", xhr.responseJSON);
+                    }
+                }
+            });
 
             const selectedCountries = new Set();
             const selectedStates = new Set();
@@ -281,6 +322,8 @@
                 $(otherContainer).hide();
                 $(containerId).show();
 
+                console.log('Loading properties with wishlist:', userWishlistIds);
+
                 const filters = getFilterParams();
                 const query = $.param(filters);
                 const url = apiUrls[currentType] + (query ? `?${query}` : '');
@@ -321,7 +364,8 @@
 
             function renderGrid(property) {
                 let imageUrl = '{{ asset("user/assets/images/shop/shop-10.png") }}'; // default image
-
+                const isFavourite = userWishlistIds.includes(parseInt(property.id));
+                console.log('Rendering grid item:', { propertyId: property.id, isFavourite, userWishlistIds });
                 if (property.photos) {
                     try {
                         // Parse JSON string into array
@@ -339,7 +383,8 @@
                     <div class="inner-box">
                         <div class="image-box">
                             <ul class="option-list">
-                                <li><button type="button"><i class="icon-6"></i></button></li>
+                                <li>
+                                </li>
                             </ul>
                             <figure class="image"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
                         </div>
@@ -347,10 +392,13 @@
                             <span class="product-stock"><img src="{{ asset('user/assets/images/icons/icon-1.png') }}" alt=""> ${property.status || ''}</span>
                             <h4><a href="shop-details.html">${property.owner_name || ''}</a></h4>
                             <p>${property.village || ''}, ${property.taluka?.name || ''}, ${property.district?.district_title || ''}, ${property.state?.state_title || ''}</p>
-                            <div class="cart-btn">
+                            <div class="cart-btn d-flex justify-content-between">
                                 <a href="${propertyDetailsBaseUrl}/${property.id}">
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
+                                <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle" data-property-id="${property.id}">
+                                    <i class="icon-6"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -359,6 +407,8 @@
 
             function renderList(property) {
                 let imageUrl = '{{ asset("user/assets/images/shop/shop-10.png") }}'; // default image
+                const isFavourite = userWishlistIds.includes(parseInt(property.id));
+                console.log('Rendering list item:', { propertyId: property.id, isFavourite, userWishlistIds });
                 console.log(property);
                 if (property.photos) {
                     try {
@@ -386,7 +436,9 @@
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
                                 <a href="#" class="ms-3">
-                                    <button type="button" class="btn"><i class="icon-6"></i></button>
+                                    <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle" data-property-id="${property.id}">
+                                        <i class="icon-6"></i>
+                                    </button>
                                 </a>
                             </div>
                         </div>
@@ -563,6 +615,48 @@
                         $("#city-widget").show();
                     });
             }
+            $(document).on('click', '.favourite-btn', function() {
+                const btn = $(this);
+                const propertyId = btn.data('property-id');
+                const isActive = btn.hasClass('active');
+                const url = `/wishlist${isActive ? '/' + propertyId : ''}`;
+                const method = isActive ? 'DELETE' : 'POST';
+
+                console.log('Favorite button clicked:', { propertyId, isActive, url, method });
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: !isActive ? { property_id: propertyId } : {},
+                    success: function(res) {
+                        console.log('Wishlist update success:', res);
+                        btn.toggleClass('active');
+                        // Update the userWishlistIds array
+                        if (isActive) {
+                            // Remove from wishlist (remove all instances in case of duplicates)
+                            userWishlistIds = userWishlistIds.filter(id => id != propertyId);
+                        } else {
+                            // Add to wishlist only if not already present
+                            if (!userWishlistIds.includes(parseInt(propertyId))) {
+                                userWishlistIds.push(parseInt(propertyId));
+                            }
+                        }
+                        // Ensure the wishlist array is always unique
+                        userWishlistIds = [...new Set(userWishlistIds)];
+                        console.log('Updated wishlist IDs:', userWishlistIds);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error updating wishlist:", error);
+                        console.log("Response:", xhr);
+                        // Try to get more details about the error
+                        if (xhr.responseJSON) {
+                            console.log("Error details:", xhr.responseJSON);
+                        }
+                        // Show an error message to the user
+                        alert('For Add To Wishlist, Please Login.');
+                    }
+                });
+            });
         });
     </script>
 @endpush

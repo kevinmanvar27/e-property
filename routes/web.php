@@ -1,10 +1,15 @@
 <?php
 
+use App\Http\Controllers\ManagementUserController;
+use App\Models\Property;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\LandJaminController;
 use App\Http\Controllers\LocationController;
-use App\Http\Controllers\ManagementUserController;
 use App\Http\Controllers\MasterDataController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\PlotController;
@@ -15,12 +20,8 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\ShadController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserPermissionController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\UserAuthController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use Illuminate\Http\Request;
-use App\Models\Property;
-
 
 Route::get('/', function () {
     return redirect('/admin/login');
@@ -300,8 +301,23 @@ Route::get('/properties', function() {
 })->name('properties');
 
 Route::get('/user-profile', function() {
-    return view('user.user-profile');
-})->name('user-profile');
+    $user = Auth::user();
+    
+    if (!$user) {
+        return redirect()->route('user-login');
+    }
+    
+    
+    $wishlistItems = $user->wishlistedProperties()->with(['state', 'district', 'taluka'])->get();
+    
+    // Ensure photos and amenities data are properly formatted for each wishlist item
+    foreach ($wishlistItems as $item) {
+        $item->photos = $item->getPhotosList();
+        $item->amenities = $item->getAmenitiesListAttribute();
+    }
+    
+    return view('user.user-profile', compact('wishlistItems'));
+})->name('user-profile')->middleware('auth');
 
 Route::get('/property-details/{id}', function($id) {
     $property = Property::with('state', 'district', 'taluka')->find($id);
@@ -325,6 +341,13 @@ Route::post('/login', [UserAuthController::class, 'login']);
 Route::get('/sign-up', [UserAuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/sign-up', [UserAuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [UserAuthController::class, 'logout'])->name('user-logout');
+
+// Wishlist routes
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{propertyId}', [App\Http\Controllers\Api\WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});
 
 Route::get('/email/verify', fn() => view('user.verify-email'))
     // ->middleware('auth')
@@ -353,3 +376,10 @@ Route::post('/email/verification-notification', function (Request $request) {
         'message' => 'Verification link sent!'
     ]);
 })->name('verification.send');
+
+// Wishlist routes
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{propertyId}', [App\Http\Controllers\Api\WishlistController::class, 'destroy'])->name('wishlist.destroy');
+});

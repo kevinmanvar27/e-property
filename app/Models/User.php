@@ -188,4 +188,20 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->belongsToMany(\App\Models\Permission::class, 'user_permissions', 'user_id', 'permission_id');
     }
+
+    /**
+     * Get the user's wishlist items
+     */
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
+
+    /**
+     * Get the properties wishlisted by the user
+     */
+    public function wishlistedProperties()
+    {
+        return $this->belongsToMany(Property::class, 'wishlists', 'user_id', 'property_id');
+    }
 }

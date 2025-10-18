@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\ShadApiController;
 use App\Http\Controllers\Api\ShopApiController;
 use App\Http\Controllers\Api\UserPermissionApiController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\WishlistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -210,4 +211,7 @@ Route::middleware('api')->group(function () {
     Route::get('/profile', [ProfileApiController::class, 'show']);
     Route::put('/profile', [ProfileApiController::class, 'update']);
     Route::put('/profile/password', [ProfileApiController::class, 'updatePassword']);
+
+
+
 });

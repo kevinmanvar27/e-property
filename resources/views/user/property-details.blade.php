@@ -1,6 +1,18 @@
 @extends('user.layouts.app')
 
 @section('content') 
+    
+    <style>
+        .favourite-btn.active {
+            background-color: #003085 !important;
+            color: #F5B020 !important;
+        }
+        .favourite-btn{
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+    </style>
 
     <!-- page-title -->
     <section class="page-title pt_20 pb_18">
@@ -45,6 +57,7 @@
 
 @push('scripts')
     <script>
+        let userWishlistIds = []; 
         $(document).ready(function() {
             let url = window.location.href;
             let id = url.substring(url.lastIndexOf('/') + 1);
@@ -207,6 +220,28 @@
                     'shop': '/api/shop',
                     'house': '/api/house'
                 };
+
+                // Fetch user's wishlist on page load
+                $.ajax({
+                    url: '/wishlist',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        console.log('Wishlist loaded:', response);
+                        // Ensure no duplicates in the wishlist array
+                        userWishlistIds = [...new Set(response.wishlist || [])];
+                        // Reload properties to update the favorite buttons
+                        // loadProperties();
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error loading wishlist:", error);
+                        console.log("Response:", xhr);
+                        // Try to get more details about the error
+                        if (xhr.responseJSON) {
+                            console.log("Error details:", xhr.responseJSON);
+                        }
+                    }
+                });
                 
                 const apiEndpoint = apiEndpoints[propertyType] || '/api/land-jamin';
                 
@@ -267,6 +302,7 @@
             
             function renderRelatedProperty(property) {
                 // Get the first photo or use a default image
+                const isFavourite = userWishlistIds.includes(parseInt(property.id));
                 let imageUrl = '/user/assets/images/shop/shop-10.png';
                 if (property.photos) {
                     try {
@@ -290,24 +326,73 @@
                 <div class="shop-block-two">
                     <div class="inner-box">
                     <div class="image-box">
-                            <ul class="option-list">
-                                <li><button type="button"><i class="icon-6"></i></button></li>
-                            </ul>
                             <figure class="image"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
                         </div>
                         <div class="lower-content">
                             <span class="product-stock"><img src="/user/assets/images/icons/icon-1.png" alt=""> ${property.status || ''}</span>
                             <h4><a href="/property-details/${property.id}">${property.owner_name || ''}</a></h4>
                             <p>${property.village || ''}, ${property.taluka?.name || ''}, ${property.district?.district_title || ''}, ${property.state?.state_title || ''}</p>
-                            <div class="cart-btn">
+                            <div class="cart-btn d-flex justify-content-between">
                                 <a href="/property-details/${property.id}">
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
+                                <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle" data-property-id="${property.id}">
+                                    <i class="icon-6"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>`;
             }
+
+            $(document).on('click', '.favourite-btn', function() {
+                // CSRF token setup for all AJAX requests
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+                const btn = $(this);
+                const propertyId = btn.data('property-id');
+                const isActive = btn.hasClass('active');
+                const url = `/wishlist${isActive ? '/' + propertyId : ''}`;
+                const method = isActive ? 'DELETE' : 'POST';
+
+                console.log('Favorite button clicked:', { propertyId, isActive, url, method });
+
+                $.ajax({
+                    url: url,
+                    type: method,
+                    data: !isActive ? { property_id: propertyId } : {},
+                    success: function(res) {
+                        console.log('Wishlist update success:', res);
+                        btn.toggleClass('active');
+                        // Update the userWishlistIds array
+                        if (isActive) {
+                            // Remove from wishlist (remove all instances in case of duplicates)
+                            userWishlistIds = userWishlistIds.filter(id => id != propertyId);
+                        } else {
+                            // Add to wishlist only if not already present
+                            if (!userWishlistIds.includes(parseInt(propertyId))) {
+                                userWishlistIds.push(parseInt(propertyId));
+                            }
+                        }
+                        // Ensure the wishlist array is always unique
+                        userWishlistIds = [...new Set(userWishlistIds)];
+                        console.log('Updated wishlist IDs:', userWishlistIds);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error updating wishlist:", error);
+                        console.log("Response:", xhr);
+                        // Try to get more details about the error
+                        if (xhr.responseJSON) {
+                            console.log("Error details:", xhr.responseJSON);
+                        }
+                        // Show an error message to the user
+                        alert('For Add To Wishlist, Please Login.');
+                    }
+                });
+            });
         });
     </script>
 @endpush
