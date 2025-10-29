@@ -6,7 +6,7 @@
         <section class="page-title pt_20 pb_18">
             <div class="large-container">
                 <ul class="bread-crumb clearfix">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="{{ route('home') }}">Home</a></li>
                     <li>Contact</li>
                 </ul>
             </div>
@@ -20,7 +20,8 @@
                 <div class="row clearfix">
                     <div class="col-lg-6 col-md-12 col-sm-12 content-column">
                         <div class="form-inner">
-                            <form method="post" action="sendemail.php" id="contact-form">
+                            <form method="post" action="{{ route('contact.store') }}" id="contact-form">
+                                @csrf
                                 <div class="row clearfix">
                                     <div class="col-lg-6 col-md-6 col-sm-12 form-group">
                                         <label>Name</label>
@@ -99,6 +100,53 @@
 
 @push('scripts')
     <script>
+        // Handle form submission with AJAX to provide better user experience
+        $('#contact-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form data
+            var formData = $(this).serialize();
+            
+            // Show loading state
+            var submitButton = $(this).find('button[type="submit"]');
+            var originalText = submitButton.html();
+            submitButton.html('Sending...').prop('disabled', true);
+            
+            // Send AJAX request
+            $.ajax({
+                url: $(this).attr('action'),
+                method: 'POST',
+                data: formData,
+                dataType: 'json',
+                success: function(response) {
+                    if(response.success) {
+                        // Show success message
+                        toastr.success(response.message);
+                        // Reset form
+                        $('#contact-form')[0].reset();
+                    } else {
+                        // Show error message
+                        toastr.error('There was an error submitting your form. Please try again.');
+                    }
+                },
+                error: function(xhr) {
+                    if(xhr.responseJSON && xhr.responseJSON.errors) {
+                        // Show validation errors
+                        $.each(xhr.responseJSON.errors, function(key, value) {
+                            toastr.error(value[0]);
+                        });
+                    } else {
+                        // Show generic error message
+                        toastr.error('There was an error submitting your form. Please try again.');
+                    }
+                },
+                complete: function() {
+                    // Reset button state
+                    submitButton.html(originalText).prop('disabled', false);
+                }
+            });
+        });
+        
         fetch("/api/settings")
             .then((res) => res.json())
             .then((data) => {

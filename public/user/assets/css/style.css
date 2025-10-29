@@ -2371,35 +2371,156 @@ button.ltr {
   margin-bottom: 20px;
 }
 
+/* Home Page Start Css */
+  #hero-slider .carousel-item img {
+      height: 80vh;
+      object-fit: cover;
+  }
+
+  #hero-slider .carousel-caption {
+      bottom: 20%;
+  }
+  #testimonials .card {
+      border-radius: 20px;
+      transition: all 0.3s ease;
+  }
+  #testimonials .card:hover {
+      transform: translateY(-5px);
+  }
+  #testimonials img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+  }
+  #testimonialCarousel {
+      position: relative;
+  }
+
+  /* Custom Carousel Arrows for Testimonials */
+  #testimonialCarousel .carousel-control-prev,
+  #testimonialCarousel .carousel-control-next {
+      width: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0.9;
+      transition: all 0.3s ease;
+  }
+
+  #testimonialCarousel .carousel-control-prev:hover,
+  #testimonialCarousel .carousel-control-next:hover {
+      opacity: 1;
+  }
+
+  /* Custom Icon Style */
+  #testimonialCarousel .carousel-control-prev-icon,
+  #testimonialCarousel .carousel-control-next-icon {
+      background-color: #003085 !important; /* deep blue background */
+      border-radius: 50%;
+      width: 2.5rem;
+      height: 2.5rem;
+      background-size: 100% 100%;
+      background-image: none; /* remove default Bootstrap arrow */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #F5B020; /* gold arrow color */
+  }
+
+  /* Add custom arrow symbols */
+  #testimonialCarousel .carousel-control-prev-icon::after {
+      content: '‹';
+      font-size: 2.5rem;
+      color: #F5B020;
+  }
+
+  #testimonialCarousel .carousel-control-next-icon::after {
+      content: '›';
+      font-size: 2.5rem;
+      color: #F5B020;
+  }
+/* Home Page Css End */
 
 
 
+.banner-style-six {
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
 
+.banner-style-six .large-container {
+  width: 100%;
+  max-width: 100%;
+  padding: 0;
+}
 
+/* 🔹 Fixed height for all slides */
+.banner-style-six .slide-item {
+  position: relative;
+  height: 700px; /* fixed height */
+}
 
+/* 🔹 Background image styling */
+.banner-style-six .bg-layer {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
 
+/* 🔹 Content stays naturally positioned (not centered) */
+.banner-style-six .content-box {
+  position: relative;   /* keep inside normal flow */
+  z-index: 2;           /* above the background */
+  color: #fff;
+  padding: 0px 80px;  /* adjust top/side spacing as needed */
+  text-align: left;     /* or 'center' / 'right' if you prefer */
+}
 
+/* Optional: overlay for better text visibility */
+.banner-style-six .slide-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
 
+/* Responsive height adjustments */
+@media (max-width: 992px) {
+  .banner-style-six .slide-item {
+    height: 500px;
+  }
+  .banner-style-six .content-box {
+    padding: 60px 40px;
+  }
+}
 
+@media (max-width: 576px) {
+  .banner-style-six .slide-item {
+    height: 350px;
+  }
+  .banner-style-six .content-box {
+    padding: 40px 20px;
+    text-align: center;
+  }
+}
 
+.property-img-home{
+  max-width: 350px !important; 
+  max-height: 250px !important;
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+.property-img-property{
+  max-width: 270px !important; 
+  max-height: 230px !important;
+}

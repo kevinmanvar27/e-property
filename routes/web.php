@@ -1,11 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\ContactAdminController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ManagementUserController;
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Http\Request;
-
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\LandJaminController;
@@ -22,6 +24,22 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\Auth\UserAuthController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
+|
+*/
+
+// Serve favicon.ico from the root
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('user/assets/images/favicon.ico'), ['Content-Type' => 'image/x-icon']);
+});
 
 Route::get('/', function () {
     return redirect('/admin/login');
@@ -161,8 +179,14 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::post('/admin/settings/contact', [SettingsController::class, 'updateContact'])->name('settings.contact.update');
     Route::post('/admin/settings/social', [SettingsController::class, 'updateSocial'])->name('settings.social.update');
     Route::post('/admin/settings/custom-code', [SettingsController::class, 'updateCustomCode'])->name('settings.custom-code.update');
+    Route::post('/admin/settings/app-link', [SettingsController::class, 'updateAppLink'])->name('settings.app-link.update');
     Route::get('/admin/settings/export', [SettingsController::class, 'export'])->name('settings.export');
     Route::post('/admin/settings/import', [SettingsController::class, 'import'])->name('settings.import');
+
+    // Contact Us Admin Routes
+    Route::get('/admin/contact-us', [ContactAdminController::class, 'index'])->name('admin.contact-us.index');
+    Route::get('/admin/contact-us/{contact}', [ContactAdminController::class, 'show'])->name('admin.contact-us.show');
+    Route::patch('/admin/contact-us/{contact}', [ContactAdminController::class, 'updateStatus'])->name('admin.contact-us.update-status');
 });
 
 // Land/Jamin routes
@@ -292,13 +316,36 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
 
 
 // routes for user pages
+
+Route::get('/', function() {
+    return view('user.home');
+})->name('home');
+
 Route::get('/contact', function() {
     return view('user.contact');
 })->name('contact');
 
+Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+
 Route::get('/properties', function() {
     return view('user.properties');
 })->name('properties');
+
+Route::get('/privacy-policy', function() {
+    return view('user.privacy-policy');
+})->name('privacy-policy');
+
+Route::get('/terms-and-conditions', function() {
+    return view('user.terms-conditions');
+})->name('terms-conditions');
+
+Route::get('/faq', function() {
+    return view('user.faq');
+})->name('faq');
+
+Route::get('/about-us', function() {
+    return view('user.about-us');
+})->name('about-us');
 
 Route::get('/user-profile', function() {
     $user = Auth::user();
@@ -306,7 +353,6 @@ Route::get('/user-profile', function() {
     if (!$user) {
         return redirect()->route('user-login');
     }
-    
     
     $wishlistItems = $user->wishlistedProperties()->with(['state', 'district', 'taluka'])->get();
     

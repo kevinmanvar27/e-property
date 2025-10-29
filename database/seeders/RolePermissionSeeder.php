@@ -75,6 +75,10 @@ class RolePermissionSeeder extends Seeder
             ['name' => 'role-create', 'module' => 'role', 'action' => 'create'],
             ['name' => 'role-update', 'module' => 'role', 'action' => 'update'],
             ['name' => 'role-delete', 'module' => 'role', 'action' => 'delete'],
+            
+            // Contact Us permissions
+            ['name' => 'contact-us-view', 'module' => 'contact-us', 'action' => 'view'],
+            ['name' => 'contact-us-update', 'module' => 'contact-us', 'action' => 'update'],
         ];
 
         // Create permissions

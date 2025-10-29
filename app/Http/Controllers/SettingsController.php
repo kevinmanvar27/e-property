@@ -32,6 +32,7 @@ class SettingsController extends Controller
             'contact' => $allSettings->where('section', 'contact'),
             'social' => $allSettings->where('section', 'social'),
             'custom_code' => $allSettings->where('section', 'custom_code'),
+            'app_link' => $allSettings->where('section', 'app_link'),
         ];
 
         return view('admin.settings', compact('settings'));
@@ -107,6 +108,17 @@ class SettingsController extends Controller
         Setting::firstOrCreate(
             ['section' => 'custom_code', 'key' => 'footer_code'],
             ['value' => '', 'type' => 'code']
+        );
+
+        // App link settings (empty by default)
+        Setting::firstOrCreate(
+            ['section' => 'app_link', 'key' => 'app_store_link'],
+            ['value' => '', 'type' => 'url']
+        );
+
+        Setting::firstOrCreate(
+            ['section' => 'app_link', 'key' => 'google_play_link'],
+            ['value' => '', 'type' => 'url']
         );
     }
 
@@ -221,6 +233,30 @@ class SettingsController extends Controller
         }
 
         return redirect()->back()->with('success', 'Custom code settings updated successfully.');
+    }
+
+    /**
+     * Update app link settings
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function updateAppLink(Request $request)
+    {
+        // Validate the request
+        $validated = $request->validate([
+            'app_store_link' => 'nullable|url|max:255',
+            'google_play_link' => 'nullable|url|max:255',
+        ]);
+
+        // Save settings
+        foreach ($validated as $key => $value) {
+            if ($value !== null) {
+                Setting::set('app_link', $key, $value, 'url');
+            }
+        }
+
+        return redirect()->back()->with('success', 'App link settings updated successfully.');
     }
 
     /**

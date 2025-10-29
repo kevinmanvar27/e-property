@@ -264,14 +264,15 @@
 
 .video-style-two .big-text{
   position: absolute;
-  top: 25px;
+  top: 15px;
   right: 0px;
-  font-size: 200px;
+  font-size: 125px;
   line-height: 200px;
   font-family: var(--title-font-five);
   writing-mode: vertical-lr;
   color: transparent;
-  background: -webkit-linear-gradient(180deg, #EFCA8A 0%, rgba(115,97,66,0.48) 63% , rgba(0,0,0,0.0) 100%);
+  /* background: -webkit-linear-gradient(180deg, #0019f8 0%, rgba(92, 132, 201, 0.48) 63% , rgba(0,0,0,0.0) 100%); */
+  background: white;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   opacity: 0.4;

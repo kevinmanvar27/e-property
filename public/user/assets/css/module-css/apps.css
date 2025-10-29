@@ -57,7 +57,8 @@
 }
 
 .apps-section .content-box .btn-box a:hover{
-  background: #FFB31F;
+  /* background: #FFB31F; */
+  border-radius: 10px;
 }
 
 .apps-section .content-box .btn-box a img{

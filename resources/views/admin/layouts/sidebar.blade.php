@@ -170,6 +170,16 @@
         </li>
         @endif
         
+        @if(hasPermission('contact-us', 'view'))
+        <li>
+            <a href="{{ route('admin.contact-us.index') }}">
+                <div class="parent-icon"><i class='bx bx-envelope'></i>
+                </div>
+                <div class="menu-title">Contact Us</div>
+            </a>
+        </li>
+        @endif
+        
         @if(hasPermission('role', 'view') || hasPermission('permission', 'view'))
         <li class="menu-label">Access Control</li>
         @endif

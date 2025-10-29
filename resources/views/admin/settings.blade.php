@@ -290,6 +290,7 @@
             <div class="settings-tabs">
                 <ul>
                     <li><a href="#" data-tab="general-settings" class="active">General</a></li>
+                    <li><a href="#" data-tab="app-link-settings" >Application Link</a></li>
                     <li><a href="#" data-tab="contact-settings">Contact</a></li>
                     <li><a href="#" data-tab="social-settings">Social Media</a></li>
                     <li><a href="#" data-tab="custom-code-settings">Custom Code</a></li>
@@ -367,6 +368,32 @@
                         </div>
                         
                         <button type="submit" class="btn btn-primary btn-save">Save General Settings</button>
+                    </form>
+                </div>
+
+                <div id="app-link-settings" class="settings-section">
+                    <h2 class="settings-section-title">Application Link Settings</h2>
+                    <p>Manage your site's application link.</p>
+                    
+                    <form method="POST" action="{{ route('settings.app-link.update') }}" enctype="multipart/form-data">
+                        @csrf
+                        
+                        <div class="setting-row">
+                            <div class="setting-col">
+                                <div class="form-group">
+                                    <label class="form-label">App Store Link</label>
+                                    <input type="url" class="form-control" name="app_store_link" value="{{ isset($settings['app_link']) ? $settings['app_link']->where('key', 'app_store_link')->first()?->value : '' }}">
+                                </div>
+                            </div>
+                            <div class="setting-col">
+                                <div class="form-group">
+                                    <label class="form-label">Google Play Link</label>
+                                    <input type="url" class="form-control" name="google_play_link" value="{{ isset($settings['app_link']) ? $settings['app_link']->where('key', 'google_play_link')->first()?->value : '' }}">
+                                </div>
+                            </div>
+                        </div>
+ 
+                        <button type="submit" class="btn btn-primary btn-save">Save Application Link Settings</button>
                     </form>
                 </div>
                 

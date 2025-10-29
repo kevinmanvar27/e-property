@@ -204,6 +204,7 @@
                 plot: '/api/plot',
                 shad: '/api/shad',
                 house: '/api/house',
+                global: '/api/properties/search' // Global search endpoint
             };
 
             const propertyDetailsBaseUrl = "{{ url('property-details') }}";
@@ -240,6 +241,28 @@
             const selectedStates = new Set();
             const selectedDistricts = new Set();
             const selectedCities = new Set();
+
+            // Check if this is a global search on page load
+            const urlSearchParams = new URLSearchParams(window.location.search);
+            const isGlobalSearchPage = urlSearchParams.get('global_search') === '1';
+            const globalSearchQuery = urlSearchParams.get('search') || '';
+            
+            // If it's a global search, don't set a specific property type
+            if (isGlobalSearchPage) {
+                currentType = 'global';
+                $('#current-property-type').text(`Search Results for "${globalSearchQuery}"`);
+                // Show property type filter for global search so users can switch to specific types
+                $('#property-type').show();
+            } else if (urlSearchParams.has('property_type')) {
+                // Set the checkbox for the property type from URL parameter
+                const propertyTypeParam = urlSearchParams.get('property_type');
+                $(`.property-type-checkbox[value="${propertyTypeParam}"]`).prop('checked', true);
+                currentType = propertyTypeParam;
+                updateBreadcrumb();
+            }
+
+            // Always load properties on page load
+            loadProperties();
 
             function getFilterParams() {
                 return {
@@ -324,9 +347,23 @@
 
                 console.log('Loading properties with wishlist:', userWishlistIds);
 
+                // Check if we should use global search
+                const loadUrlParams = new URLSearchParams(window.location.search);
+                const loadIsGlobalSearch = loadUrlParams.get('global_search') === '1';
+                const loadSearchQuery = loadUrlParams.get('search') || '';
+                
+                // Use global search if requested, otherwise use type-specific endpoint
+                let apiUrl = loadIsGlobalSearch ? apiUrls.global : apiUrls[currentType];
+                
                 const filters = getFilterParams();
+                
+                // Add search query to filters for global search
+                if (loadIsGlobalSearch && loadSearchQuery) {
+                    filters.search = loadSearchQuery;
+                }
+                
                 const query = $.param(filters);
-                const url = apiUrls[currentType] + (query ? `?${query}` : '');
+                const url = apiUrl + (query ? `?${query}` : '');
 
                 $.ajax({
                     url: url,
@@ -337,6 +374,12 @@
                             $(containerId).html('<p class="text-center text-danger">No properties found.</p>');
                             $('#pagination-container').hide();
                             updatePaginationInfo({from: 0, to: 0, total: 0});
+                            
+                            // Update breadcrumb for global search
+                            if (loadIsGlobalSearch) {
+                                $('#current-property-type').text(`Search Results for "${loadSearchQuery}"`);
+                            }
+                            
                             return;
                         }
 
@@ -350,8 +393,17 @@
                         // Render pagination
                         renderPagination(response.data);
                         
+                        // Update breadcrumb for global search
+                        if (loadIsGlobalSearch) {
+                            $('#current-property-type').text(`Search Results for "${loadSearchQuery}"`);
+                        } else {
+                            updateBreadcrumb();
+                        }
+                        
                         response.data.data.forEach(property => {
-                            const html = viewType === 'grid' ? renderGrid(property) : renderList(property);
+                            // For global search, property data structure might be slightly different
+                            const propertyData = loadIsGlobalSearch ? property : property;
+                            const html = viewType === 'grid' ? renderGrid(propertyData) : renderList(propertyData);
                             $(containerId).append(html);
                         });
                     },
@@ -360,6 +412,17 @@
                         $(containerId).html('<p class="text-center text-danger">Error loading properties. Please try again.</p>');
                     }
                 });
+            }
+
+            function toTitleCase(str) {
+                if (!str) return '';
+                return str
+                    .toLowerCase()
+                    .replace(/[_-]+/g, ' ') // replace underscores or hyphens with space
+                    .split(' ')
+                    .filter(Boolean) // remove empty parts
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
             }
 
             function renderGrid(property) {
@@ -378,6 +441,14 @@
                     }
                 }
                 
+                // For global search results, show property type
+                const propertyType = property.property_type ? 
+                    property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1).replace(/_/g, ' ') : '';
+                const propertyTypeBadge = propertyType ? `<span class="badge bg-primary mb-2">${propertyType}</span>` : '';
+                
+                // Create property details URL with property type
+                const propertyDetailsUrl = `${propertyDetailsBaseUrl}/${property.id}`;
+                
                 return `
                 <div class="shop-block-two">
                     <div class="inner-box">
@@ -386,14 +457,14 @@
                                 <li>
                                 </li>
                             </ul>
-                            <figure class="image"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
+                            <figure class="image property-img-property"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
                         </div>
                         <div class="lower-content">
-                            <span class="product-stock"><img src="{{ asset('user/assets/images/icons/icon-1.png') }}" alt=""> ${property.status || ''}</span>
-                            <h4><a href="shop-details.html">${property.owner_name || ''}</a></h4>
+                            <span class="product-stock"><img src="{{ asset('user/assets/images/icons/icon-1.png') }}" alt=""> ${toTitleCase(property.status) || ''}</span>
+                            <h4><a href="${propertyDetailsUrl}">${property.owner_name || ''}</a></h4>
                             <p>${property.village || ''}, ${property.taluka?.name || ''}, ${property.district?.district_title || ''}, ${property.state?.state_title || ''}</p>
                             <div class="cart-btn d-flex justify-content-between">
-                                <a href="${propertyDetailsBaseUrl}/${property.id}">
+                                <a href="${propertyDetailsUrl}">
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
                                 <button class="btn favourite-btn ${isFavourite ? 'active' : ''} rounded-circle" data-property-id="${property.id}">
@@ -421,6 +492,15 @@
                         console.error("Invalid photo format:", property.photos);
                     }
                 }
+                
+                // For global search results, show property type
+                const propertyType = property.property_type ? 
+                    property.property_type.charAt(0).toUpperCase() + property.property_type.slice(1).replace(/_/g, ' ') : '';
+                const propertyTypeBadge = propertyType ? `<span class="badge bg-primary mb-2">${propertyType}</span>` : '';
+                
+                // Create property details URL with property type
+                const propertyDetailsUrl = `${propertyDetailsBaseUrl}/${property.id}`;
+                
                 return `
                 <div class="shop-block-seven">
                     <div class="inner-box">
@@ -428,11 +508,11 @@
                             <figure class="image"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
                         </div>
                         <div class="content-box">
-                            <span class="product-stock"><img src="{{ asset('user/assets/images/icons/icon-1.png') }}" alt=""> ${property.status || ''}</span>
-                            <h4><a href="shop-details.html">${property.owner_name || ''}</a></h4>
+                            <span class="product-stock"><img src="{{ asset('user/assets/images/icons/icon-1.png') }}" alt=""> ${toTitleCase(property.status) || ''}</span>
+                            <h4><a href="${propertyDetailsUrl}">${property.owner_name || ''}</a></h4>
                             <p class="mb_30">${property.village || ''}, ${property.taluka?.name || ''}, ${property.district?.district_title || ''}, ${property.state?.state_title || ''}</p>
                             <div class="cart-btn d-flex align-items-center">
-                                <a href="${propertyDetailsBaseUrl}/${property.id}">
+                                <a href="${propertyDetailsUrl}">
                                     <button type="button" class="theme-btn">View Details<span></span><span></span><span></span><span></span></button>
                                 </a>
                                 <a href="#" class="ms-3">
@@ -447,7 +527,21 @@
             }
 
             wrapper.removeClass('list grid').addClass(viewType);
-            loadProperties();
+            
+            // Check if we should perform a global search on page load
+            const pageUrlParams = new URLSearchParams(window.location.search);
+            const pageIsGlobalSearch = pageUrlParams.get('global_search') === '1';
+            const pageSearchQuery = pageUrlParams.get('search') || '';
+            
+            // If it's a global search, update the UI accordingly
+            if (pageIsGlobalSearch && pageSearchQuery) {
+                currentType = 'global';
+                $('#current-property-type').text(`Search Results for "${pageSearchQuery}"`);
+                // Show property type filter for global search so users can switch to specific types
+                $('#property-type').show();
+            }
+            
+            // loadProperties();
 
             // Handle pagination clicks
             $(document).on('click', '#pagination-list a', function(e) {
@@ -484,6 +578,11 @@
                 currentType = $(this).data('type');
                 currentPage = 1; // Reset to first page when changing property type
                 updateBreadcrumb();
+                
+                // Clean the URL by removing all query parameters
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                
                 loadProperties();
             });
 
@@ -491,6 +590,11 @@
                 currentType = $(this).find(':selected').data('type');
                 currentPage = 1; // Reset to first page when changing property type
                 updateBreadcrumb();
+                
+                // Clean the URL by removing all query parameters
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                
                 loadProperties();
             });
 
@@ -499,6 +603,21 @@
                 currentType = $(this).val();
                 currentPage = 1; // Reset to first page when changing property type
                 updateBreadcrumb();
+                
+                // Clean the URL by removing all query parameters
+                const cleanUrl = window.location.pathname;
+                window.history.replaceState({}, document.title, cleanUrl);
+                
+                // Clear any existing search query from the URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('search') || urlParams.has('global_search')) {
+                    // Remove search parameters by using clean URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+                
+                // Clear the search field in the header
+                $('#header-search-form input[name="search"]').val('');
+                
                 loadProperties();
             });
             
@@ -658,5 +777,39 @@
                 });
             });
         });
+        $(document).ready(function() {
+            var listButton = $('button.list-view');
+            var gridButton = $('button.grid-view');
+            var wrapper = $('div.wrapper');
+
+            // Get last selected view from localStorage
+            var lastView = localStorage.getItem('viewMode') || 'list';
+
+            if (lastView === 'list') {
+                listButton.addClass('on');
+                gridButton.removeClass('on');
+                wrapper.removeClass('grid').addClass('list');
+            } else {
+                gridButton.addClass('on');
+                listButton.removeClass('on');
+                wrapper.removeClass('list').addClass('grid');
+            }
+
+            // Button click events
+            listButton.on('click', function() {
+                gridButton.removeClass('on');
+                listButton.addClass('on');
+                wrapper.removeClass('grid').addClass('list');
+                localStorage.setItem('viewMode', 'list');
+            });
+
+            gridButton.on('click', function() {
+                listButton.removeClass('on');
+                gridButton.addClass('on');
+                wrapper.removeClass('list').addClass('grid');
+                localStorage.setItem('viewMode', 'grid');
+            });
+        });
+
     </script>
 @endpush

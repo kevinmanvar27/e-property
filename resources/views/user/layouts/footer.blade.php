@@ -120,16 +120,14 @@
             </div> -->
         </div>
         <div class="footer-bottom">
-            <div class="bottom-inner justify-content-center">
+            <div class="bottom-inner justify-content-between">
                 <div class="copyright"><p>Copyright &copy; 2025 <a href="index.html">R-Property</a>, Inc. All Rights Reserved</p></div>
-                <!-- <ul class="footer-card">
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-1.png') }}" alt=""></a></li>
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-2.png') }}" alt=""></a></li>
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-3.png') }}" alt=""></a></li>
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-4.png') }}" alt=""></a></li>
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-5.png') }}" alt=""></a></li>
-                    <li><a href="index.html"><img src="{{ asset('user/assets/images/resource/footer-card-6.png') }}" alt=""></a></li>
-                </ul> -->
+                <ul class="footer-card">
+                    <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('terms-conditions') }}">Terms & Condition</a></li>
+                    <li><a href="{{ route('about-us') }}">About Us</a></li>
+                    <li><a href="{{ route('faq') }}">FAQ</a></li>
+                </ul>
             </div>
         </div>
     </div>

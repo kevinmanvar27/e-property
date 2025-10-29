@@ -188,7 +188,7 @@
                         </div>
                         <div class="tab" id="tab-4">
                             <h3>Wishlist</h3>
-                            <div class="wrapper list">
+                            <div class="wrapper grid">
                                 <!-- Grid container -->
                                 <div class="shop-grid-content">
                                     <div class="row clearfix" id="property-container-grid">

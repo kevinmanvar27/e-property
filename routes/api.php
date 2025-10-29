@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\ShopApiController;
 use App\Http\Controllers\Api\UserPermissionApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WishlistController;
+use App\Http\Controllers\Api\BasePropertyApiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,9 @@ Route::middleware('api')->group(function () {
         'update' => 'api.house.update',
         'destroy' => 'api.house.destroy',
     ]);
+
+    // Global search across all property types
+    Route::get('/properties/search', [BasePropertyApiController::class, 'searchAll'])->name('api.properties.search');
 
     // Property specific endpoints for Land Jamin
     Route::get('/land-jamin/{property}/states/{countryId}', [LandJaminApiController::class, 'getStatesByCountry']);

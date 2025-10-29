@@ -101,31 +101,93 @@ class BasePropertyApiController extends Controller
     }
 
     /**
+     * Display a listing of properties across all property types.
+     */
+    public function searchAll(Request $request)
+    {
+        try {
+            // Get filter query params
+            $countryIds = $request->input('country_ids') ? explode(',', $request->input('country_ids')) : [];
+            $stateIds   = $request->input('state_ids') ? explode(',', $request->input('state_ids')) : [];
+            $districtIds = $request->input('district_ids') ? explode(',', $request->input('district_ids')) : [];
+            $cityIds = $request->input('city_ids') ? explode(',', $request->input('city_ids')) : [];
+            $searchQuery = $request->input('search', '');
+            
+            // Get pagination params
+            $perPage = $request->input('per_page', 10); // Default to 10 items per page
+            $page = $request->input('page', 1); // Default to first page
+
+            // Build the base query - no property type filter
+            $query = Property::with(['state', 'district', 'taluka'])
+                ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at', 'photos']);
+
+            // Apply search filter
+            if (!empty($searchQuery)) {
+                $query->where(function($q) use ($searchQuery) {
+                    // Search in all text-based property fields
+                    $q->where('owner_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('contact_number', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('size', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('apartment_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('first_line', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('second_line', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('village', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('pincode', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('vavetar_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('issue_description', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('family_issue_description', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('road_distance', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('additional_notes', 'LIKE', "%{$searchQuery}%")
+                      // Search in location relationships
+                      ->orWhereHas('state', function($stateQuery) use ($searchQuery) {
+                          $stateQuery->where('state_title', 'LIKE', "%{$searchQuery}%");
+                      })
+                      ->orWhereHas('district', function($districtQuery) use ($searchQuery) {
+                          $districtQuery->where('district_title', 'LIKE', "%{$searchQuery}%");
+                      })
+                      ->orWhereHas('taluka', function($talukaQuery) use ($searchQuery) {
+                          $talukaQuery->where('name', 'LIKE', "%{$searchQuery}%");
+                      });
+                });
+            }
+
+            // Apply filters only if arrays are not empty
+            if (!empty($countryIds)) {
+                $query->whereIn('country_id', $countryIds);
+            }
+
+            if (!empty($stateIds)) {
+                $query->whereIn('state_id', $stateIds);
+            }
+
+            if (!empty($districtIds)) {
+                $query->whereIn('district_id', $districtIds);
+            }
+
+            if (!empty($cityIds)) {
+                $query->whereIn('taluka_id', $cityIds);
+            }
+
+            // Apply pagination
+            $properties = $query->paginate($perPage, ['*'], 'page', $page);
+
+            return response()->json([
+                'success' => true,
+                'data' => $properties,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error loading properties: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'An error occurred while loading properties. Please try again.',
+            ], 500);
+        }
+    }
+
+    /**
      * Display a listing of the resource.
      */
-    
-    // public function index(Request $request)
-    // {
-    //     try {
-    //         $properties = Property::with(['state', 'district', 'taluka'])
-    //             ->where('property_type', $this->propertyType)
-    //             ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at'])
-    //             ->get();
-
-    //         return response()->json([
-    //             'success' => true,
-    //             'data' => $properties,
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         \Log::error('Error loading properties: ' . $e->getMessage());
-
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'An error occurred while loading properties. Please try again.',
-    //         ], 500);
-    //     }
-    // }
-
     public function index(Request $request)
     {
         try {
@@ -134,14 +196,46 @@ class BasePropertyApiController extends Controller
             $stateIds   = $request->input('state_ids') ? explode(',', $request->input('state_ids')) : [];
             $districtIds = $request->input('district_ids') ? explode(',', $request->input('district_ids')) : [];
             $cityIds = $request->input('city_ids') ? explode(',', $request->input('city_ids')) : [];
+            $searchQuery = $request->input('search', '');
             
             // Get pagination params
             $perPage = $request->input('per_page', 10); // Default to 10 items per page
             $page = $request->input('page', 1); // Default to first page
 
+            // Build the base query
             $query = Property::with(['state', 'district', 'taluka'])
                 ->where('property_type', $this->propertyType)
                 ->select(['id', 'owner_name', 'village', 'taluka_id', 'district_id', 'state_id', 'status', 'property_type', 'created_at', 'photos']);
+
+            // Apply search filter
+            if (!empty($searchQuery)) {
+                $query->where(function($q) use ($searchQuery) {
+                    // Search in all text-based property fields
+                    $q->where('owner_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('contact_number', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('size', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('apartment_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('first_line', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('second_line', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('village', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('pincode', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('vavetar_name', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('issue_description', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('family_issue_description', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('road_distance', 'LIKE', "%{$searchQuery}%")
+                      ->orWhere('additional_notes', 'LIKE', "%{$searchQuery}%")
+                      // Search in location relationships
+                      ->orWhereHas('state', function($stateQuery) use ($searchQuery) {
+                          $stateQuery->where('state_title', 'LIKE', "%{$searchQuery}%");
+                      })
+                      ->orWhereHas('district', function($districtQuery) use ($searchQuery) {
+                          $districtQuery->where('district_title', 'LIKE', "%{$searchQuery}%");
+                      })
+                      ->orWhereHas('taluka', function($talukaQuery) use ($searchQuery) {
+                          $talukaQuery->where('name', 'LIKE', "%{$searchQuery}%");
+                      });
+                });
+            }
 
             // Apply filters only if arrays are not empty
             if (!empty($countryIds)) {
