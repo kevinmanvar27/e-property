@@ -290,7 +290,7 @@
             <div class="settings-tabs">
                 <ul>
                     <li><a href="#" data-tab="general-settings" class="active">General</a></li>
-                    <li><a href="#" data-tab="app-link-settings" >Application Link</a></li>
+                    <li><a href="#" data-tab="app-link-settings" class="d-none">Application Link</a></li>
                     <li><a href="#" data-tab="contact-settings">Contact</a></li>
                     <li><a href="#" data-tab="social-settings">Social Media</a></li>
                     <li><a href="#" data-tab="custom-code-settings">Custom Code</a></li>
@@ -363,6 +363,16 @@
                                             </div>
                                         @endif
                                     @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="setting-row">
+                            <div class="setting-col">
+                                <div class="form-group">
+                                    <label class="form-label">Footer Text</label>
+                                    <input type="text" class="form-control" name="footer_text" value="{{ $settings['general']->where('key', 'footer_text')->first()?->value ?? '' }}">
+                                    <div class="form-text">Text to display in the footer of your site.</div>
                                 </div>
                             </div>
                         </div>

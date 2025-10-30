@@ -121,7 +121,7 @@
         </div>
         <div class="footer-bottom">
             <div class="bottom-inner justify-content-between">
-                <div class="copyright"><p>Copyright &copy; 2025 <a href="index.html">R-Property</a>, Inc. All Rights Reserved</p></div>
+                <div class="copyright"><p class="footer-text"></p></div>
                 <ul class="footer-card">
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
                     <li><a href="{{ route('terms-conditions') }}">Terms & Condition</a></li>

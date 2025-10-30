@@ -9,7 +9,7 @@
 <title>Nexmart - HTML 5 Template Preview</title>
 
 <!-- Fav Icon -->
-<link rel="icon" href="{{ asset('user/assets/images/favicon.ico') }}" type="image/x-icon">
+<link rel="icon" href="{{ asset('user/assets/images/products/favicon.jpg') }}" type="image/x-icon">
 
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
@@ -153,6 +153,7 @@
                 const tagLine = data.tagline || "";
                 const logo = data.logo || "";
                 const favicon = data.favicon || "";
+                const footerText = data.footer_text || "";
 
                 // Set logo
                 const logoImg = document.querySelector(".logo-box img");
@@ -175,7 +176,8 @@
                         document.head.appendChild(faviconTag);
                     }
                     faviconTag.href = "/storage/" + favicon;
-                } else {
+                } 
+                else {
                     // Use default favicon if none is set in settings
                     let faviconTag = document.querySelector("link[rel='icon']");
                     if (!faviconTag) {
@@ -183,12 +185,20 @@
                         faviconTag.rel = "icon";
                         document.head.appendChild(faviconTag);
                     }
-                    faviconTag.href = "/user/assets/images/favicon.ico";
+                    faviconTag.href = "/user/assets/images/products/favicon.jpg";
                 }
 
                 // Set document title
                 if (title) {
                     document.title = title + (tagLine ? " | " + tagLine : "");
+                }
+
+                if (footerText)
+                {
+                    document.querySelector(".footer-text").innerText = footerText;
+                }
+                else{
+                    document.querySelector(".footer-text").innerText = "All Rights Reserved by RProperty";
                 }
             });
 

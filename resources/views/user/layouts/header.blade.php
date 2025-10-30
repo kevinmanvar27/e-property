@@ -5,7 +5,7 @@
         <div class="large-container">
             <div class="upper-inner">
                 <div class="logo-and-toggle">
-                    <figure class="logo-box"><a href="{{ route('home') }}"><img src="/user/assets/images/logo.png" alt="Logo" style="max-width: 180px; max-height: 80px;"></a></figure>
+                    <figure class="logo-box"><a href="{{ route('home') }}"><img src="{{ asset('assets/images/products/logo.png') }}" alt="Logo" style="max-width: 180px; max-height: 80px;"></a></figure>
                     <!--Mobile Navigation Toggler-->
                     <div class="mobile-nav-toggler">
                         <i class="icon-bar"></i>
