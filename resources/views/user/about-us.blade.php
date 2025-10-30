@@ -263,14 +263,8 @@ fetch("/api/settings")
         if (appStoreLink && appStoreBtn) {
             appStoreBtn.setAttribute("href", appStoreLink);
         }
-        else{
-            appStoreBtn.setAttribute("href", "#");
-        }
         if (playStoreLink && playStoreBtn) {
             playStoreBtn.setAttribute("href", playStoreLink);
-        }
-        else{
-            playStoreBtn.setAttribute("href", "#");
         }
     })
     .catch((err) => console.error("Error loading settings:", err));

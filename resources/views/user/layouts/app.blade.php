@@ -177,17 +177,6 @@
                     }
                     faviconTag.href = "/storage/" + favicon;
                 } 
-                else {
-                    // Use default favicon if none is set in settings
-                    let faviconTag = document.querySelector("link[rel='icon']");
-                    if (!faviconTag) {
-                        faviconTag = document.createElement("link");
-                        faviconTag.rel = "icon";
-                        document.head.appendChild(faviconTag);
-                    }
-                    faviconTag.href = "/user/assets/images/products/favicon.jpg";
-                }
-
                 // Set document title
                 if (title) {
                     document.title = title + (tagLine ? " | " + tagLine : "");
