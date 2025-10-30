@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\UserPermissionApiController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\BasePropertyApiController;
+use App\Http\Controllers\Api\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,11 @@ use App\Http\Controllers\Api\BasePropertyApiController;
 */
 
 Route::middleware('api')->group(function () {
+    // Auth APIs
+    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/register', [AuthController::class, 'register']);
+    Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+
     // Settings API
     Route::get('/settings', [SettingsController::class, 'index']);
     Route::post('/settings/update', [SettingsController::class, 'update']);
@@ -212,9 +218,14 @@ Route::middleware('api')->group(function () {
     Route::post('/users/{user}/permissions', [UserPermissionApiController::class, 'update']);
 
     // Profile APIs
-    Route::get('/profile', [ProfileApiController::class, 'show']);
-    Route::put('/profile', [ProfileApiController::class, 'update']);
-    Route::put('/profile/password', [ProfileApiController::class, 'updatePassword']);
+    Route::get('/profile', [ProfileApiController::class, 'show'])->middleware('auth:sanctum');
+    Route::put('/profile', [ProfileApiController::class, 'update'])->middleware('auth:sanctum');
+    Route::put('/profile/password', [ProfileApiController::class, 'updatePassword'])->middleware('auth:sanctum');
+
+    // Wishlist APIs
+    Route::get('/wishlist', [WishlistController::class, 'index'])->middleware('auth:sanctum');
+    Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('auth:sanctum');
+    Route::delete('/wishlist/{propertyId}', [WishlistController::class, 'destroy'])->middleware('auth:sanctum');
 
 
 

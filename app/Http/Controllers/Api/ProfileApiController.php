@@ -6,11 +6,89 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
+
+/**
+ * @OA\Schema(
+ *     schema="ProfileUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="name", type="string", example="John Doe"),
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     @OA\Property(property="phone", type="string", example="1234567890")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="PasswordUpdateRequest",
+ *     type="object",
+ *     @OA\Property(property="current_password", type="string", example="currentpassword"),
+ *     @OA\Property(property="password", type="string", example="newpassword"),
+ *     @OA\Property(property="password_confirmation", type="string", example="newpassword")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProfileResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(
+ *         property="data",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="John Doe"),
+ *         @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *         @OA\Property(property="phone", type="string", example="1234567890"),
+ *         @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+ *     )
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ProfileUpdateResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Profile updated successfully"),
+ *     @OA\Property(
+ *         property="data",
+ *         type="object",
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="name", type="string", example="John Doe"),
+ *         @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *         @OA\Property(property="phone", type="string", example="1234567890"),
+ *         @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00.000000Z")
+ *     )
+ * )
+ *
+ * @OA\Tag(
+ *     name="User Profile",
+ *     description="API Endpoints for User Profile Management"
+ * )
+ */
 
 class ProfileApiController extends Controller
 {
     /**
-     * Display the user's profile.
+     * @OA\Get(
+     *      path="/api/profile",
+     *      operationId="getProfile",
+     *      tags={"User Profile"},
+     *      summary="Get user profile",
+     *      description="Retrieve the authenticated user's profile information",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ProfileResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Server Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *      )
+     * )
      */
     public function show(Request $request)
     {
@@ -22,7 +100,7 @@ class ProfileApiController extends Controller
                 'data' => $user,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error loading profile: ' . $e->getMessage());
+            Log::error('Error loading profile: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -32,7 +110,36 @@ class ProfileApiController extends Controller
     }
 
     /**
-     * Update the user's profile.
+     * @OA\Put(
+     *      path="/api/profile",
+     *      operationId="updateProfile",
+     *      tags={"User Profile"},
+     *      summary="Update user profile",
+     *      description="Update the authenticated user's profile information",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/ProfileUpdateRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ProfileUpdateResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Server Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *      )
+     * )
      */
     public function update(Request $request)
     {
@@ -58,7 +165,7 @@ class ProfileApiController extends Controller
                 'data' => $user->fresh(),
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating profile: ' . $e->getMessage());
+            Log::error('Error updating profile: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -68,7 +175,39 @@ class ProfileApiController extends Controller
     }
 
     /**
-     * Update the user's password.
+     * @OA\Put(
+     *      path="/api/profile/password",
+     *      operationId="updatePassword",
+     *      tags={"User Profile"},
+     *      summary="Update user password",
+     *      description="Update the authenticated user's password",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/PasswordUpdateRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="message", type="string", example="Password updated successfully")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Server Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *      )
+     * )
      */
     public function updatePassword(Request $request)
     {
@@ -97,7 +236,7 @@ class ProfileApiController extends Controller
                 'message' => 'Password updated successfully',
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error updating password: ' . $e->getMessage());
+            Log::error('Error updating password: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,

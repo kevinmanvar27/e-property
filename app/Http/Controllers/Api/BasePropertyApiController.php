@@ -75,6 +75,11 @@ use Illuminate\Support\Facades\Log;
  *     @OA\Property(property="success", type="boolean", example=false),
  *     @OA\Property(property="message", type="string", example="An error occurred")
  * )
+ *
+ * @OA\Tag(
+ *     name="Global Search",
+ *     description="API Endpoints for Global Property Search"
+ * )
  */
 
 class BasePropertyApiController extends Controller
@@ -101,7 +106,70 @@ class BasePropertyApiController extends Controller
     }
 
     /**
-     * Display a listing of properties across all property types.
+     * @OA\Get(
+     *      path="/api/properties/search",
+     *      operationId="searchAllProperties",
+     *      tags={"Global Search"},
+     *      summary="Search across all property types",
+     *      description="Returns paginated list of properties from all types that match the search criteria",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          name="search",
+     *          in="query",
+     *          description="Search query for property fields",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="country_ids",
+     *          in="query",
+     *          description="Filter by country IDs (comma separated)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="state_ids",
+     *          in="query",
+     *          description="Filter by state IDs (comma separated)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="district_ids",
+     *          in="query",
+     *          description="Filter by district IDs (comma separated)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="city_ids",
+     *          in="query",
+     *          description="Filter by city IDs (comma separated)",
+     *          @OA\Schema(type="string")
+     *      ),
+     *      @OA\Parameter(
+     *          name="per_page",
+     *          in="query",
+     *          description="Number of items per page",
+     *          @OA\Schema(type="integer", default=10)
+     *      ),
+     *      @OA\Parameter(
+     *          name="page",
+     *          in="query",
+     *          description="Page number",
+     *          @OA\Schema(type="integer", default=1)
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/PropertiesResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated"
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Server Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *      )
+     * )
      */
     public function searchAll(Request $request)
     {
