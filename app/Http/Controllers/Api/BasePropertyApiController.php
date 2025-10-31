@@ -238,6 +238,12 @@ class BasePropertyApiController extends Controller
 
             // Apply pagination
             $properties = $query->paginate($perPage, ['*'], 'page', $page);
+            
+            // Process the properties to add amenities_list and land_types_list
+            $properties->getCollection()->each(function ($property) {
+                $property->setAttribute('amenities_list', $property->getAmenitiesListAttribute());
+                $property->setAttribute('land_types_list', $property->getLandTypesList());
+            });
 
             return response()->json([
                 'success' => true,
@@ -324,6 +330,12 @@ class BasePropertyApiController extends Controller
 
             // Apply pagination
             $properties = $query->paginate($perPage, ['*'], 'page', $page);
+            
+            // Process the properties to add amenities_list and land_types_list
+            $properties->getCollection()->each(function ($property) {
+                $property->setAttribute('amenities_list', $property->getAmenitiesListAttribute());
+                $property->setAttribute('land_types_list', $property->getLandTypesList());
+            });
 
             return response()->json([
                 'success' => true,
@@ -445,7 +457,13 @@ class BasePropertyApiController extends Controller
             ], 404);
         }
 
-        $property->load(['state', 'district', 'taluka', 'amenities', 'landTypes']);
+        // Load the relationships that exist
+        $property->load(['state', 'district', 'taluka']);
+        
+        // For amenities and landTypes, we'll use the helper methods since they're stored as JSON
+        // Add the amenities list and land types list to the property object
+        $property->setAttribute('amenities_list', $property->getAmenitiesListAttribute());
+        $property->setAttribute('land_types_list', $property->getLandTypesList());
 
         return response()->json([
             'success' => true,

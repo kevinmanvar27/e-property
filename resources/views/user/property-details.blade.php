@@ -62,6 +62,17 @@
             let url = window.location.href;
             let id = url.substring(url.lastIndexOf('/') + 1);
 
+            function toTitleCase(str) {
+                if (!str) return '';
+                return str
+                    .toLowerCase()
+                    .replace(/[_-]+/g, ' ') // replace underscores or hyphens with space
+                    .split(' ')
+                    .filter(Boolean) // remove empty parts
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+            }
+
             $.ajax({
                 url: '/property-details/' + id,
                 type: 'GET',
@@ -136,7 +147,7 @@
                             </div>
                             <div class="col-lg-6 col-md-12 col-sm-12 content-column">
                                 <div class="content-box ml_30">
-                                    <span class="upper-text">${property.property_type}</span>
+                                    <span class="upper-text">${toTitleCase(property.property_type || '')}</span>
                                     <h2>${property.apartment_name || property.owner_name}</h2>
                                     <div class="text-box mb_30">
                                         <p>${property.first_line || ''}<br>${property.second_line || ''}</p>
@@ -145,7 +156,7 @@
                                     <ul class="discription-box mb_30 clearfix">
                                         <li><strong>Owner :</strong> ${property.owner_name || ''}</li>
                                         <li><strong>Contact Number :</strong> ${property.contact_number || ''}</li>
-                                        <li><strong>Availability :</strong><span class="product-stock"><img src="/user/assets/images/icons/icon-1.png" alt=""> ${property.status || ''}</span></li>
+                                        <li><strong>Availability :</strong><span class="product-stock"><img src="/user/assets/images/icons/icon-1.png" alt=""> ${toTitleCase(property.status || '')}</span></li>
                                     </ul>
                                     <div class="size-box mb_40">
                                         <h6>Details<span>*</span></h6>
