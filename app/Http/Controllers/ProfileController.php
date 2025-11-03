@@ -42,9 +42,8 @@ class ProfileController extends Controller
         try {
             $user = Auth::user();
 
-            // Update user fields
+            // Update user fields (excluding username)
             $user->name = $request->name;
-            $user->username = $request->username;
             $user->email = $request->email;
             $user->contact = $request->contact;
             $user->dob = $request->dob;

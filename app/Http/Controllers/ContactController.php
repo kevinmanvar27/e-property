@@ -6,6 +6,7 @@ use App\Models\ContactUs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
+use App\Mail\ContactFormMail;
 
 class ContactController extends Controller
 {
@@ -44,14 +45,14 @@ class ContactController extends Controller
                 'status' => 'pending', // Default status
             ]);
 
-            // Send email notification
-            // Note: You'll need to configure mail settings in your .env file
-            // This is a simplified example - you might want to create a Mailable class
-            Mail::raw("New contact form submission:\n\nName: {$request->username}\nEmail: {$request->email}\nPhone: {$request->phone}\nSubject: {$request->subject}\nMessage: {$request->message}", function ($message) use ($request) {
-                $message->to(config('mail.from.address'))
-                        ->subject('New Contact Form Submission: ' . $request->subject)
-                        ->from($request->email, $request->username);
-            });
+            // Send email notification using the Mailable class
+            Mail::to(config('mail.from.address'))->send(new ContactFormMail(
+                $request->username,
+                $request->email,
+                $request->phone,
+                $request->subject,
+                $request->message
+            ));
 
             return response()->json([
                 'success' => true,

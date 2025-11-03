@@ -39,7 +39,7 @@
                 <div class="right-column">
                     @if(Auth::check())
                     <div class="support-box">
-                        <div class="icon-box"><img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name ?? '' }}" style="max-width: 40px; max-height: 40px;"></div>
+                        <div class="icon-box"><img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/images/products/placeholder.png') }}" style="max-width: 40px; max-height: 40px;"></div>
                         <a href="{{ route('user-profile') }}">{{ ucwords(Auth::user()->name) ?? '' }}</a>
                         <p>{{ Auth::user()->email ?? '' }}</p>
                     </div>

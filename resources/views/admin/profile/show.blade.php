@@ -45,10 +45,7 @@
                                     <h6 class="mb-0"><i class='bx bx-user me-2'></i>Full Name</h6>
                                     <span class="text-secondary">{{ $user->name }}</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                                    <h6 class="mb-0"><i class='bx bx-user-circle me-2'></i>Username</h6>
-                                    <span class="text-secondary">{{ $user->username }}</span>
-                                </li>
+
                                 <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
                                     <h6 class="mb-0"><i class='bx bx-envelope me-2'></i>Email</h6>
                                     <span class="text-secondary">{{ $user->email }}</span>
@@ -120,17 +117,7 @@
                                                         @enderror
                                                     </div>
                                                 </div>
-                                                <div class="row mb-3">
-                                                    <div class="col-sm-3">
-                                                        <h6 class="mb-0">Username</h6>
-                                                    </div>
-                                                    <div class="col-sm-9 text-secondary">
-                                                        <input type="text" name="username" class="form-control @error('username') is-invalid @enderror" value="{{ old('username', $user->username) }}" required>
-                                                        @error('username')
-                                                            <div class="invalid-feedback">{{ $message }}</div>
-                                                        @enderror
-                                                    </div>
-                                                </div>
+
                                                 <div class="row mb-3">
                                                     <div class="col-sm-3">
                                                         <h6 class="mb-0">Email</h6>

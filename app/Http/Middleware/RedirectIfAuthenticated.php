@@ -48,7 +48,7 @@ class RedirectIfAuthenticated
             if ($user->isSuperAdmin() || $user->isAdmin()) {
                 return redirect('/admin/settings');
             } else {
-                return redirect('/user/dashboard'); // <-- user dashboard
+                return redirect('/user-profile'); // <-- user dashboard
             }
         }
 

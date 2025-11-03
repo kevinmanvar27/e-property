@@ -33,7 +33,7 @@
                 <div class="tabs-box">
                     <div class="account-info">
                         <div class="upper-box centred mb_40">
-                            <figure class="image-box"><img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name ?? '' }}" style="max-width: 200px; max-height: 200px;"></figure>
+                            <figure class="image-box"><img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/images/products/placeholder.png') }}" alt="{{ Auth::user()->name ?? '' }}" style="max-width: 200px; max-height: 200px;"></figure>
                             <h4>{{ ucwords(Auth::user()->name) ?? '' }}</h4>
                             <a href="mailto:rodiyrock11@gmail.com">{{ Auth::user()->email ?? '' }}</a>
                         </div>
@@ -60,12 +60,7 @@
                                             <input type="text" class="form-control" id="name" name="name" value="{{ Auth::user()->name ?? '' }}">
                                         </div>
                                     </div>
-                                    <div class="form-group row mb-4">
-                                        <label for="username" class="col-sm-2 col-form-label">Username</label>
-                                        <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="username" name="username" value="{{ Auth::user()->username ?? '' }}">
-                                        </div>
-                                    </div>
+
                                     <div class="form-group row mb-4">
                                         <label for="email" class="col-sm-2 col-form-label">Email</label>
                                         <div class="col-sm-10">
@@ -88,7 +83,7 @@
                                         <label for="address" class="col-sm-2 col-form-label">Old Photo</label>
                                         <div class="col-sm-10">
                                             @if(Auth::user()->photo)
-                                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" alt="{{ Auth::user()->name ?? '' }}" style="max-width: 200px; max-height: 200px;">
+                                                <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/images/products/placeholder.png') }}" alt="{{ Auth::user()->name ?? '' }}" style="max-width: 200px; max-height: 200px;">
                                             @else
                                                 <p>No photo uploaded</p>
                                             @endif
@@ -113,12 +108,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-6 col-md-6 col-sm-12 single-column">
-                                            <div class="single-item">
-                                                <h6>Username</h6>
-                                                <span>{{ Auth::user()->username ?? '' }}</span>
-                                            </div>
-                                        </div>
+
 
                                         <div class="col-lg-6 col-md-6 col-sm-12 single-column">
                                             <div class="single-item">
@@ -145,7 +135,7 @@
                                         <div class="col-12 single-column text-center mt-3">
                                             <div class="single-item">
                                                 <h6>Photo</h6>
-                                                <img src="{{ asset('storage/' . Auth::user()->photo) }}" 
+                                                <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/images/products/placeholder.png') }}" 
                                                     alt="{{ Auth::user()->name ?? '' }}" 
                                                     class="rounded img-fluid mt-2" 
                                                     style="max-width: 150px;">

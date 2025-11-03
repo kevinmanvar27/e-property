@@ -24,7 +24,6 @@ class UserProfileUpdateRequest extends FormRequest
 
         return [
             'name' => 'required|string|max:255',
-            'username' => 'required|string|max:255|unique:users,username,'.$user->id,
             'email' => 'required|string|email|max:255|unique:users,email,'.$user->id,
             'contact' => 'nullable|string|max:255',
             'dob' => 'nullable|date',
@@ -39,8 +38,6 @@ class UserProfileUpdateRequest extends FormRequest
     {
         return [
             'name.required' => 'The name field is required.',
-            'username.required' => 'The username field is required.',
-            'username.unique' => 'This username is already taken.',
             'email.required' => 'The email field is required.',
             'email.email' => 'Please enter a valid email address.',
             'email.unique' => 'This email is already registered.',

@@ -24,6 +24,7 @@ use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\Auth\UserAuthController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Support\Facades\Mail;
 
 /*
 |--------------------------------------------------------------------------
@@ -388,13 +389,6 @@ Route::get('/sign-up', [UserAuthController::class, 'showRegisterForm'])->name('r
 Route::post('/sign-up', [UserAuthController::class, 'register'])->name('register.post');
 Route::post('/logout', [UserAuthController::class, 'logout'])->name('user-logout');
 
-// Wishlist routes
-Route::middleware('auth')->group(function () {
-    Route::get('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist', [App\Http\Controllers\Api\WishlistController::class, 'store'])->name('wishlist.store');
-    Route::delete('/wishlist/{propertyId}', [App\Http\Controllers\Api\WishlistController::class, 'destroy'])->name('wishlist.destroy');
-});
-
 Route::get('/email/verify', fn() => view('user.verify-email'))
     // ->middleware('auth')
     ->name('verification.notice');
@@ -422,6 +416,7 @@ Route::post('/email/verification-notification', function (Request $request) {
         'message' => 'Verification link sent!'
     ]);
 })->name('verification.send');
+
 
 // Wishlist routes
 Route::middleware('auth')->group(function () {

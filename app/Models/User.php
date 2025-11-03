@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
 use Laravel\Sanctum\PersonalAccessToken;
+use App\Notifications\CustomVerifyEmail;
 
 /**
  * App\Models\User
@@ -248,5 +249,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function wishlistedProperties()
     {
         return $this->belongsToMany(Property::class, 'wishlists', 'user_id', 'property_id');
+    }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    public function sendEmailVerificationNotification()
+    {
+        $this->notify(new CustomVerifyEmail);
     }
 }
