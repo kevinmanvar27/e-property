@@ -368,6 +368,11 @@
 }
 
 /** responsive-css **/
+@media only screen and (max-width: 1440px){
+  .shop-page-section .wrapper .inner-container .shop-block-two{
+    width: 33.333%;
+  }
+}
 
 @media only screen and (max-width: 1200px){
   .shop-page-section .wrapper .inner-container .shop-block-two{

@@ -2520,7 +2520,13 @@ button.ltr {
   max-height: 250px !important;
 }
 
-.property-img-property{
+/* .property-img-property{
   max-width: 270px !important; 
+  max-height: 230px !important;
+} */
+
+
+.property-img-property{
+  max-width: 310px !important; 
   max-height: 230px !important;
 }

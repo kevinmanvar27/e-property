@@ -453,10 +453,6 @@
                 <div class="shop-block-two">
                     <div class="inner-box">
                         <div class="image-box">
-                            <ul class="option-list">
-                                <li>
-                                </li>
-                            </ul>
                             <figure class="image property-img-property"><img src="${imageUrl}" alt="${property.owner_name || ''}"></figure>
                         </div>
                         <div class="lower-content">
