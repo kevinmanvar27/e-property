@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>New Contact Form Submission</title>
+  <title>Thank you for contacting us</title>
   <style>
     body {
       font-family: 'Segoe UI', Roboto, Arial, sans-serif;
@@ -22,7 +22,7 @@
       border: 1px solid #e0e7ff;
     }
     .header {
-      background: linear-gradient(135deg, #003085, #0055c4);
+      background: linear-gradient(135deg, #00a86b, #00c980);
       color: #fff;
       text-align: center;
       padding: 40px 25px 30px;
@@ -40,27 +40,37 @@
     .content {
       padding: 35px 30px;
     }
-    .field {
-      margin-bottom: 20px;
+    .message-box {
+      background-color: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      border-left: 5px solid #00a86b;
+      padding: 20px;
+      border-radius: 6px;
+      font-size: 16px;
+      color: #444;
+      line-height: 1.6;
+      margin-bottom: 25px;
     }
-    .field-label {
-      font-weight: 600;
-      color: #003085;
-      text-transform: uppercase;
-      font-size: 13px;
-      margin-bottom: 6px;
-      display: inline-block;
-      letter-spacing: 0.5px;
-    }
-    .field-value {
+    .details {
       background-color: #f8fafc;
       border: 1px solid #e2e8f0;
-      border-left: 5px solid #f5b020;
-      padding: 12px 14px;
+      padding: 20px;
       border-radius: 6px;
+    }
+    .detail-item {
+      margin-bottom: 15px;
+      display: flex;
+    }
+    .detail-label {
+      font-weight: 600;
+      color: #00a86b;
+      min-width: 100px;
+      font-size: 14px;
+    }
+    .detail-value {
+      flex: 1;
       font-size: 15px;
       color: #444;
-      line-height: 1.5;
     }
     .footer {
       background-color: #f9fafc;
@@ -74,8 +84,12 @@
       margin: 5px 0;
     }
     .highlight {
-      color: #f5b020;
+      color: #00a86b;
       font-weight: bold;
+    }
+    .icon {
+      font-size: 48px;
+      margin-bottom: 15px;
     }
   </style>
 </head>
@@ -86,42 +100,23 @@
       @if(isset($logoBase64))
         <img src="{{ $logoBase64 }}" alt="Website Logo" style="max-height: 70px; margin-bottom: 15px; border-radius: 8px;">
       @endif
-      <h1>📬 New Contact Form Submission</h1>
-      <p>You’ve received a new message from your website contact form</p>
+      <h1>Thank You for Reaching Out!</h1>
+      <p>We've received your message and will get back to you soon</p>
     </div>
 
     <div class="content">
-      <div class="field">
-        <span class="field-label">Name</span>
-        <div class="field-value">{{ $name }}</div>
+      <div class="message-box">
+        Hello {{ $name }},<br><br>
+        We received your mail and will be shortly contact in 24 hours.<br><br>
+        Our team is reviewing your message and will reach out to you at {{ $email }} as soon as possible.<br><br>
+        Thank you for contacting us!
       </div>
 
-      <div class="field">
-        <span class="field-label">Email</span>
-        <div class="field-value">{{ $email }}</div>
-      </div>
-
-      @if($phone)
-      <div class="field">
-        <span class="field-label">Phone</span>
-        <div class="field-value">{{ $phone }}</div>
-      </div>
-      @endif
-
-      <div class="field">
-        <span class="field-label">Subject</span>
-        <div class="field-value">{{ $subject }}</div>
-      </div>
-
-      <div class="field">
-        <span class="field-label">Message</span>
-        <div class="field-value">{{ $messageBody }}</div>
-      </div>
     </div>
 
     <div class="footer">
-      <p>This email was sent from your <span class="highlight">website contact form</span>.</p>
-      <p>Please respond to the customer as soon as possible.</p>
+      <p>This is an automated confirmation of your contact form submission.</p>
+      <p>If you have any urgent inquiries, please contact us directly.</p>
     </div>
   </div>
 </body>

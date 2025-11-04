@@ -260,15 +260,15 @@
       let userWishlistIds = [];
 
       // Fetch user's wishlist on page load
-      try {
-        const wishlistRes = await fetch('/wishlist');
-        if (wishlistRes.ok) {
-          const wishlistData = await wishlistRes.json();
-          userWishlistIds = [...new Set(wishlistData.wishlist || [])];
-        }
-      } catch (e) {
-        console.log('Could not load wishlist:', e);
-      }
+      // try {
+      //   const wishlistRes = await fetch('/wishlist');
+      //   if (wishlistRes.ok) {
+      //     const wishlistData = await wishlistRes.json();
+      //     userWishlistIds = [...new Set(wishlistData.wishlist || [])];
+      //   }
+      // } catch (e) {
+      //   console.log('Could not load wishlist:', e);
+      // }
 
       // Helper function to convert string to title case
       function toTitleCase(str) {

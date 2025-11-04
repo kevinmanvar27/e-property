@@ -5,33 +5,28 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
-class ContactFormMail extends Mailable
+class UserConfirmationMail extends Mailable
 {
     use Queueable, SerializesModels;
 
     public $name;
     public $email;
-    public $phone;
     public $subject;
-    public $messageBody;
     public $logoBase64;
 
     /**
      * Create a new message instance.
      */
-    public function __construct($name, $email, $phone, $subject, $messageBody)
+    public function __construct($name, $email, $subject)
     {
         $this->name = $name;
         $this->email = $email;
-        $this->phone = $phone;
         $this->subject = $subject;
-        $this->messageBody = $messageBody;
         
         // Generate base64 encoded logo for email clients that block external images
         $this->generateLogoBase64();
@@ -74,8 +69,7 @@ class ContactFormMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address(config('mail.from.address'), config('mail.from.name')),
-            subject: 'New Contact Form Submission: ' . $this->subject,
+            subject: 'Thank you for contacting us - ' . $this->subject,
         );
     }
 
@@ -85,8 +79,8 @@ class ContactFormMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.contact-form',
-            text: 'emails.contact-form-text',
+            view: 'emails.user-confirmation',
+            text: 'emails.user-confirmation-text',
             with: [
                 'logoBase64' => $this->logoBase64,
             ]

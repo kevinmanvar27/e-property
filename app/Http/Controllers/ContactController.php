@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Mail\ContactFormMail;
+use App\Mail\UserConfirmationMail;
 
 class ContactController extends Controller
 {
@@ -45,7 +46,7 @@ class ContactController extends Controller
                 'status' => 'pending', // Default status
             ]);
 
-            // Send email notification using the Mailable class
+            // Send email notification to admin
             Mail::to(config('mail.from.address'))->send(new ContactFormMail(
                 $request->username,
                 $request->email,
@@ -53,9 +54,16 @@ class ContactController extends Controller
                 $request->subject,
                 $request->message
             ));
+            // Send confirmation email to the user
+            Mail::to($request->email)->send(new UserConfirmationMail(
+                $request->username,
+                $request->email,
+                $request->subject
+            ));
 
             return response()->json([
                 'success' => true,
+                'data' => $contact,
                 'message' => 'Thank you for contacting us. We will get back to you soon.'
             ], 200);
         } catch (\Exception $e) {
