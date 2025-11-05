@@ -65,6 +65,8 @@
                                             <span class="badge bg-danger">Super Admin</span>
                                         @elseif($user->role == 'admin')
                                             <span class="badge bg-primary">Admin</span>
+                                        @else
+                                            <span class="badge bg-secondary">{{ ucfirst(str_replace('_', ' ', $user->role)) }}</span>
                                         @endif
                                     </td>
                                     <td>
@@ -169,6 +171,19 @@
                             </div>
                         </div>
                         
+                        <!-- Status Field -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="status" name="status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <!-- Remove the redundant Role field and keep only Role Assignment -->
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -313,6 +328,19 @@
                             </div>
                         </div>
                         
+                        <!-- Status Field -->
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="edit_status" class="form-label">Status <span class="text-danger">*</span></label>
+                                <select class="form-select" id="edit_status" name="status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
                         <!-- Remove the redundant Role field and keep only Role Assignment -->
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -511,7 +539,7 @@
                     // Session expired, redirect to login
                     toastr.error('Session expired. Redirecting to login...');
                     setTimeout(function() {
-                        window.location.href = '{{ route('login') }}';
+                        window.location.href = '/login';
                     }, 2000);
                 } else if (xhr.status === 403) {
                     // Forbidden action (e.g., trying to deactivate own account)
@@ -545,15 +573,14 @@
         $('#edit_email').val(email);
         $('#edit_contact').val(contact);
         $('#edit_dob').val(dob);
-        $('#edit_role').val(role);
         $('#edit_status').val(status);
         
         // Reset all permission checkboxes
         $('.permissions-container input[type="checkbox"]').prop('checked', false);
         
-        // Fetch user permissions
+        // Fetch user permissions and photo data
         $.ajax({
-            url: '/admin/users/management/' + id + '/permissions',
+            url: '/admin/users/management/' + id + '/permissions-data',
             type: 'GET',
             success: function(response) {
                 // Check the permission checkboxes based on user permissions
@@ -562,16 +589,23 @@
                         $('#edit-' + permission.module + '-' + permission.action).prop('checked', true);
                     });
                 }
+                
+                // Set the role ID in the select field
+                if (response.user && response.user.role_id) {
+                    $('#edit_role_id').val(response.user.role_id);
+                }
+                
+                // Display current photo if exists
+                if (response.user && response.user.photo) {
+                    var photoUrl = '/storage/' + response.user.photo;
+                    var photoHtml = '<img src="' + photoUrl + '" alt="Current Photo" class="img-thumbnail" style="max-width: 100px; max-height: 100px;">';
+                    $('#current_photo').html(photoHtml);
+                }
             },
             error: function(xhr) {
-                console.log('Error fetching user permissions');
+                console.log('Error fetching user permissions and photo data');
             }
         });
-        
-        // Display current photo if exists
-        var photoHtml = '';
-        // You would need to pass the photo URL from the backend to display it here
-        $('#current_photo').html(photoHtml);
         
         $('#editUserModal').modal('show');
     });

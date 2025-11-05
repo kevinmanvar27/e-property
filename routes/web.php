@@ -8,6 +8,8 @@ use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ManagementUserController;
 use App\Models\Property;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\HouseController;
 use App\Http\Controllers\LandJaminController;
@@ -91,6 +93,7 @@ Route::middleware(['auth', 'role:admin,super_admin'])->group(function () {
     Route::delete('/admin/users/management/{management_user}', [ManagementUserController::class, 'destroy'])->name('users.management.delete');
     Route::patch('/admin/users/management/{management_user}/toggle-status', [ManagementUserController::class, 'toggleStatus'])->name('users.management.toggle-status');
     Route::get('/admin/users/management/{user}/permissions', [UserPermissionController::class, 'show'])->name('users.management.permissions');
+    Route::get('/admin/users/management/{user}/permissions-data', [UserPermissionController::class, 'getUserPermissions'])->name('users.management.permissions.data');
     Route::post('/admin/users/management/{user}/permissions', [UserPermissionController::class, 'update'])->name('users.management.permissions.assign');
 
     Route::get('/admin/users/regular', [RegularUserController::class, 'index'])->name('users.regular');
@@ -417,6 +420,49 @@ Route::post('/email/verification-notification', function (Request $request) {
     ]);
 })->name('verification.send');
 
+// Password Reset Routes
+Route::get('/forgot-password', function () {
+    return view('user.forgot-password');
+})->middleware('guest')->name('password.request');
+
+Route::post('/forgot-password', function (Request $request) {
+    $request->validate(['email' => 'required|email|exists:users']);
+
+    $status = \Illuminate\Support\Facades\Password::sendResetLink(
+        $request->only('email')
+    );
+
+    return $status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT
+                ? back()->with(['status' => __($status)])
+                : back()->withErrors(['email' => __($status)]);
+})->middleware('guest')->name('password.email');
+
+Route::get('/reset-password/{token}', function ($token) {
+    return view('user.reset-password', ['token' => $token]);
+})->middleware('guest')->name('password.reset');
+
+Route::post('/reset-password', function (Request $request) {
+    $request->validate([
+        'token' => 'required',
+        'email' => 'required|email|exists:users',
+        'password' => 'required|min:8|confirmed',
+    ]);
+
+    $status = \Illuminate\Support\Facades\Password::reset(
+        $request->only('email', 'password', 'password_confirmation', 'token'),
+        function ($user, $password) {
+            $user->forceFill([
+                'password' => \Illuminate\Support\Facades\Hash::make($password)
+            ])->save();
+
+            $user->markPasswordAsChanged();
+        }
+    );
+
+    return $status === \Illuminate\Support\Facades\Password::PASSWORD_RESET
+                ? redirect()->route('user-login')->with('status', __($status))
+                : back()->withErrors(['email' => [__($status)]]);
+})->middleware('guest')->name('password.update');
 
 // Wishlist routes
 Route::middleware('auth')->group(function () {

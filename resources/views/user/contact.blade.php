@@ -37,7 +37,7 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-12 form-group">
                                         <label>Subject</label>
-                                        <input type="text" name="subject" placeholder="" required>
+                                        <input type="text" name="subject" placeholder="" required value="{{ request()->query('subject') ? 'Account Active Request' : '' }}" {{ request()->query('subject') ? 'readonly' : '' }}>
                                     </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12 form-group">
                                         <label>Write Message *</label>

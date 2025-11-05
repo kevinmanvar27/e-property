@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Setting;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SettingsController extends Controller
 {
@@ -153,15 +154,38 @@ class SettingsController extends Controller
             }
         }
 
-        // Handle file uploads
+        // Handle logo upload
         if ($request->hasFile('logo')) {
+            // Get the current logo path before updating
+            $currentLogoPath = Setting::get('general', 'logo');
+            
+            // Store the new logo
             $logoPath = $request->file('logo')->store('logos', 'public');
+            
+            // Update the setting with new logo path
             Setting::set('general', 'logo', $logoPath, 'file');
+            
+            // Delete the old logo file if it exists and is different from the new one
+            if ($currentLogoPath && $currentLogoPath !== $logoPath) {
+                Storage::disk('public')->delete($currentLogoPath);
+            }
         }
 
+        // Handle favicon upload
         if ($request->hasFile('favicon')) {
+            // Get the current favicon path before updating
+            $currentFaviconPath = Setting::get('general', 'favicon');
+            
+            // Store the new favicon
             $faviconPath = $request->file('favicon')->store('favicons', 'public');
+            
+            // Update the setting with new favicon path
             Setting::set('general', 'favicon', $faviconPath, 'file');
+            
+            // Delete the old favicon file if it exists and is different from the new one
+            if ($currentFaviconPath && $currentFaviconPath !== $faviconPath) {
+                Storage::disk('public')->delete($currentFaviconPath);
+            }
         }
 
         return redirect()->back()->with('success', 'General settings updated successfully.');

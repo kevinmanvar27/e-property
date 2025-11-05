@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ManagementUserStoreRequest;
 use App\Http\Requests\ManagementUserUpdateRequest;
+use App\Http\Requests\RegularUserStoreRequest;
 use App\Http\Requests\RegularUserToggleStatusRequest;
+use App\Http\Requests\RegularUserUpdateRequest;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Services\UserService;
 use Illuminate\Support\Facades\Auth;
@@ -31,7 +35,7 @@ class RegularUserController extends Controller
 
             return view('admin.users.regular', compact('users'));
         } catch (\Exception $e) {
-            \Log::error('Error loading regular users: ' . $e->getMessage());
+            Log::error('Error loading regular users: ' . $e->getMessage());
 
             return redirect()->back()->with('error', 'An error occurred while loading users. Please try again.');
         }
@@ -40,10 +44,10 @@ class RegularUserController extends Controller
     /**
      * Store a newly created regular user in storage.
      *
-     * @param  ManagementUserStoreRequest  $request
+     * @param  RegularUserStoreRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ManagementUserStoreRequest $request)
+    public function store(RegularUserStoreRequest $request)
     {
         try {
             $data = $request->all();
@@ -58,7 +62,7 @@ class RegularUserController extends Controller
 
             return response()->json(['message' => 'User created successfully', 'user' => $user]);
         } catch (\Exception $e) {
-            \Log::error('Error creating regular user: ' . $e->getMessage());
+            Log::error('Error creating regular user: ' . $e->getMessage());
 
             return response()->json(['errors' => ['general' => ['An error occurred while creating the user. Please try again.']]], 500);
         }
@@ -67,11 +71,11 @@ class RegularUserController extends Controller
     /**
      * Update the specified regular user in storage.
      *
-     * @param  ManagementUserUpdateRequest  $request
+     * @param  RegularUserUpdateRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ManagementUserUpdateRequest $request, $id)
+    public function update(RegularUserUpdateRequest $request, $id)
     {
         try {
             $user = User::findOrFail($id);
@@ -93,7 +97,7 @@ class RegularUserController extends Controller
 
             return response()->json(['message' => 'User updated successfully', 'user' => $user]);
         } catch (\Exception $e) {
-            \Log::error('Error updating regular user: ' . $e->getMessage());
+            Log::error('Error updating regular user: ' . $e->getMessage());
 
             return response()->json(['errors' => ['general' => ['An error occurred while updating the user. Please try again.']]], 500);
         }
@@ -115,11 +119,16 @@ class RegularUserController extends Controller
                 return response()->json(['message' => 'User is not a regular user'], 400);
             }
 
+            // Delete user photo if exists
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+
             $user->delete();
 
             return response()->json(['message' => 'User deleted successfully']);
         } catch (\Exception $e) {
-            \Log::error('Error deleting regular user: ' . $e->getMessage());
+            Log::error('Error deleting regular user: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred while deleting the user. Please try again.'], 500);
         }
@@ -159,7 +168,7 @@ class RegularUserController extends Controller
                 'status_text' => $statusText,
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error toggling user status: ' . $e->getMessage());
+            Log::error('Error toggling user status: ' . $e->getMessage());
 
             return response()->json(['message' => 'An error occurred while updating the user status. Please try again.'], 500);
         }

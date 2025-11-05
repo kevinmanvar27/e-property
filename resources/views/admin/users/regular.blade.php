@@ -35,7 +35,6 @@
                                     <th>Sr. No</th>
                                     <th>Photo</th>
                                     <th>Name</th>
-                                    <th>Username</th>
                                     <th>Email</th>
                                     <th>Contact</th>
                                     <th>Status</th>
@@ -56,7 +55,6 @@
                                         @endif
                                     </td>
                                     <td>{{ $user->name }}</td>
-                                    <td>{{ $user->username }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td>{{ $user->contact ?? 'N/A' }}</td>
                                     <td>
@@ -84,7 +82,7 @@
                                     </td>
                                     <td>
                                         <div class="d-flex order-actions">
-                                            <a href="javascript:;" class="ms-3 edit-user text-warning" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-username="{{ $user->username }}" data-email="{{ $user->email }}" data-contact="{{ $user->contact }}" data-dob="{{ $user->dob ? $user->dob->format('Y-m-d') : '' }}" data-status="{{ $user->status }}"><i class='bx bxs-edit bx-sm'></i></a>
+                                            <a href="javascript:;" class="ms-3 edit-user text-warning" data-id="{{ $user->id }}" data-name="{{ $user->name }}" data-email="{{ $user->email }}" data-contact="{{ $user->contact }}" data-dob="{{ $user->dob ? $user->dob->format('Y-m-d') : '' }}" data-status="{{ $user->status }}" data-photo="{{ $user->photo }}"><i class='bx bxs-edit bx-sm'></i></a>
                                             <a href="javascript:;" class="ms-3 delete-user text-danger" data-id="{{ $user->id }}"><i class='bx bxs-trash bx-sm'></i></a>
                                         </div>
                                     </td>
@@ -118,10 +116,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="username" name="username" required autocomplete="username">
-                            </div>
+                            <!-- Username field removed as per requirements -->
                         </div>
                     </div>
                     <div class="row">
@@ -201,10 +196,7 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="edit_username" class="form-label">Username <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="edit_username" name="username" required autocomplete="username">
-                            </div>
+                            <!-- Username field removed as per requirements -->
                         </div>
                     </div>
                     <div class="row">
@@ -366,7 +358,7 @@
                     // Session expired, redirect to login
                     toastr.error('Session expired. Redirecting to login...');
                     setTimeout(function() {
-                        window.location.href = '{{ route('login') }}';
+                        window.location.href = "{{ route('login') }}";
                     }, 2000);
                 } else if (xhr.status === 403) {
                     // Forbidden action (e.g., trying to deactivate own account)
@@ -387,7 +379,6 @@
     $(document).on('click', '.edit-user', function() {
         var id = $(this).data('id');
         var name = $(this).data('name');
-        var username = $(this).data('username');
         var email = $(this).data('email');
         var contact = $(this).data('contact');
         var dob = $(this).data('dob');
@@ -395,7 +386,6 @@
         
         $('#edit_user_id').val(id);
         $('#edit_name').val(name);
-        $('#edit_username').val(username);
         $('#edit_email').val(email);
         $('#edit_contact').val(contact);
         $('#edit_dob').val(dob);
@@ -403,7 +393,15 @@
         
         // Display current photo if exists
         var photoHtml = '';
-        // You would need to pass the photo URL from the backend to display it here
+        var photoPath = $(this).data('photo');
+        if (photoPath) {
+            var assetUrl = $('meta[name=asset-url]').attr('content');
+            // Remove trailing slash if present to avoid double slashes
+            if (assetUrl.endsWith('/')) {
+                assetUrl = assetUrl.slice(0, -1);
+            }
+            photoHtml = '<img src="' + assetUrl + '/storage/' + photoPath + '" alt="Current Photo" class="img-thumbnail" width="100">';
+        }
         $('#current_photo').html(photoHtml);
         
         $('#editUserModal').modal('show');

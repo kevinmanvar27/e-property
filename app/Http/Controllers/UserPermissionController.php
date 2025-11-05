@@ -64,4 +64,31 @@ class UserPermissionController extends Controller
 
         return redirect()->back()->with('success', 'User permissions updated successfully.');
     }
+
+    /**
+     * Get user permissions and photo for editing
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getUserPermissions($id)
+    {
+        $user = User::with(['permissions', 'role'])->findOrFail($id);
+        
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'username' => $user->username,
+                'email' => $user->email,
+                'contact' => $user->contact,
+                'photo' => $user->photo,
+                'dob' => $user->dob,
+                'role' => $user->role,
+                'role_id' => $user->role_id,
+                'status' => $user->status,
+            ],
+            'permissions' => $user->permissions
+        ]);
+    }
 }

@@ -68,7 +68,15 @@ class UserAuthController extends Controller
             RateLimiter::clear($throttleKey);
             $user = Auth::user();
 
-            if (! $user->hasVerifiedEmail()) {
+            // Check if user is active
+            if ($user->status !== 'active') {
+                Auth::logout();
+                return redirect()->route('user-login')
+                                ->withInput(['email' => $user->email])
+                                ->with('error', 'Your account is not active. Please contact administrator. Or fill out this <a href="'.route('contact').'?subject=Account%20Active%20Request">contact us form</a>.');
+            }
+
+            if ($user->email_verified_at === null) {
                 Auth::logout();
                 return redirect()->route('user-login')
                                 ->withInput(['email' => $user->email])

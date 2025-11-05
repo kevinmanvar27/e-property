@@ -54,12 +54,12 @@ class UserService
     }
 
     /**
-     * Get cached users with roles
+     * Get cached users with roles (excluding regular users with 'user' role)
      */
     public function getUsersWithRoles()
     {
         return Cache::remember('users_with_roles', $this->cacheDuration, function () {
-            return User::with('role')->get();
+            return User::where('role', '!=', 'user')->with('role')->get();
         });
     }
 
@@ -98,7 +98,7 @@ class UserService
     {
         return User::create([
             'name' => $data['name'],
-            'username' => $data['username'],
+            'username' => $data['username'] ?? null,
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'contact' => $data['contact'] ?? null,
@@ -115,13 +115,22 @@ class UserService
     public function updateUser(User $user, array $data)
     {
         $user->name = $data['name'];
-        $user->username = $data['username'];
         $user->email = $data['email'];
         $user->contact = $data['contact'] ?? $user->contact;
         $user->dob = $data['dob'] ?? $user->dob;
-        $user->role_id = $data['role_id'] ?? $user->role_id;
-        $user->role = $data['role'] ?? $user->role;
         $user->status = $data['status'] ?? $user->status;
+
+        // Set role based on role_id if provided
+        if (isset($data['role_id']) && !empty($data['role_id'])) {
+            $role = Role::find($data['role_id']);
+            if ($role) {
+                $user->role_id = $data['role_id'];
+                $user->role = $role->name;
+            }
+        } elseif (isset($data['role'])) {
+            // Fallback to role field if provided
+            $user->role = $data['role'];
+        }
 
         if (isset($data['password']) && ! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
@@ -138,9 +147,14 @@ class UserService
     public function handleUserPhotoUpload($photo, User $user)
     {
         if ($photo) {
-            $filename = time() . '.' . $photo->getClientOriginalExtension();
-            Storage::disk('photos')->putFileAs('', $photo, $filename);
-            $user->photo = $filename;
+            // Delete old photo if exists
+            if ($user->photo) {
+                Storage::disk('public')->delete($user->photo);
+            }
+            
+            // Store in the public disk under photos directory
+            $path = $photo->store('photos', 'public');
+            $user->photo = $path;
             $user->save();
         }
     }
@@ -155,6 +169,10 @@ class UserService
             if ($role && $role->isActive()) {
                 // Sync role permissions
                 $user->permissions()->sync($role->permissions->pluck('id'));
+                
+                // Update the user's role field to match the role name
+                $user->role = $role->name;
+                $user->save();
             }
         }
     }

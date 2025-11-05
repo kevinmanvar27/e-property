@@ -35,7 +35,7 @@ class CheckUserRole
                 return response()->json(['message' => 'Your account is not active.'], 401);
             }
 
-            return redirect('/admin/login')->with('error', 'Your account is not active.');
+            return redirect('/admin/login')->with('error', 'Your account is not active. Please contact administrator. Or fill out this <a href="'.route('contact').'?subject=Account%20Active%20Request">contact us form</a>.');
         }
 
         // If no specific roles are required, just check authentication

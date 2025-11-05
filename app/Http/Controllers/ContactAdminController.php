@@ -14,7 +14,8 @@ class ContactAdminController extends Controller
      */
     public function index()
     {
-        $contacts = ContactUs::orderBy('created_at', 'desc')->paginate(10);
+        // Return all contacts for DataTables to handle pagination and sorting
+        $contacts = ContactUs::orderBy('created_at', 'desc')->get();
         return view('admin.contact-us.index', compact('contacts'));
     }
 
