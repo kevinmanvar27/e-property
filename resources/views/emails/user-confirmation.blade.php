@@ -97,9 +97,12 @@
   <div class="email-wrapper">
     <div class="header">
       <!-- Base64 encoded logo for reliable email client display -->
-      @if(isset($logoBase64))
-        <img src="{{ $logoBase64 }}" alt="Website Logo" style="max-height: 70px; margin-bottom: 15px; border-radius: 8px;">
-      @endif
+      <img
+        src="{{ asset('storage/' . \App\Models\Setting::get('general', 'logo')) }}"
+        alt="Website Logo"
+        style="max-height:70px;margin-bottom:15px;border-radius:8px;"
+        onerror="this.style.display='none';"/>
+
       <h1>Thank You for Reaching Out!</h1>
       <p>We've received your message and will get back to you soon</p>
     </div>

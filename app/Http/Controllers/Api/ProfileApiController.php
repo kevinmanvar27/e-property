@@ -93,7 +93,8 @@ class ProfileApiController extends Controller
     public function show(Request $request)
     {
         try {
-            $user = $request->user()->load('roles', 'permissions');
+            // Load the user with their role and permissions
+            $user = $request->user()->load('role', 'permissions');
 
             return response()->json([
                 'success' => true,
@@ -154,10 +155,11 @@ class ProfileApiController extends Controller
                     'max:255',
                     Rule::unique('users')->ignore($user->id),
                 ],
-                'phone' => 'nullable|string|max:20',
+                'contact' => 'nullable|string|max:20', // Changed from 'phone' to 'contact' to match User model
             ]);
 
-            $user->update($request->only(['name', 'email', 'phone']));
+            // Updated to use 'contact' instead of 'phone' to match User model
+            $user->update($request->only(['name', 'email', 'contact']));
 
             return response()->json([
                 'success' => true,

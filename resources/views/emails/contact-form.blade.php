@@ -83,8 +83,15 @@
   <div class="email-wrapper">
     <div class="header">
       <!-- Base64 encoded logo for reliable email client display -->
-      @if(isset($logoBase64))
-        <img src="{{ $logoBase64 }}" alt="Website Logo" style="max-height: 70px; margin-bottom: 15px; border-radius: 8px;">
+      @php
+        $logoPath = \App\Models\Setting::get('general', 'logo');
+      @endphp
+
+      @if($logoPath && Storage::disk('public')->exists($logoPath))
+        <img
+          src="{{ asset('storage/' . $logoPath) }}"
+          alt="Website Logo"
+          style="max-height:70px;margin-bottom:15px;border-radius:8px;">
       @endif
       <h1>📬 New Contact Form Submission</h1>
       <p>You’ve received a new message from your website contact form</p>
