@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\BasePropertyApiController;
 use App\Http\Controllers\Api\AuthController;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -276,5 +277,58 @@ Route::middleware('api')->group(function () {
             ], 422);
         }
     })->middleware('guest')->name('api.password.reset');
+    
+    // Email Verification API Routes
+    Route::post('/auth/verify-email', function (Request $request) {
+        $request->validate([
+            'id' => 'required|integer|exists:users,id',
+            'hash' => 'required|string',
+        ]);
+        
+        $user = \App\Models\User::findOrFail($request->id);
+        
+        if (! hash_equals((string) $request->hash, sha1($user->getEmailForVerification()))) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid verification link.',
+            ], 400);
+        }
+        
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Email already verified.',
+            ]);
+        }
+        
+        $user->markEmailAsVerified();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Email verified successfully.',
+        ]);
+    })->middleware('guest')->name('api.verification.verify');
+    
+    Route::post('/auth/resend-verification', function (Request $request) {
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+        
+        $user = \App\Models\User::where('email', $request->email)->first();
+        
+        if ($user->hasVerifiedEmail()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Email already verified.',
+            ]);
+        }
+        
+        $user->sendEmailVerificationNotification();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Verification link sent to your email.',
+        ]);
+    })->middleware('guest')->name('api.verification.send');
 
 });

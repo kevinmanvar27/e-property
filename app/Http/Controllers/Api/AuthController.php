@@ -131,6 +131,35 @@ use Laravel\Sanctum\PersonalAccessToken;
  *     @OA\Property(property="message", type="string", example="Password reset successfully. You can now login with your new password.")
  * )
  *
+ * @OA\Schema(
+ *     schema="VerifyEmailRequest",
+ *     type="object",
+ *     @OA\Property(property="id", type="integer", example=1),
+ *     @OA\Property(property="hash", type="string", example="abcdef123456"),
+ *     required={"id", "hash"}
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ResendVerificationRequest",
+ *     type="object",
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     required={"email"}
+ * )
+ *
+ * @OA\Schema(
+ *     schema="VerifyEmailResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Email verified successfully.")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ResendVerificationResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Verification link sent to your email.")
+ * )
+ *
  * @OA\Tag(
  *     name="Authentication",
  *     description="API Endpoints for User Authentication"
@@ -350,6 +379,67 @@ class AuthController extends Controller
      * )
      */
     public function resetPassword()
+    {
+        // Implementation is in routes/api.php
+    }
+    
+    /**
+     * @OA\Post(
+     *      path="/api/auth/verify-email",
+     *      operationId="verifyEmail",
+     *      tags={"Authentication"},
+     *      summary="Verify Email Address",
+     *      description="Verify a user's email address using the verification link",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/VerifyEmailRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/VerifyEmailResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Invalid verification link",
+     *          @OA\JsonContent(ref="#/components/schemas/ErrorResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+     *      )
+     * )
+     */
+    public function verifyEmail()
+    {
+        // Implementation is in routes/api.php
+    }
+    
+    /**
+     * @OA\Post(
+     *      path="/api/auth/resend-verification",
+     *      operationId="resendVerification",
+     *      tags={"Authentication"},
+     *      summary="Resend Verification Email",
+     *      description="Resend the email verification link to the user's email",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/ResendVerificationRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ResendVerificationResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+     *      )
+     * )
+     */
+    public function resendVerification()
     {
         // Implementation is in routes/api.php
     }

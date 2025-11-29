@@ -237,6 +237,100 @@
                 }
             }
         },
+        "/api/auth/verify-email": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify Email Address",
+                "description": "Verify a user's email address using the verification link",
+                "operationId": "verifyEmail",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/VerifyEmailRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/VerifyEmailResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid verification link",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/auth/resend-verification": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Resend Verification Email",
+                "description": "Resend the email verification link to the user's email",
+                "operationId": "resendVerification",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ResendVerificationRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ResendVerificationResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ValidationErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/properties/search": {
             "get": {
                 "tags": [
@@ -9270,6 +9364,62 @@
                     "message": {
                         "type": "string",
                         "example": "Password reset successfully. You can now login with your new password."
+                    }
+                },
+                "type": "object"
+            },
+            "VerifyEmailRequest": {
+                "required": [
+                    "id",
+                    "hash"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "hash": {
+                        "type": "string",
+                        "example": "abcdef123456"
+                    }
+                },
+                "type": "object"
+            },
+            "ResendVerificationRequest": {
+                "required": [
+                    "email"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    }
+                },
+                "type": "object"
+            },
+            "VerifyEmailResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Email verified successfully."
+                    }
+                },
+                "type": "object"
+            },
+            "ResendVerificationResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Verification link sent to your email."
                     }
                 },
                 "type": "object"
