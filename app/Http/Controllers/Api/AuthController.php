@@ -100,6 +100,37 @@ use Laravel\Sanctum\PersonalAccessToken;
  *     )
  * )
  *
+ * @OA\Schema(
+ *     schema="ForgotPasswordRequest",
+ *     type="object",
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     required={"email"}
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ResetPasswordRequest",
+ *     type="object",
+ *     @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+ *     @OA\Property(property="token", type="string", example="abcdef123456"),
+ *     @OA\Property(property="password", type="string", example="newpassword123"),
+ *     @OA\Property(property="password_confirmation", type="string", example="newpassword123"),
+ *     required={"email", "token", "password", "password_confirmation"}
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ForgotPasswordResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Password reset link sent to your email.")
+ * )
+ *
+ * @OA\Schema(
+ *     schema="ResetPasswordResponse",
+ *     type="object",
+ *     @OA\Property(property="success", type="boolean", example=true),
+ *     @OA\Property(property="message", type="string", example="Password reset successfully. You can now login with your new password.")
+ * )
+ *
  * @OA\Tag(
  *     name="Authentication",
  *     description="API Endpoints for User Authentication"
@@ -265,5 +296,61 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'Logout successful',
         ]);
+    }
+    
+    /**
+     * @OA\Post(
+     *      path="/api/auth/forgot-password",
+     *      operationId="forgotPassword",
+     *      tags={"Authentication"},
+     *      summary="Forgot Password",
+     *      description="Send password reset link to user's email",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/ForgotPasswordRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ForgotPasswordResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+     *      )
+     * )
+     */
+    public function forgotPassword()
+    {
+        // Implementation is in routes/api.php
+    }
+    
+    /**
+     * @OA\Post(
+     *      path="/api/auth/reset-password",
+     *      operationId="resetPassword",
+     *      tags={"Authentication"},
+     *      summary="Reset Password",
+     *      description="Reset user's password using token",
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(ref="#/components/schemas/ResetPasswordRequest")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/ResetPasswordResponse")
+     *      ),
+     *      @OA\Response(
+     *          response=422,
+     *          description="Validation Error",
+     *          @OA\JsonContent(ref="#/components/schemas/ValidationErrorResponse")
+     *      )
+     * )
+     */
+    public function resetPassword()
+    {
+        // Implementation is in routes/api.php
     }
 }

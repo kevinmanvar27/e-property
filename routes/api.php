@@ -227,6 +227,54 @@ Route::middleware('api')->group(function () {
     Route::post('/wishlist', [WishlistController::class, 'store'])->middleware('auth:sanctum');
     Route::delete('/wishlist/{propertyId}', [WishlistController::class, 'destroy'])->middleware('auth:sanctum');
 
-
+    // Password Reset API Routes
+    Route::post('/auth/forgot-password', function (Request $request) {
+        $request->validate(['email' => 'required|email|exists:users']);
+        
+        $status = \Illuminate\Support\Facades\Password::sendResetLink(
+            $request->only('email')
+        );
+        
+        if ($status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset link sent to your email.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to send reset link. Please try again.'
+            ], 422);
+        }
+    })->middleware('guest')->name('api.password.email');
+    
+    Route::post('/auth/reset-password', function (Request $request) {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email|exists:users',
+            'password' => 'required|min:8|confirmed',
+        ]);
+        
+        $status = \Illuminate\Support\Facades\Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => \Illuminate\Support\Facades\Hash::make($password)
+                ])->save();
+            }
+        );
+        
+        if ($status === \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully. You can now login with your new password.'
+            ]);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to reset password. Please try again.'
+            ], 422);
+        }
+    })->middleware('guest')->name('api.password.reset');
 
 });

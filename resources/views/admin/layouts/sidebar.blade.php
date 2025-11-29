@@ -9,7 +9,7 @@
         <div>
             @if($logoPath)
                 <!-- Full logo when sidebar is expanded -->
-                <img src="{{ safe_asset('storage/' . $logoPath, 'assets/images/logo-img.png') }}" class="logo-icon" alt="logo icon" id="full-logo">
+                <img src="{{ safe_asset('storage/' . $logoPath, 'assets/images/logo-img.png') }}" class="logo-icon" alt="logo icon" id="full-logo" style="width: 55px;">
                 <!-- Favicon when sidebar is collapsed -->
                 <img src="{{ $faviconPath ? safe_asset('storage/' . $faviconPath, 'assets/images/favicon-32x32.png') : asset('assets/images/favicon-32x32.png') }}" class="logo-icon" alt="favicon" id="favicon-logo">
             @else
