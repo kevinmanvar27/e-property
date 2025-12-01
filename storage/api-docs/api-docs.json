@@ -431,6 +431,68 @@
                 ]
             }
         },
+        "/api/contact-us": {
+            "post": {
+                "tags": [
+                    "Contact Us"
+                ],
+                "summary": "Submit Contact Form",
+                "description": "Submit contact form data and send emails",
+                "operationId": "contactUs",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ContactRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful submission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContactValidationErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "There was an error submitting your form. Please try again later."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/house": {
             "get": {
                 "tags": [
@@ -9595,6 +9657,127 @@
                 },
                 "type": "object"
             },
+            "ContactRequest": {
+                "required": [
+                    "username",
+                    "email",
+                    "subject",
+                    "message"
+                ],
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "user@example.com"
+                    },
+                    "phone": {
+                        "type": "string",
+                        "example": "1234567890"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "example": "Inquiry about properties"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "I would like to know more about your properties."
+                    }
+                },
+                "type": "object"
+            },
+            "ContactResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Thank you for contacting us. We will get back to you soon."
+                    },
+                    "data": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "John Doe"
+                            },
+                            "email": {
+                                "type": "string",
+                                "format": "email",
+                                "example": "user@example.com"
+                            },
+                            "phone": {
+                                "type": "string",
+                                "example": "1234567890"
+                            },
+                            "subject": {
+                                "type": "string",
+                                "example": "Inquiry about properties"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "I would like to know more about your properties."
+                            },
+                            "status": {
+                                "type": "string",
+                                "example": "pending"
+                            },
+                            "created_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2023-01-01T00:00:00.000000Z"
+                            },
+                            "updated_at": {
+                                "type": "string",
+                                "format": "date-time",
+                                "example": "2023-01-01T00:00:00.000000Z"
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ContactValidationErrorResponse": {
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "Validation failed"
+                    },
+                    "errors": {
+                        "properties": {
+                            "username": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": "The username field is required."
+                                }
+                            },
+                            "email": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "example": "The email must be a valid email address."
+                                }
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
             "Country": {
                 "properties": {
                     "id": {
@@ -10076,6 +10259,10 @@
         {
             "name": "Global Search",
             "description": "API Endpoints for Global Property Search"
+        },
+        {
+            "name": "Contact Us",
+            "description": "API Endpoints for Contact Form"
         },
         {
             "name": "House Properties",

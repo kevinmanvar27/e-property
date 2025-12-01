@@ -331,4 +331,7 @@ Route::middleware('api')->group(function () {
         ]);
     })->middleware('guest')->name('api.verification.send');
 
+    // Contact Us API Route
+    Route::post('/contact-us', [App\Http\Controllers\Api\ContactUsApiController::class, 'store'])->name('api.contact-us.store');
+
 });
