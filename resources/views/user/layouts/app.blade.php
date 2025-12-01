@@ -74,7 +74,7 @@
             <div class="menu-backdrop"></div>
             <div class="close-btn"><i class="fas fa-times"></i></div>
             <nav class="menu-box">
-                <div class="nav-logo"><a href="{{ route('home') }}"><img src="/user/assets/images/logo.png" alt="Logo" title=""></a></div>
+                <div class="nav-logo"><a href="{{ route('home') }}"><img src="/user/assets/images/logo.png" alt="Logo" class="main-header-logo" title=""></a></div>
                 <div class="menu-outer"><!-- Dynamic menu content will be inserted here --></div>
                 <div class="social-links">
                     <ul class="clearfix">

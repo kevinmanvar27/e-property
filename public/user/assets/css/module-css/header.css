@@ -3,7 +3,7 @@
 
 .header-upper{
   position: relative;
-  background: var(--theme-color);
+  background: white;
   padding: 25px 0px;
 }
 
@@ -78,6 +78,8 @@
 
 .header-upper .search-area .search-box{
   width: 100%;
+  border: 2px solid var(--theme-color);
+  border-radius: 50px;
 }
 
 .header-upper .search-area .search-box .form-group{
@@ -143,7 +145,7 @@
   display: inline-block;
   font-size: 24px;
   line-height: 18px;
-  color: #fff;
+  color: var(--theme-color);
   font-weight: 700;
 }
 
@@ -203,6 +205,7 @@
 
 .main-header .header-lower{
   box-shadow: 0px 4px 4px 0px #0000000D;
+  background: var(--theme-color);
 }
 
 .main-header .outer-box{
@@ -210,7 +213,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
+} 
 
 .main-header .outer-box .category-box{
   position: relative;
@@ -511,7 +514,7 @@
   position: relative;
   display: inline-block;
   font-size: 18px;
-  color: var(--title-color);
+  color: #fff;
 }
 
 .main-header .menu-right-content .info-list li a:hover{
@@ -584,7 +587,7 @@
   font-weight:500;
   font-family: var(--text-font);
   opacity:1;
-  color: var(--title-color);
+  color: #ffffff;
   z-index:1;
   -webkit-transition:all 500ms ease;
   -moz-transition:all 500ms ease;
@@ -599,7 +602,7 @@
 
 .main-menu .navigation > li.current > a,
 .main-menu .navigation > li:hover > a{
-  
+  color: #ffffff;
 }
 
 .main-menu .navigation > li.dropdown > a:before{
@@ -678,7 +681,8 @@
 
 .main-menu .navigation > li > ul > li > a:hover,
 .main-menu .navigation > li > .megamenu li > a:hover{
-  letter-spacing: 1px;
+  letter-spacing: 0px;
+  color: var(--title-color);
 }
 
 .main-menu .navigation > li > ul > li:last-child > a,
@@ -757,7 +761,8 @@
 }
 
 .main-menu .navigation > li > ul > li > ul > li > a:hover{
-  padding-left: 35px;
+  padding-left: 25px;
+  color: #fff;
 }
 
 .main-menu .navigation > li > ul > li > ul > li.dropdown > a:after{
@@ -892,9 +897,8 @@
 
 .mobile-menu .nav-logo{
   position:relative;
-  padding:50px 25px;
+  padding:30px 15px;
   text-align:left;  
-  padding-bottom: 100px;
 }
 
 .mobile-menu-visible{
@@ -959,7 +963,8 @@
 .mobile-menu .close-btn{
   position: absolute;
   right: 25px;
-  top: 10px;
+  /* top: 10px; */
+  padding: 35px 15px;
   line-height: 30px;
   width: 24px;
   text-align: center;
@@ -1958,7 +1963,7 @@ div#mCSB_1_container{
 }
 
 .header-style-nine .main-menu .navigation > li > a{
-  color: #fff;
+  color: #ffffff;
   padding-right: 0px;
 }
 
@@ -1986,10 +1991,31 @@ div#mCSB_1_container{
 }
 
 .header-style-nine .sticky-header{
-  background: var(--secondary-color);
+  background: #000000;
   border-bottom: 1px solid rgba(255, 255, 255, 0.10);
 }
 
+/* Added styles for sticky header navigation */
+.sticky-header .main-menu .navigation > li > a{
+  color: #ffffff; /* White color for sticky header links */
+}
+
+.sticky-header .main-menu .navigation > li.current > a,
+.sticky-header .main-menu .navigation > li:hover > a{
+  color: #ffffff; /* Ensure white color on hover */
+  /* Removed any additional hover effects */
+}
+
+.sticky-header .main-menu .navigation > li > ul > li > a:hover,
+.sticky-header .main-menu .navigation > li > .megamenu li > a:hover{
+  letter-spacing: 0px; /* Removed letter spacing on hover */
+  color: var(--title-color); /* Reset to default color */
+}
+
+.sticky-header .main-menu .navigation > li > ul > li > ul > li > a:hover{
+  padding-left: 25px; /* Reset padding on hover */
+  color: #fff; /* Keep white color */
+}
 
 /** header-style-ten **/
 
@@ -2127,6 +2153,10 @@ div#mCSB_1_container{
   margin-left: 110px;
 }
 
+.main-header-logo{
+  max-width: 180px;
+  max-height: 80px;
+}
 
 /** responsive-css **/
 
@@ -2144,6 +2174,11 @@ div#mCSB_1_container{
 
   .header-style-six .outer-box .right-column .search-form{
     display: none;
+  }
+
+  .main-header-logo{
+    max-width: 150px;
+    max-height: 50px;
   }
 
 }
@@ -2188,7 +2223,7 @@ div#mCSB_1_container{
   }
 
   .main-header .header-lower{
-    padding: 15px 0px;
+    /* padding: 15px 0px; */
   }
 
   .header-style-four .location-box{
@@ -2214,6 +2249,11 @@ div#mCSB_1_container{
 
   .header-style-eight .header-top-two .right-column{
     justify-content: center;
+  }
+
+  .main-header-logo{
+    max-width: 150px;
+    max-height: 50px;
   }
 }
 
@@ -2255,6 +2295,10 @@ div#mCSB_1_container{
     padding-left: 0px;
   }
 
+  .main-header-logo{
+    max-width: 150px;
+    max-height: 50px;
+  }
 }
 
 @media only screen and (max-width: 767px){
@@ -2303,6 +2347,10 @@ div#mCSB_1_container{
     margin-bottom: 20px;
   }
 
+  .main-header-logo{
+    max-width: 150px;
+    max-height: 50px;
+  }
 }
 
 @media only screen and (max-width: 599px){

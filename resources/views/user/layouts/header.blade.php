@@ -5,7 +5,7 @@
         <div class="large-container">
             <div class="upper-inner">
                 <div class="logo-and-toggle">
-                    <figure class="logo-box"><a href="{{ route('home') }}"><img src="{{ asset('assets/images/products/logo.png') }}" alt="Logo" style="max-width: 180px; max-height: 80px;"></a></figure>
+                    <figure class="logo-box"><a href="{{ route('home') }}"><img src="{{ asset('assets/images/products/logo.png') }}" alt="Logo" class="main-header-logo"></a></figure>
                     <!--Mobile Navigation Toggler-->
                     <div class="mobile-nav-toggler">
                         <i class="icon-bar"></i>
@@ -39,7 +39,7 @@
                 <div class="right-column">
                     @if(Auth::check())
                     <div class="support-box">
-                        <div class="icon-box"><img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : asset('assets/images/products/placeholder.png') }}" style="max-width: 40px; max-height: 40px;"></div>
+                        <figure class="logo-box"><a href="{{ route('home') }}"><img src="{{ asset('assets/images/products/logo.png') }}" alt="Logo" class="main-header-logo"></a></figure>
                         <a href="{{ route('user-profile') }}">{{ ucwords(Auth::user()->name) ?? '' }}</a>
                         <p>{{ Auth::user()->email ?? '' }}</p>
                     </div>
@@ -122,6 +122,14 @@
     <div class="sticky-header">
         <div class="auto-container">
             <div class="outer-box">
+                @php
+                    $logoPath = \App\Models\Setting::get('general', 'logo');
+                @endphp
+                @if($logoPath)
+                    <figure style="padding: 10px 0;"><img src="{{ asset('storage/' . $logoPath) }}" alt="Logo" style="max-width: 150px;max-height: 50px;background-color: white;border-radius: 100%; padding:3px"></figure>
+                @else
+                    <figure><img src="{{ asset('assets/images/products/logo.png') }}" alt="Logo" style="max-width: 180px; max-height: 80px;"></figure>
+                @endif
                 <div class="menu-area">
                     <nav class="main-menu clearfix">
                         <!--Keep This Empty / Menu will come through Javascript-->
