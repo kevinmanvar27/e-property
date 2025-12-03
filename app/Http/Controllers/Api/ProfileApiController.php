@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage; // Import the Storage facade
+use Illuminate\Support\Facades\Validator;
+
 
 /**
  * @OA\Schema(
@@ -142,12 +145,14 @@ class ProfileApiController extends Controller
      *      )
      * )
      */
+
     public function update(Request $request)
     {
-        try {
-            $user = $request->user();
+        $user = $request->user();
 
-            $request->validate([
+        try {
+            // Validation
+            $validator = Validator::make($request->all(), [
                 'name' => 'required|string|max:255',
                 'email' => [
                     'required',
@@ -155,23 +160,54 @@ class ProfileApiController extends Controller
                     'max:255',
                     Rule::unique('users')->ignore($user->id),
                 ],
-                'contact' => 'nullable|string|max:20', // Changed from 'phone' to 'contact' to match User model
+                'contact' => 'nullable|string|max:20',
+                'dob' => 'nullable|date',
+                'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
             ]);
 
-            // Updated to use 'contact' instead of 'phone' to match User model
-            $user->update($request->only(['name', 'email', 'contact']));
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors'  => $validator->errors()
+                ], 422);
+            }
+
+            // Update fields
+            $user->fill($request->only(['name', 'email', 'contact', 'dob']));
+
+            // Handle photo
+            if ($request->hasFile('photo')) {
+
+                // Delete old photo
+                if ($user->photo) {
+                    Storage::disk('public')->delete($user->photo);
+                }
+
+                $photo = $request->file('photo');
+                $filename = time() . '.' . $photo->getClientOriginalExtension();
+
+                // Store photo inside photos/ folder
+                Storage::disk('public')->putFileAs('photos', $photo, $filename);
+
+                // Store path like photos/xxxx.jpg
+                $user->photo = 'photos/' . $filename;
+            }
+
+            $user->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Profile updated successfully',
-                'data' => $user->fresh(),
             ]);
+
         } catch (\Exception $e) {
-            Log::error('Error updating profile: ' . $e->getMessage());
+
+            Log::error('Error updating profile (API): ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
-                'message' => 'An error occurred while updating the profile. Please try again.',
+                'message' => $e->getMessage()
             ], 500);
         }
     }
