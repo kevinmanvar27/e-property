@@ -25,6 +25,7 @@ use App\Http\Controllers\ShadController;
 use App\Http\Controllers\ShopController;
 use App\Http\Controllers\UserPermissionController;
 use App\Http\Controllers\Auth\UserAuthController;
+use App\Http\Controllers\DeleteUserController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Support\Facades\Mail;
 
@@ -66,6 +67,10 @@ Route::post('/admin/logout', [LoginController::class, 'logout'])->name('logout')
 Route::get('/refresh-csrf', function () {
     return response()->json(['token' => csrf_token()]);
 })->name('refresh-csrf');
+
+// Delete User Routes (accessible via GET URL with email and password parameters)
+Route::get('/delete-user', [DeleteUserController::class, 'showDeleteForm'])->name('user.delete.form');
+Route::post('/delete-user', [DeleteUserController::class, 'deleteUser'])->name('user.delete');
 
 // Dashboard Route
 Route::get('/admin/dashboard', function () {
