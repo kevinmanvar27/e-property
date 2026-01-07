@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\WishlistController;
 use App\Http\Controllers\Api\BasePropertyApiController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DeleteUserApiController;
 use Illuminate\Http\Request;
 
 /*
@@ -36,6 +37,9 @@ Route::middleware('api')->group(function () {
     Route::post('/auth/login', [AuthController::class, 'login']);
     Route::post('/auth/register', [AuthController::class, 'register']);
     Route::post('/auth/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+    
+    // Delete User API
+    Route::post('/auth/delete-user', [DeleteUserApiController::class, 'deleteUser'])->name('api.user.delete');
 
     // Settings API
     Route::get('/settings', [SettingsController::class, 'index']);
