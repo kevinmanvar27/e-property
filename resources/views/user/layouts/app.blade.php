@@ -62,6 +62,96 @@
 <!-- Toastr CSS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
 
+<!-- Mobile Auth Buttons Styles -->
+<style>
+    .mobile-auth-buttons {
+        padding: 20px 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 20px;
+    }
+    
+    .mobile-user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-user-info .user-avatar {
+        font-size: 40px;
+        color: #F5B020;
+    }
+    
+    .mobile-user-info .user-details {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .mobile-user-info .user-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #ffffff;
+    }
+    
+    .mobile-user-info .user-email {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .mobile-auth-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+    
+    .mobile-auth-btn:last-child {
+        margin-bottom: 0;
+    }
+    
+    .mobile-auth-btn.login-btn {
+        background-color: #003085;
+        color: #ffffff;
+        border: 2px solid #003085;
+    }
+    
+    .mobile-auth-btn.login-btn:hover {
+        background-color: transparent;
+        color: #003085;
+    }
+    
+    .mobile-auth-btn.profile-btn {
+        background-color: #F5B020;
+        color: #003085;
+        border: 2px solid #F5B020;
+    }
+    
+    .mobile-auth-btn.profile-btn:hover {
+        background-color: transparent;
+        color: #F5B020;
+    }
+    
+    .mobile-auth-btn.logout-btn {
+        background-color: transparent;
+        color: #ff4444;
+        border: 2px solid #ff4444;
+    }
+    
+    .mobile-auth-btn.logout-btn:hover {
+        background-color: #ff4444;
+        color: #ffffff;
+    }
+</style>
+
 </head>
 
 <!-- page wrapper -->
@@ -76,6 +166,35 @@
             <nav class="menu-box">
                 <div class="nav-logo"><a href="{{ route('home') }}"><img src="/user/assets/images/logo.png" alt="Logo" class="main-header-logo" title=""></a></div>
                 <div class="menu-outer"><!-- Dynamic menu content will be inserted here --></div>
+                
+                <!-- Mobile Auth Buttons -->
+                <div class="mobile-auth-buttons">
+                    @if(Auth::check())
+                        <div class="mobile-user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name">{{ ucwords(Auth::user()->name) ?? '' }}</span>
+                                <span class="user-email">{{ Auth::user()->email ?? '' }}</span>
+                            </div>
+                        </div>
+                        <a href="{{ route('user-profile') }}" class="mobile-auth-btn profile-btn">
+                            <i class="fas fa-user me-2"></i> My Profile
+                        </a>
+                        <form id="mobile-logout-form" action="{{ route('user-logout') }}" method="POST" style="display: none;">
+                            @csrf
+                        </form>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('mobile-logout-form').submit();" class="mobile-auth-btn logout-btn">
+                            <i class="fas fa-sign-out-alt me-2"></i> Logout
+                        </a>
+                    @else
+                        <a href="{{ route('user-login') }}" class="mobile-auth-btn login-btn">
+                            <i class="fas fa-sign-in-alt me-2"></i> Login
+                        </a>
+                    @endif
+                </div>
+                
                 <div class="social-links">
                     <ul class="clearfix">
                         <li><a href="#"><span class="fab fa-twitter"></span></a></li>

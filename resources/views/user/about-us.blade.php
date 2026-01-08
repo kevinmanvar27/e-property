@@ -49,17 +49,17 @@
                                 At RProperty, we help you discover not just a property — but your true property destiny. With over 20 years of local market expertise, our dedicated team of real estate professionals is committed to making your property search, buying, and selling journey smooth, transparent, and stress-free.
                             </p>
                             <p>
-                                Based in Rajkot, Gujarat, we’ve built our reputation on trust, integrity, and personalized service, proudly serving thousands of happy clients across the region and beyond. Whether you’re a first-time homebuyer, an investor, or a business owner looking for the perfect commercial space, we’re here to guide you every step of the way.
+                                Based in Rajkot, Gujarat, we've built our reputation on trust, integrity, and personalized service, proudly serving thousands of happy clients across the region and beyond. Whether you're a first-time homebuyer, an investor, or a business owner looking for the perfect commercial space, we're here to guide you every step of the way.
                             </p>
                             <p>
                             <p>
                                 Our platform offers verified property listings — from dream homes and premium plots to high-potential commercial and investment properties. Each listing is carefully vetted to ensure authenticity and value, giving you confidence in every decision you make.
                             </p>
                             <p>
-                                What sets RProperty apart is our end-to-end support — from your first inquiry to property visits, negotiation, legal documentation, and final closing. But our relationship doesn’t end there; we continue to assist you beyond the sale, offering advice, after-sale services, and market insights to help you make the most of your investment.
+                                What sets RProperty apart is our end-to-end support — from your first inquiry to property visits, negotiation, legal documentation, and final closing. But our relationship doesn't end there; we continue to assist you beyond the sale, offering advice, after-sale services, and market insights to help you make the most of your investment.
                             </p>
                             <p>
-                                With RProperty, you’re not just finding a property — you’re finding peace of mind. Experience real estate the way it should be: simple, honest, and empowering.
+                                With RProperty, you're not just finding a property — you're finding peace of mind. Experience real estate the way it should be: simple, honest, and empowering.
                             </p>
                         </div>
                         <div class="inner-box">
@@ -93,12 +93,12 @@
 <!-- video intro (optional, can use for "property video tours" if available) -->
 <section class="video-style-two">
     <div class="bg-layer parallax-bg" data-parallax='{"y": 100}' style="background-image: url('{{ asset('assets/images/slider-images/slider-4.jpg') }}');"></div>
-    <span class="big-text">RProperty</span>
+    <span class="big-text rproperty-big-text">RProperty</span>
     <div class="auto-container">
         <div class="inner-container">
             <div class="content-box">
                 <h2>Contact Information</h2>
-                <h5 class="text-white mb-4">Have questions or want to work together? Let’s start a conversation!</h5>
+                <h5 class="text-white mb-4">Have questions or want to work together? Let's start a conversation!</h5>
                 <a href="{{ route('contact') }}" class="theme-btn btn-one">Contact Us<span></span><span></span><span></span><span></span></a>
             </div>
         </div>
@@ -123,7 +123,7 @@
                         <li><i class="icon-11"></i></li>
                         <li class="light"><i class="icon-11"></i></li>
                     </ul>
-                    <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                    <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                     <div class="author-box">
                         <figure class="thumb-box">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -148,7 +148,7 @@
                         <li><i class="icon-11"></i></li>
                         <li class="light"><i class="icon-11"></i></li>
                     </ul>
-                    <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                    <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                     <div class="author-box">
                         <figure class="thumb-box">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -173,7 +173,7 @@
                         <li><i class="icon-11"></i></li>
                         <li class="light"><i class="icon-11"></i></li>
                     </ul>
-                    <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                    <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                     <div class="author-box">
                         <figure class="thumb-box">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -196,20 +196,12 @@
 <!-- apps-section -->
 <section class="apps-section mb-5">
     <div class="large-container">
-        <div class="inner-container d-flex justify-content-between align-items-center">
+        <div class="inner-container app-download-container">
             <div class="bg-layer" style="background-image: url('{{ asset('assets/images/slider-images/slider-3.jpg') }}');"></div>
-            <!-- <figure class="image-layer p_absolute r_170 b_0"><img src="{{ asset('assets/images/slider-images/slider-3.jpg') }}" alt=""></figure> -->
-            <div class="content-box">
+            <div class="content-box app-content-box">
                 <h2>Download the RProperty Mobile App</h2>
-                <!-- <div class="btn-box">
-                    <a href="#" class="apple-store">
-                        <img src="{{ asset('assets/images/icons/mac.png') }}" alt="">
-                        <span>Download on</span>
-                        App Store
-                    </a>
-                </div> -->
             </div>
-            <div class="content-box">
+            <div class="content-box app-btn-box">
                 <div class="btn-box">
                     <a href="#" class="play-store">
                         <img src="{{ asset('assets/images/icons/play.png') }}" alt="">
@@ -247,6 +239,130 @@
     </div>
 </section>
 <!-- instagram-section end -->
+
+<style>
+/* RProperty Big Text Responsive Styles */
+.rproperty-big-text {
+    font-size: clamp(3rem, 15vw, 12rem) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+@media (max-width: 991px) {
+    .rproperty-big-text {
+        display: none !important;
+    }
+    
+    .video-style-two .content-box h2 {
+        font-size: 1.5rem;
+    }
+    
+    .video-style-two .content-box h5 {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-style-two .content-box h2 {
+        font-size: 1.2rem;
+    }
+    
+    .video-style-two .content-box h5 {
+        font-size: 0.8rem;
+    }
+}
+
+/* App Download Section Responsive Styles */
+.apps-section .inner-container.app-download-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 50px;
+    position: relative;
+}
+
+.apps-section .app-content-box {
+    flex: 1 1 auto;
+    min-width: 250px;
+}
+
+.apps-section .app-content-box h2 {
+    font-size: clamp(1.2rem, 3vw, 2rem);
+    margin: 0;
+    line-height: 1.3;
+}
+
+.apps-section .app-btn-box {
+    flex: 0 0 auto;
+}
+
+.apps-section .play-store {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+@media (max-width: 991px) {
+    .apps-section .inner-container.app-download-container {
+        padding: 30px 30px;
+        gap: 20px;
+    }
+    
+    .apps-section .app-content-box h2 {
+        font-size: clamp(1.1rem, 2.5vw, 1.6rem);
+    }
+}
+
+@media (max-width: 767px) {
+    .apps-section .inner-container.app-download-container {
+        flex-direction: column;
+        text-align: center;
+        padding: 25px 20px;
+        gap: 20px;
+    }
+    
+    .apps-section .app-content-box {
+        width: 100%;
+        min-width: unset;
+    }
+    
+    .apps-section .app-content-box h2 {
+        font-size: 1.3rem;
+    }
+    
+    .apps-section .app-btn-box {
+        width: 100%;
+    }
+    
+    .apps-section .play-store {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .apps-section .inner-container.app-download-container {
+        padding: 20px 15px;
+    }
+    
+    .apps-section .app-content-box h2 {
+        font-size: 1.1rem;
+    }
+    
+    .apps-section .play-store {
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+    
+    .apps-section .play-store img {
+        width: 24px;
+        height: 24px;
+    }
+}
+</style>
 @endsection
 
 @push('scripts')

@@ -10,8 +10,8 @@
             <div class="bg-layer" style="background-image: url('{{ asset('assets/images/slider-images/slider-1.jpg') }}');"></div>
             <div class="content-box">
               <span class="upper-text text-white">Featured Property</span>
-              <h2 class="text-white"><span class="text-white">Discover Premium Living</span> in Every Corner</h2>
-              <h3 class="text-white">Explore top-rated homes & spaces across the city</h3>
+              <h2 class="text-white hero-title"><span class="text-white">Discover Premium Living</span><span class="text-white">in Every Corner</span></h2>
+              <h3 class="text-white hero-subtitle">Explore top-rated homes & spaces across the city</h3>
               <div class="btn-box"><a href="{{ route('properties') }}" class="theme-btn btn-one">Explore Now<span></span><span></span><span></span><span></span></a></div>
             </div>
           </div>
@@ -20,8 +20,8 @@
             <div class="bg-layer" style="background-image: url('{{ asset('assets/images/slider-images/slider-2.jpg') }}');"></div>
             <div class="content-box">
               <span class="upper-text text-white">Property Insights</span>
-              <h2 class="text-white"><span class="text-white">Find Your Perfect Space</span> to Call Home</h2>
-              <h3 class="text-white">From apartments to villas — we cover it all</h3>
+              <h2 class="text-white hero-title"><span class="text-white">Find Your Perfect Space</span><span class="text-white">to Call Home</span></h2>
+              <h3 class="text-white hero-subtitle">From apartments to villas — we cover it all</h3>
               <div class="btn-box"><a href="{{ route('about-us') }}" class="theme-btn btn-one">Learn More<span></span><span></span><span></span><span></span></a></div>
             </div>
           </div>
@@ -30,8 +30,8 @@
             <div class="bg-layer" style="background-image: url('{{ asset('assets/images/slider-images/slider-3.jpg') }}');"></div>
             <div class="content-box">
               <span class="upper-text text-white">RProperty Guide</span>
-              <h2 class="text-white"><span class="text-white">Trusted Property Information</span> You Can Rely On</h2>
-              <h3 class="text-white">Detailed insights, locations, and trends — all in one place</h3>
+              <h2 class="text-white hero-title"><span class="text-white">Trusted Property Information</span><span class="text-white">You Can Rely On</span></h2>
+              <h3 class="text-white hero-subtitle">Detailed insights, locations, and trends — all in one place</h3>
               <div class="btn-box"><a href="{{ route('contact') }}" class="theme-btn btn-one">Get in Touch<span></span><span></span><span></span><span></span></a></div>
             </div>
           </div>
@@ -97,12 +97,12 @@
         <!-- video-style-two -->
           <section class="video-style-two">
               <div class="bg-layer parallax-bg" data-parallax='{"y": 100}' style="background-image: url('{{ asset('assets/images/slider-images/slider-4.jpg') }}');"></div>
-              <span class="big-text">RProperty</span>
+              <span class="big-text rproperty-big-text">RProperty</span>
               <div class="auto-container">
                   <div class="inner-container">
                       <div class="content-box">
                           <h2>Contact Information</h2>
-                          <h5 class="text-white mb-4">Have questions or want to work together? Let’s start a conversation!</h5>
+                          <h5 class="text-white mb-4">Have questions or want to work together? Let's start a conversation!</h5>
                           <a href="{{ route('contact') }}" class="theme-btn btn-one">Contact Us<span></span><span></span><span></span><span></span></a>
                       </div>
                   </div>
@@ -128,7 +128,7 @@
                             <li><i class="icon-11"></i></li>
                             <li class="light"><i class="icon-11"></i></li>
                         </ul>
-                        <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                        <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                         <div class="author-box">
                             <figure class="thumb-box">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -153,7 +153,7 @@
                             <li><i class="icon-11"></i></li>
                             <li class="light"><i class="icon-11"></i></li>
                         </ul>
-                        <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                        <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                         <div class="author-box">
                             <figure class="thumb-box">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -178,7 +178,7 @@
                             <li><i class="icon-11"></i></li>
                             <li class="light"><i class="icon-11"></i></li>
                         </ul>
-                        <p>“Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales”</p>
+                        <p>"Suspendisse est imperdiet pellentesque nulla vulputa te eu pharetra pharetra massa amet ac semper et pelle ntesque dolor tincidunt sodales"</p>
                         <div class="author-box">
                             <figure class="thumb-box">
                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="70" height="70">
@@ -207,6 +207,215 @@
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
+    }
+    
+    /* Hero Section Responsive Styles - Override base styles */
+    .banner-style-six .banner-carousel .content-box h2.hero-title {
+        font-size: 48px !important;
+        line-height: 1.2 !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        margin-bottom: 15px !important;
+    }
+    
+    .banner-style-six .banner-carousel .content-box h2.hero-title span {
+        display: inline;
+    }
+    
+    .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+        font-size: 20px !important;
+        line-height: 1.4 !important;
+        font-weight: 400 !important;
+        color: #fff !important;
+    }
+    
+    /* Desktop and large tablets (992px - 1199px) */
+    @media (max-width: 1199px) {
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 40px !important;
+            line-height: 1.25 !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 18px !important;
+        }
+    }
+    
+    /* Tablets landscape and smaller (max-width: 991px) */
+    @media (max-width: 991px) {
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 32px !important;
+            line-height: 1.3 !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h2.hero-title span {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 16px !important;
+        }
+        
+        .banner-style-six .content-box {
+            padding: 40px 30px !important;
+        }
+    }
+    
+    /* Tablet portrait - 820px and similar (max-width: 850px) */
+    @media (max-width: 850px) {
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 28px !important;
+            line-height: 1.3 !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 15px !important;
+            margin-bottom: 15px !important;
+        }
+        
+        .banner-style-six .content-box {
+            padding: 30px 25px !important;
+        }
+        
+        .banner-style-six .content-box .upper-text {
+            font-size: 11px !important;
+        }
+    }
+    
+    /* Large phones / small tablets (max-width: 767px) */
+    @media (max-width: 767px) {
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 24px !important;
+            line-height: 1.35 !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 14px !important;
+            margin-bottom: 12px !important;
+        }
+        
+        .banner-style-six .content-box {
+            padding: 25px 20px !important;
+        }
+        
+        .banner-style-six .btn-box .theme-btn {
+            padding: 10px 20px !important;
+            font-size: 14px !important;
+        }
+    }
+    
+    /* Medium phones (max-width: 600px) */
+    @media (max-width: 600px) {
+        .banner-style-six .slide-item {
+            height: 380px !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 20px !important;
+            line-height: 1.4 !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 13px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .banner-style-six .content-box {
+            padding: 20px 15px !important;
+        }
+        
+        .banner-style-six .content-box .upper-text {
+            font-size: 10px !important;
+            padding: 2px 10px !important;
+            margin-bottom: 10px !important;
+        }
+        
+        .banner-style-six .btn-box .theme-btn {
+            padding: 8px 16px !important;
+            font-size: 13px !important;
+        }
+    }
+    
+    /* Small phones (max-width: 480px) */
+    @media (max-width: 480px) {
+        .banner-style-six .slide-item {
+            height: 320px !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 18px !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 12px !important;
+        }
+        
+        .banner-style-six .content-box .upper-text {
+            font-size: 9px !important;
+        }
+        
+        .banner-style-six .btn-box .theme-btn {
+            padding: 7px 14px !important;
+            font-size: 12px !important;
+        }
+    }
+    
+    /* Very small phones (max-width: 375px) */
+    @media (max-width: 375px) {
+        .banner-style-six .slide-item {
+            height: 280px !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h2.hero-title {
+            font-size: 16px !important;
+        }
+        
+        .banner-style-six .banner-carousel .content-box h3.hero-subtitle {
+            font-size: 11px !important;
+        }
+        
+        .banner-style-six .content-box {
+            padding: 15px 10px !important;
+        }
+        
+        .banner-style-six .btn-box .theme-btn {
+            padding: 6px 12px !important;
+            font-size: 11px !important;
+        }
+    }
+    
+    /* RProperty Big Text Responsive Styles */
+    .rproperty-big-text {
+        font-size: clamp(3rem, 15vw, 12rem) !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+    }
+    
+    @media (max-width: 991px) {
+        .rproperty-big-text {
+            display: none !important;
+        }
+        
+        .video-style-two .content-box h2 {
+            font-size: 1.5rem;
+        }
+        
+        .video-style-two .content-box h5 {
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .video-style-two .content-box h2 {
+            font-size: 1.2rem;
+        }
+        
+        .video-style-two .content-box h5 {
+            font-size: 0.8rem;
+        }
     }
   </style>
 @endsection
