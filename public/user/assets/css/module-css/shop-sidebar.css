@@ -395,20 +395,66 @@
 }
 
 @media only screen and (max-width: 991px){
-  
+  .shop-sidebar {
+    margin-bottom: 30px;
+    padding: 30px 20px;
+  }
 }
 
 @media only screen and (max-width: 767px){
+  .shop-sidebar {
+    padding: 25px 15px;
+  }
 
+  .shop-sidebar .sidebar-widget .widget-title h4 {
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .shop-sidebar .check-box label {
+    font-size: 14px;
+  }
 }
 
 @media only screen and (max-width: 599px){
+  .shop-sidebar {
+    padding: 20px 12px;
+  }
 
+  .shop-sidebar .sidebar-widget {
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  .shop-sidebar .sidebar-widget .widget-title {
+    margin-bottom: 15px;
+  }
+
+  .shop-sidebar .sidebar-widget .widget-title h4 {
+    font-size: 16px;
+  }
 }
 
 @media only screen and (max-width: 499px){
+  .shop-sidebar {
+    padding: 15px 10px;
+  }
 
+  .shop-sidebar .check-box label {
+    font-size: 13px;
+    padding-left: 25px;
+  }
 
+  .shop-sidebar .check-box label:before {
+    width: 16px;
+    height: 16px;
+  }
+
+  .shop-sidebar .check-box label:after {
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+  }
 }
 
 

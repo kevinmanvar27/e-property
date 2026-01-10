@@ -1,5 +1,52 @@
 /* Responsive Css */
 
+/* ============================================
+   STICKY HEADER - All Devices
+   ============================================ */
+.main-header {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 999 !important;
+  background: #fff !important;
+}
+
+/* ============================================
+   FULL SCREEN DRAWER/MOBILE MENU - All Devices
+   ============================================ */
+.mobile-menu {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+.mobile-menu .nav-logo {
+  width: 100% !important;
+}
+
+.mobile-menu .menu-box {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.mobile-menu .menu-outer {
+  height: calc(100vh - 80px) !important;
+  height: calc(100dvh - 80px) !important;
+  overflow-y: auto !important;
+}
+
+.category-menu {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+}
+
+.category-menu .menu-box {
+  width: 100% !important;
+  height: 100% !important;
+}
+
 
 @media only screen and (max-width: 1749px){
 
@@ -103,6 +150,155 @@
     border: none;
   }
 
+  /* ============================================
+     1. HERO SECTION - Vertical Middle Alignment
+     ============================================ */
+  .banner-style-six .slide-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .banner-style-six .content-box {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 30px 20px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .banner-style-six .content-box .upper-text {
+    text-align: center !important;
+  }
+
+  .banner-style-six .content-box h2.hero-title {
+    text-align: center !important;
+  }
+
+  .banner-style-six .content-box h2.hero-title span {
+    display: block !important;
+    text-align: center !important;
+  }
+
+  .banner-style-six .content-box h3.hero-subtitle {
+    text-align: center !important;
+  }
+
+  .banner-style-six .content-box .btn-box {
+    text-align: center !important;
+    display: flex !important;
+    justify-content: center !important;
+  }
+
+  /* ============================================
+     2. CONTACT INFORMATION SECTION - Center All
+     ============================================ */
+  .video-style-two {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 400px !important;
+  }
+
+  .video-style-two .auto-container {
+    width: 100% !important;
+  }
+
+  .video-style-two .inner-container {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    max-width: 100% !important;
+  }
+
+  .video-style-two .content-box {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    max-width: 100% !important;
+    padding: 0 20px !important;
+  }
+
+  .video-style-two .content-box h2 {
+    text-align: center !important;
+    font-size: 1.8rem !important;
+    margin-bottom: 15px !important;
+  }
+
+  .video-style-two .content-box h5 {
+    text-align: center !important;
+    font-size: 1rem !important;
+  }
+
+  .video-style-two .video-btn {
+    display: none !important;
+  }
+
+  /* ============================================
+     4. SHOP PAGE FILTER - Proper Design
+     ============================================ */
+  .shop-page-section .our-shop .item-shorting {
+    flex-direction: column !important;
+    gap: 15px !important;
+    padding: 15px !important;
+  }
+
+  .shop-page-section .our-shop .item-shorting .left-column {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  .shop-page-section .our-shop .item-shorting .right-column {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  .shop-page-section .our-shop .item-shorting .right-column .short-box {
+    margin-right: 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .shop-page-section .our-shop .item-shorting .right-column .menu-box {
+    width: 100% !important;
+    justify-content: center !important;
+    margin-top: 10px !important;
+  }
+
+  /* ============================================
+     5. CONTACT FORM - Proper Field Sizes
+     ============================================ */
+  .contact-section .form-inner {
+    padding: 30px 20px !important;
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+  }
+
+  .contact-section .form-inner .form-group input[type='text'],
+  .contact-section .form-inner .form-group input[type='email'],
+  .contact-section .form-inner .form-group textarea {
+    width: 100% !important;
+    padding: 12px 15px !important;
+    font-size: 14px !important;
+  }
+
+  .contact-section .form-inner .form-group textarea {
+    min-height: 120px !important;
+  }
+
+  .contact-section .form-inner .form-group .theme-btn {
+    width: 100% !important;
+    text-align: center !important;
+  }
 
 }
 
@@ -125,6 +321,150 @@
     width: 50%;
   }
 
+  /* ============================================
+     1. HERO SECTION - Vertical Middle (Mobile)
+     ============================================ */
+  .banner-style-six .slide-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 350px !important;
+  }
+
+  .banner-style-six .content-box {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 20px 15px !important;
+  }
+
+  /* ============================================
+     2. CONTACT INFORMATION - Center (Mobile)
+     ============================================ */
+  .video-style-two {
+    padding: 60px 0 !important;
+    min-height: auto !important;
+  }
+
+  .video-style-two .content-box h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .video-style-two .content-box h5 {
+    font-size: 0.9rem !important;
+  }
+
+  /* ============================================
+     4. SHOP FILTER - Mobile Optimization
+     ============================================ */
+  .shop-page-section .item-shorting {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 15px 10px !important;
+  }
+
+  .shop-page-section .item-shorting .left-column {
+    margin-bottom: 15px !important;
+  }
+
+  .shop-page-section .item-shorting .right-column {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .shop-page-section .item-shorting .right-column .short-box {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .shop-page-section .item-shorting .right-column .menu-box {
+    justify-content: center !important;
+  }
+
+  /* ============================================
+     5. CONTACT FORM - Mobile Field Sizes
+     ============================================ */
+  .contact-section .row {
+    margin: 0 !important;
+  }
+
+  .contact-section .form-inner {
+    padding: 25px 15px !important;
+    border-radius: 10px !important;
+  }
+
+  .contact-section .form-inner .row {
+    margin: 0 -5px !important;
+  }
+
+  .contact-section .form-inner .form-group {
+    padding: 0 5px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .contact-section .form-inner .form-group input[type='text'],
+  .contact-section .form-inner .form-group input[type='email'],
+  .contact-section .form-inner .form-group textarea {
+    width: 100% !important;
+    height: 45px !important;
+    padding: 10px 15px !important;
+    font-size: 14px !important;
+    border-radius: 25px !important;
+  }
+
+  .contact-section .form-inner .form-group textarea {
+    height: auto !important;
+    min-height: 100px !important;
+    border-radius: 15px !important;
+  }
+
+  .contact-section .form-inner .form-group label {
+    font-size: 14px !important;
+    margin-bottom: 5px !important;
+  }
+
+  /* Contact Info Section on Contact Page */
+  .contact-section .map-column .large-container {
+    padding: 0 15px !important;
+  }
+
+  .contact-section .map-column .sec-title {
+    text-align: center !important;
+  }
+
+  .contact-section .map-column .sec-title h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .info-block-one .inner-box {
+    padding: 25px 20px 25px 20px !important;
+    text-align: center !important;
+  }
+
+  .info-block-one .inner-box .icon-box {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    margin: 0 auto 15px auto !important;
+    display: block !important;
+  }
+
+  .info-block-one .inner-box h4 {
+    text-align: center !important;
+  }
+
+  .info-block-one .inner-box p {
+    text-align: center !important;
+  }
 
 }
 
@@ -145,19 +485,192 @@
     border-bottom: none;
   }
 
+  /* ============================================
+     1. HERO SECTION - Small Mobile
+     ============================================ */
+  .banner-style-six .slide-item {
+    min-height: 300px !important;
+  }
+
+  .banner-style-six .content-box {
+    padding: 15px 10px !important;
+  }
+
+  .banner-style-six .content-box .upper-text {
+    font-size: 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .banner-style-six .content-box h2.hero-title {
+    font-size: 18px !important;
+    line-height: 1.3 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .banner-style-six .content-box h3.hero-subtitle {
+    font-size: 12px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .banner-style-six .btn-box .theme-btn {
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+  }
+
+  /* ============================================
+     2. CONTACT INFO - Small Mobile
+     ============================================ */
+  .video-style-two {
+    padding: 40px 0 !important;
+  }
+
+  .video-style-two .content-box {
+    padding: 0 15px !important;
+  }
+
+  .video-style-two .content-box h2 {
+    font-size: 1.2rem !important;
+  }
+
+  .video-style-two .content-box h5 {
+    font-size: 0.8rem !important;
+    margin-bottom: 15px !important;
+  }
+
+  .video-style-two .content-box .theme-btn {
+    padding: 8px 20px !important;
+    font-size: 13px !important;
+  }
+
+  /* ============================================
+     4. SHOP FILTER - Small Mobile
+     ============================================ */
+  .shop-page-section .item-shorting {
+    padding: 12px 10px !important;
+  }
+
+  .shop-page-section .item-shorting .left-column .text p {
+    font-size: 12px !important;
+  }
+
+  .shop-page-section .item-shorting .right-column p {
+    font-size: 12px !important;
+  }
+
+  .shop-page-section .item-shorting .right-column .short-box {
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .shop-page-section .item-shorting .right-column .select-box {
+    width: 100% !important;
+    min-width: 150px !important;
+  }
+
+  /* ============================================
+     5. CONTACT FORM - Small Mobile
+     ============================================ */
+  .contact-section .form-inner {
+    padding: 20px 12px !important;
+  }
+
+  .contact-section .form-inner .form-group input[type='text'],
+  .contact-section .form-inner .form-group input[type='email'],
+  .contact-section .form-inner .form-group textarea {
+    height: 42px !important;
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  .contact-section .form-inner .form-group textarea {
+    min-height: 90px !important;
+  }
+
+  .contact-section .form-inner .form-group label {
+    font-size: 13px !important;
+  }
+
+  .contact-section .form-inner .message-btn .theme-btn {
+    padding: 10px 25px !important;
+    font-size: 14px !important;
+  }
 
 }
 
 
 @media only screen and (max-width: 499px){
 
-  .mobile-menu,
-  .category-menu{
-    width: 100%;
+  /* ============================================
+     1. HERO SECTION - Extra Small Mobile
+     ============================================ */
+  .banner-style-six .slide-item {
+    min-height: 260px !important;
   }
 
+  .banner-style-six .content-box h2.hero-title {
+    font-size: 16px !important;
+  }
+
+  .banner-style-six .content-box h3.hero-subtitle {
+    font-size: 11px !important;
+  }
+
+  /* ============================================
+     5. CONTACT FORM - Extra Small Mobile
+     ============================================ */
+  .contact-section .form-inner .col-lg-6,
+  .contact-section .form-inner .col-md-6,
+  .contact-section .form-inner .col-sm-12 {
+    padding-left: 5px !important;
+    padding-right: 5px !important;
+  }
 
 }
+
+
+/* ============================================
+   3. HIGHLIGHT SECTION - Center Vertical & Horizontal
+   (Applied to all screen sizes for consistency)
+   ============================================ */
+.highlight-section,
+.cta-section,
+.cta-style-two,
+.cta-style-three {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.highlight-section .content-box,
+.cta-section .content-box,
+.cta-style-two .content-box,
+.cta-style-three .content-box {
+  text-align: center !important;
+}
+
+@media only screen and (max-width: 991px) {
+  .highlight-section,
+  .cta-section,
+  .cta-style-two,
+  .cta-style-three {
+    padding: 40px 15px !important;
+  }
+
+  .highlight-section .content-box h2,
+  .cta-section .content-box h2,
+  .cta-style-two .content-box h2,
+  .cta-style-three .content-box h2 {
+    font-size: 1.5rem !important;
+  }
+
+  .highlight-section .content-box p,
+  .cta-section .content-box p,
+  .cta-style-two .content-box p,
+  .cta-style-three .content-box p {
+    font-size: 0.9rem !important;
+  }
+}
+
 
 
 

@@ -2459,6 +2459,9 @@ button.ltr {
 .banner-style-six .slide-item {
   position: relative;
   height: 700px; /* fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 /* 🔹 Background image styling */
@@ -2499,19 +2502,34 @@ button.ltr {
 @media (max-width: 992px) {
   .banner-style-six .slide-item {
     height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .banner-style-six .content-box {
     padding: 60px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
   }
 }
 
 @media (max-width: 576px) {
   .banner-style-six .slide-item {
     height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
   .banner-style-six .content-box {
     padding: 40px 20px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 }
 

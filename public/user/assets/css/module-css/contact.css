@@ -219,29 +219,136 @@
 }
 
 @media only screen and (max-width: 767px){
+  /* Contact Form - Mobile Field Sizes */
+  .contact-section .row {
+    margin: 0;
+  }
 
+  .contact-section .form-inner {
+    padding: 25px 15px;
+    border-radius: 10px;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .contact-section .form-inner .row {
+    margin: 0 -5px;
+  }
+
+  .contact-section .form-inner .form-group {
+    padding: 0 5px;
+    margin-bottom: 15px;
+  }
+
+  .contact-section .form-inner .form-group input[type='text'],
+  .contact-section .form-inner .form-group input[type='email'],
+  .contact-section .form-inner .form-group textarea {
+    width: 100%;
+    height: 45px;
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 25px;
+  }
+
+  .contact-section .form-inner .form-group textarea {
+    height: auto;
+    min-height: 100px;
+    border-radius: 15px;
+  }
+
+  .contact-section .form-inner .form-group label {
+    font-size: 14px;
+    margin-bottom: 5px;
+  }
+
+  /* Contact Info Section on Contact Page */
+  .contact-section .map-column .large-container {
+    padding: 0 15px;
+  }
+
+  .contact-section .map-column .sec-title {
+    text-align: center;
+  }
+
+  .contact-section .map-column .sec-title h2 {
+    font-size: 1.5rem;
+  }
+
+  .info-block-one .inner-box {
+    padding: 25px 20px 25px 20px;
+    text-align: center;
+  }
+
+  .info-block-one .inner-box .icon-box {
+    position: relative;
+    left: auto;
+    top: auto;
+    margin: 0 auto 15px auto;
+    display: block;
+  }
+
+  .info-block-one .inner-box h4 {
+    text-align: center;
+  }
+
+  .info-block-one .inner-box p {
+    text-align: center;
+  }
 }
 
 @media only screen and (max-width: 599px){
+  /* Contact Form - Small Mobile */
+  .contact-section .form-inner {
+    padding: 20px 12px;
+  }
 
+  .contact-section .form-inner .form-group input[type='text'],
+  .contact-section .form-inner .form-group input[type='email'],
+  .contact-section .form-inner .form-group textarea {
+    height: 42px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .contact-section .form-inner .form-group textarea {
+    min-height: 90px;
+  }
+
+  .contact-section .form-inner .form-group label {
+    font-size: 13px;
+  }
+
+  .contact-section .form-inner .message-btn .theme-btn {
+    padding: 10px 25px;
+    font-size: 14px;
+    width: 100%;
+  }
 }
 
 @media only screen and (max-width: 499px){
   .info-block-one .inner-box,
   .rtl .info-block-one .inner-box{
-    padding-left: 30px;
-    padding-right: 30px;
+    padding-left: 20px;
+    padding-right: 20px;
   }
 
   .info-block-one .inner-box .icon-box{
     position: relative;
     left: 0px;
     top: 0px;
-    margin-bottom: 15px;
+    margin: 0 auto 15px auto;
   }
 
   .rtl .info-block-one .inner-box .icon-box{
     right: 0px;
+  }
+
+  /* Contact Form - Extra Small Mobile */
+  .contact-section .form-inner .col-lg-6,
+  .contact-section .form-inner .col-md-6,
+  .contact-section .form-inner .col-sm-12 {
+    padding-left: 5px;
+    padding-right: 5px;
   }
 }
 
