@@ -1,16 +1,6 @@
 /* Responsive Css */
 
 /* ============================================
-   STICKY HEADER - All Devices
-   ============================================ */
-.main-header {
-  position: sticky !important;
-  top: 0 !important;
-  z-index: 999 !important;
-  background: #fff !important;
-}
-
-/* ============================================
    FULL SCREEN DRAWER/MOBILE MENU - All Devices
    ============================================ */
 .mobile-menu {
@@ -79,6 +69,25 @@
 
 @media only screen and (max-width: 1200px){
 
+  /* ============================================
+     STICKY HEADER - Responsive Only (Fixed position 
+     because parent .boxed_wrapper has overflow:hidden)
+     ============================================ */
+  .main-header {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: #fff !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Add padding to body to compensate for fixed header height */
+  .boxed_wrapper {
+    padding-top: 140px !important;
+  }
+
   .main-menu,
   .sticky-header,
   .main-header.style-one .outer-container:before{
@@ -141,6 +150,11 @@
 
 
 @media only screen and (max-width: 991px){
+
+  /* Adjust padding for smaller header on tablets */
+  .boxed_wrapper {
+    padding-top: 120px !important;
+  }
 
   .shop-six .shop-block-two{
     width: 33.333%;
@@ -304,6 +318,11 @@
 
 
 @media only screen and (max-width: 767px){
+
+  /* Adjust padding for smaller header on mobile */
+  .boxed_wrapper {
+    padding-top: 100px !important;
+  }
 
   .shop-tab-btn{
     display: block;

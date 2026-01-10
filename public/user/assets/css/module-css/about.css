@@ -185,10 +185,16 @@
 
   .content_block_two .content-box .inner-box{
     display: block;
+    text-align: center;
   }
 
   .content_block_two .content-box .inner-box .single-item{
     margin-bottom: 30px;
+    text-align: center;
+  }
+
+  .content_block_two .content-box .inner-box .single-item:before{
+    display: none;
   }
 
   .content_block_two .content-box .inner-box .single-item:last-child{
