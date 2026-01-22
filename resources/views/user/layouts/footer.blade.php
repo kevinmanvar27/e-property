@@ -2,7 +2,7 @@
 <section class="highlights-section inner-highlights">
     <div class="large-container">
         <div class="inner-container clearfix d-flex flex-wrap justify-content-center justify-content-lg-between">
-            <div class="shape" style="background-image: url( {{ asset('user/assets/images/shape/shape-5.png') }});"></div>
+            <div class="shape" style="background-image: url({{ asset('user/assets/images/shape/shape-5.png') }});"></div>
             <div class="highlights-block-one">
                 <div class="inner-box">
                     <div class="icon-box"><i class="icon-17"></i></div>
@@ -25,17 +25,28 @@
     </div>
 </section>
 <!-- highlights-section end -->
+
 <!-- main-footer -->
 <footer class="main-footer">
     <div class="large-container">
         <div class="footer-bottom">
             <div class="bottom-inner d-flex flex-column flex-md-row justify-content-center justify-content-md-between align-items-center gap-3">
-                <div class="copyright"><p class="footer-text"></p></div>
+
+                <!-- LEFT SIDE: COPYRIGHT / DEVELOPER INFO -->
+                <div class="copyright">
+                    <p class="footer-text mb-0">
+                        © 2025-26 R Property Hub. All rights reserved. 
+                        Developed and maintained by <strong>RekTech</strong>.
+                    </p>
+                </div>
+
+                <!-- RIGHT SIDE: IMPORTANT LINKS -->
                 <ul class="footer-card d-flex flex-wrap justify-content-center gap-2 gap-md-3 list-unstyled mb-0">
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
-                    <li><a href="{{ route('terms-conditions') }}">Terms & Condition</a></li>
+                    <li><a href="{{ route('terms-conditions') }}">Terms &amp; Conditions</a></li>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
                     <li><a href="{{ route('faq') }}">FAQ</a></li>
+                    <li><a href="mailto:support@rproperty.com">Contact Support</a></li>
                 </ul>
             </div>
         </div>
