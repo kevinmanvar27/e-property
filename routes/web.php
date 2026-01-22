@@ -344,6 +344,10 @@ Route::get('/privacy-policy', function() {
     return view('user.privacy-policy');
 })->name('privacy-policy');
 
+Route::get('/support', function() {
+    return view('user.support');
+})->name('support');
+
 Route::get('/terms-and-conditions', function() {
     return view('user.terms-conditions');
 })->name('terms-conditions');
