@@ -43,6 +43,7 @@
                 <!-- RIGHT SIDE: IMPORTANT LINKS -->
                 <ul class="footer-card d-flex flex-wrap justify-content-center gap-2 gap-md-3 list-unstyled mb-0">
                     <li><a href="{{ route('privacy-policy') }}">Privacy Policy</a></li>
+                    <li><a href="{{ route('support') }}">Support</a></li>
                     <li><a href="{{ route('terms-conditions') }}">Terms &amp; Conditions</a></li>
                     <li><a href="{{ route('about-us') }}">About Us</a></li>
                     <li><a href="{{ route('faq') }}">FAQ</a></li>
